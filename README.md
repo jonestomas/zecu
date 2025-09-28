@@ -81,3 +81,5 @@ Los colores y estilos principales se pueden personalizar en:
 ---
 
 Creado con ❤️ para proteger usuarios de phishing en WhatsApp.
+
+<!-- Deploy fix: Eliminado vercel.json problemático -->
