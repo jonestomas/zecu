@@ -64,7 +64,7 @@ export default function Home() {
             <div className="w-10 h-10 bg-gradient-to-r from-emerald-500 to-cyan-500 rounded-full flex items-center justify-center">
               <span className="text-white font-bold text-lg">Z</span>
             </div>
-            <span className="text-gray-900 font-bold text-xl">Zecubot</span>
+            <span className="text-gray-900 font-bold text-xl">Zecu</span>
           </div>
 
           <div className="flex items-center gap-6">
@@ -93,13 +93,13 @@ export default function Home() {
               <div className="text-center lg:text-left space-y-8">
                 <div className="space-y-4">
                   <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
-                    Tu escudo digital contra{" "}
+                    Tu asistente digital contra{" "}
                     <span className="bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
                       estafas online
                     </span>
                   </h1>
                   <p className="text-xl md:text-2xl text-gray-600 max-w-2xl">
-                    ¿Es una estafa o un mensaje seguro? Descúbrelo en segundos con Zecubot.
+                    ¿Es una estafa o un mensaje seguro? ¿Qué debo hacer? Resuelve en segundos con Zecubot.
                   </p>
                 </div>
 
