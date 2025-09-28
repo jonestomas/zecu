@@ -1,4 +1,61 @@
+"use client"
+
+import { useState, useEffect } from "react"
+
 export default function Home() {
+  const [currentConversation, setCurrentConversation] = useState(0)
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentConversation((prev) => (prev === 0 ? 1 : 0))
+    }, 6000)
+
+    return () => clearInterval(interval)
+  }, [])
+
+  const conversations = [
+    // Conversation 1: Prevention
+    {
+      messages: [
+        {
+          type: "bot",
+          content: "Hola! Envíame el mensaje sospechoso que recibiste y te ayudo a identificar si es una estafa.",
+        },
+        {
+          type: "user",
+          content: '"Felicidades! Has ganado $1000. Haz clic aquí para reclamar tu premio..."',
+        },
+        {
+          type: "bot",
+          content: "Este es un mensaje de phishing típico. NO hagas clic en ningún enlace.",
+          isAlert: true,
+          alertType: "danger",
+        },
+      ],
+    },
+    // Conversation 2: Post-incident support
+    {
+      messages: [
+        {
+          type: "user",
+          content: "Ya compartí mis datos en un enlace sospechoso... ¿qué hago?",
+        },
+        {
+          type: "bot",
+          content: "No te preocupes, actuemos rápido:",
+          isAlert: false,
+        },
+        {
+          type: "bot",
+          content:
+            "1. Cambia tus contraseñas inmediatamente\n2. Contacta a tu banco si compartiste datos financieros\n3. Revisa tus cuentas por actividad sospechosa",
+          isAlert: true,
+          alertType: "info",
+        },
+      ],
+    },
+  ]
+
   return (
     <div className="min-h-screen bg-gray-100">
       <nav className="navbar fixed top-0 left-0 right-0 z-50 px-4 py-4">
@@ -54,7 +111,7 @@ export default function Home() {
                 </button>
               </div>
 
-              {/* Right Content - WhatsApp Mockup */}
+              {/* Right Content - WhatsApp Mockup with Transitions */}
               <div className="flex justify-center lg:justify-end">
                 <div className="whatsapp-mockup rounded-3xl p-6 max-w-sm w-full">
                   <div className="bg-green-500 text-white p-3 rounded-t-2xl flex items-center gap-3">
@@ -67,34 +124,77 @@ export default function Home() {
                     </div>
                   </div>
 
-                  <div className="bg-gray-50 p-4 space-y-4 min-h-[300px]">
-                    <div className="bg-white p-3 rounded-lg shadow-sm max-w-[80%]">
-                      <p className="text-sm text-gray-700">
-                        Hola! Envíame el mensaje sospechoso que recibiste y te ayudo a identificar si es una estafa.
-                      </p>
-                    </div>
-
-                    <div className="bg-blue-500 text-white p-3 rounded-lg shadow-sm max-w-[80%] ml-auto">
-                      <p className="text-sm">
-                        "Felicidades! Has ganado $1000. Haz clic aquí para reclamar tu premio..."
-                      </p>
-                    </div>
-
-                    <div className="bg-red-100 border-l-4 border-red-500 p-3 rounded-lg shadow-sm max-w-[80%]">
-                      <div className="flex items-center gap-2 mb-2">
-                        <svg className="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
-                          <path
-                            fillRule="evenodd"
-                            d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                        <span className="font-semibold text-red-700 text-sm">ALTO RIESGO</span>
+                  <div className="bg-gray-50 p-4 space-y-4 min-h-[350px] relative overflow-hidden">
+                    {conversations.map((conversation, convIndex) => (
+                      <div
+                        key={convIndex}
+                        className={`absolute inset-4 space-y-4 transition-all duration-1000 ${
+                          currentConversation === convIndex
+                            ? "opacity-100 translate-y-0"
+                            : "opacity-0 translate-y-4 pointer-events-none"
+                        }`}
+                      >
+                        {conversation.messages.map((message, msgIndex) => (
+                          <div
+                            key={msgIndex}
+                            className={`animate-fade-in-up`}
+                            style={{ animationDelay: `${msgIndex * 0.8}s` }}
+                          >
+                            {message.type === "user" ? (
+                              <div className="bg-blue-500 text-white p-3 rounded-lg shadow-sm max-w-[85%] ml-auto">
+                                <p className="text-sm whitespace-pre-line">{message.content}</p>
+                              </div>
+                            ) : (
+                              <div
+                                className={`p-3 rounded-lg shadow-sm max-w-[85%] ${
+                                  message.isAlert
+                                    ? message.alertType === "danger"
+                                      ? "bg-red-100 border-l-4 border-red-500"
+                                      : "bg-blue-100 border-l-4 border-blue-500"
+                                    : "bg-white"
+                                }`}
+                              >
+                                {message.isAlert && message.alertType === "danger" && (
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <svg className="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                                      <path
+                                        fillRule="evenodd"
+                                        d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                                        clipRule="evenodd"
+                                      />
+                                    </svg>
+                                    <span className="font-semibold text-red-700 text-sm">ALTO RIESGO</span>
+                                  </div>
+                                )}
+                                {message.isAlert && message.alertType === "info" && (
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <svg className="w-5 h-5 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                                      <path
+                                        fillRule="evenodd"
+                                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                                        clipRule="evenodd"
+                                      />
+                                    </svg>
+                                    <span className="font-semibold text-blue-700 text-sm">PASOS A SEGUIR</span>
+                                  </div>
+                                )}
+                                <p
+                                  className={`text-sm whitespace-pre-line ${
+                                    message.isAlert
+                                      ? message.alertType === "danger"
+                                        ? "text-red-700"
+                                        : "text-blue-700"
+                                      : "text-gray-700"
+                                  }`}
+                                >
+                                  {message.content}
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                        ))}
                       </div>
-                      <p className="text-sm text-red-700">
-                        Este es un mensaje de phishing típico. NO hagas clic en ningún enlace.
-                      </p>
-                    </div>
+                    ))}
                   </div>
                 </div>
               </div>
