@@ -1,12 +1,24 @@
-import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
-import './globals.css'
+import type React from "react"
+import type { Metadata } from "next"
+import "./globals.css"
 
-const inter = Inter({ subsets: ['latin'] })
+import { Poppins, Geist as V0_Font_Geist, Geist_Mono as V0_Font_Geist_Mono, Source_Serif_4 as V0_Font_Source_Serif_4 } from 'next/font/google'
+
+// Initialize fonts
+V0_Font_Geist({ weight: ["100","200","300","400","500","600","700","800","900"] })
+V0_Font_Geist_Mono({ weight: ["100","200","300","400","500","600","700","800","900"] })
+V0_Font_Source_Serif_4({ weight: ["200","300","400","500","600","700","800","900"] })
+
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-poppins",
+})
 
 export const metadata: Metadata = {
-  title: 'Zecu - Tu asistente contra el phishing en WhatsApp',
-  description: 'Protege tu WhatsApp contra mensajes de phishing con Zecu, tu asistente inteligente de seguridad.',
+  title: "Zecubot - Tu escudo digital contra estafas online",
+  description: "¿Es una estafa o un mensaje seguro? Descúbrelo en segundos con Zecubot.",
+    generator: 'v0.app'
 }
 
 export default function RootLayout({
@@ -16,7 +28,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es">
-      <body className={inter.className}>{children}</body>
+      <body className={`${poppins.variable} font-sans`}>{children}</body>
     </html>
   )
 }

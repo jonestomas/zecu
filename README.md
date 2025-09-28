@@ -8,14 +8,14 @@ Este proyecto está optimizado para ser desplegado en Vercel. Sigue estos pasos:
 
 ### 1. Preparación del repositorio
 
-```bash
+\`\`\`bash
 # Clona o sube tu código a un repositorio de Git
 git init
 git add .
 git commit -m "Initial commit"
 git remote add origin [tu-repositorio-url]
 git push -u origin main
-```
+\`\`\`
 
 ### 2. Implementación en Vercel
 
@@ -36,7 +36,7 @@ El proyecto incluye:
 
 ## 🛠️ Desarrollo Local
 
-```bash
+\`\`\`bash
 # Instalar dependencias
 npm install
 
@@ -48,7 +48,7 @@ npm run build
 
 # Vista previa de producción
 npm run preview
-```
+\`\`\`
 
 ## 📦 Características técnicas
 
