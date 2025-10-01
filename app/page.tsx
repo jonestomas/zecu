@@ -2,8 +2,258 @@
 
 import { useState, useEffect } from "react"
 
+const translations = {
+  es: {
+    nav: {
+      subscription: "Suscripción",
+      privacy: "Política de Privacidad",
+    },
+    hero: {
+      title: "Tu asistente digital contra",
+      titleHighlight: "estafas online",
+      subtitle: "¿Es una estafa o un mensaje seguro? ¿Qué debo hacer? Resuelve en segundos con Zecubot.",
+      cta: "Probar gratis en WhatsApp",
+      ctaFinal: "Empieza ahora gratis en WhatsApp",
+    },
+    chat: {
+      botName: "Zecubot",
+      online: "en línea",
+      highRisk: "ALTO RIESGO",
+      steps: "PASOS A SEGUIR",
+      conversation1: {
+        bot1: "Hola! Envíame el mensaje sospechoso que recibiste y te ayudo a identificar si es una estafa.",
+        user1: '"Felicidades! Has ganado $1000. Haz clic aquí para reclamar tu premio..."',
+        bot2: "Este es un mensaje de phishing típico. NO hagas clic en ningún enlace.",
+      },
+      conversation2: {
+        user1: "Ya compartí mis datos en un enlace sospechoso... ¿qué hago?",
+        bot1: "No te preocupes, actuemos rápido:",
+        bot2: "1. Cambia tus contraseñas inmediatamente\n2. Contacta a tu banco si compartiste datos financieros\n3. Revisa tus cuentas por actividad sospechosa",
+      },
+    },
+    benefits: {
+      fast: {
+        title: "Rápido y claro",
+        description: "Respuesta en segundos para que puedas actuar inmediatamente.",
+      },
+      confidential: {
+        title: "Confidencial",
+        description: "No necesitas preguntar a nadie más. Tu privacidad está protegida.",
+      },
+      action: {
+        title: "Acción inmediata",
+        description: "Consejos prácticos para actuar si ya caíste en una estafa.",
+      },
+    },
+    howItWorks: {
+      title: "¿Cómo funciona?",
+      subtitle: "Tres pasos simples para protegerte de las estafas digitales",
+      step1: {
+        title: "Envía el mensaje",
+        description: "Envía el mensaje sospechoso a Zecubot (texto, audio o imagen).",
+      },
+      step2: {
+        title: "Recibe el análisis",
+        description: "Obtén el nivel de riesgo: seguro, posible estafa o alto riesgo.",
+      },
+      step3: {
+        title: "Actúa con claridad",
+        description: "Sigue las instrucciones de Zecubot para protegerte.",
+      },
+    },
+    education: {
+      title: "¿Qué es el phishing?",
+      description:
+        "El phishing es un engaño digital en el que alguien intenta robarte información personal o dinero haciéndose pasar por una entidad confiable.",
+      highlight:
+        "Zecubot te ayuda a prevenir estas estafas antes de caer y también te guía con los pasos a seguir si ya fuiste víctima.",
+    },
+    pricing: {
+      title: "Elige tu plan",
+      subtitle: "Protección contra estafas para cada necesidad",
+      popular: "Más Popular",
+      cta: "Comenzar",
+      free: {
+        name: "Free",
+        price: "AR$0",
+        period: "/mes",
+        description: "Perfecto para comenzar a protegerte",
+        features: [
+          "5 análisis de mensajes al mes",
+          "Detección básica de phishing",
+          "Respuestas automáticas",
+          "Soporte por email",
+        ],
+      },
+      basic: {
+        name: "Básico",
+        price: "AR$1.999",
+        period: "/mes",
+        description: "Ideal para protección diaria completa",
+        features: [
+          "50 análisis de mensajes al mes",
+          "Detección avanzada de estafas",
+          "Análisis de imágenes y audios",
+          "Guía paso a paso personalizada",
+          "Soporte prioritario 24/7",
+          "Alertas en tiempo real",
+        ],
+      },
+      premium: {
+        name: "Premium",
+        price: "AR$5.999",
+        period: "/mes",
+        description: "Protección máxima para ti y tu familia",
+        features: [
+          "Análisis ilimitados",
+          "IA avanzada con aprendizaje continuo",
+          "Protección para hasta 5 números",
+          "Análisis forense de amenazas",
+          "Reportes mensuales de seguridad",
+          "Consultor de seguridad dedicado",
+          "Acceso anticipado a nuevas funciones",
+        ],
+      },
+    },
+    social: {
+      title: "Hecho para quienes buscan tranquilidad digital",
+      subtitle: "Únete a miles de usuarios que ya protegen sus conversaciones con Zecubot",
+      comingSoon: "Próximamente: testimonios de usuarios",
+    },
+    finalCta: {
+      title: "Protégete ahora mismo",
+      subtitle: "No esperes a ser víctima de una estafa. Empieza a usar Zecubot hoy mismo.",
+    },
+  },
+  en: {
+    nav: {
+      subscription: "Subscription",
+      privacy: "Privacy Policy",
+    },
+    hero: {
+      title: "Your digital assistant against",
+      titleHighlight: "online scams",
+      subtitle: "Is it a scam or a safe message? What should I do? Get answers in seconds with Zecubot.",
+      cta: "Try free on WhatsApp",
+      ctaFinal: "Start now free on WhatsApp",
+    },
+    chat: {
+      botName: "Zecubot",
+      online: "online",
+      highRisk: "HIGH RISK",
+      steps: "STEPS TO FOLLOW",
+      conversation1: {
+        bot1: "Hi! Send me the suspicious message you received and I'll help you identify if it's a scam.",
+        user1: '"Congratulations! You\'ve won $1000. Click here to claim your prize..."',
+        bot2: "This is a typical phishing message. DO NOT click on any links.",
+      },
+      conversation2: {
+        user1: "I already shared my data on a suspicious link... what do I do?",
+        bot1: "Don't worry, let's act quickly:",
+        bot2: "1. Change your passwords immediately\n2. Contact your bank if you shared financial data\n3. Check your accounts for suspicious activity",
+      },
+    },
+    benefits: {
+      fast: {
+        title: "Fast and clear",
+        description: "Response in seconds so you can act immediately.",
+      },
+      confidential: {
+        title: "Confidential",
+        description: "You don't need to ask anyone else. Your privacy is protected.",
+      },
+      action: {
+        title: "Immediate action",
+        description: "Practical advice to act if you've already fallen for a scam.",
+      },
+    },
+    howItWorks: {
+      title: "How does it work?",
+      subtitle: "Three simple steps to protect yourself from digital scams",
+      step1: {
+        title: "Send the message",
+        description: "Send the suspicious message to Zecubot (text, audio or image).",
+      },
+      step2: {
+        title: "Receive the analysis",
+        description: "Get the risk level: safe, possible scam or high risk.",
+      },
+      step3: {
+        title: "Act with clarity",
+        description: "Follow Zecubot's instructions to protect yourself.",
+      },
+    },
+    education: {
+      title: "What is phishing?",
+      description:
+        "Phishing is a digital scam where someone tries to steal your personal information or money by impersonating a trusted entity.",
+      highlight:
+        "Zecubot helps you prevent these scams before falling for them and also guides you with the steps to follow if you've already been a victim.",
+    },
+    pricing: {
+      title: "Choose your plan",
+      subtitle: "Scam protection for every need",
+      popular: "Most Popular",
+      cta: "Get Started",
+      free: {
+        name: "Free",
+        price: "AR$0",
+        period: "/month",
+        description: "Perfect to start protecting yourself",
+        features: ["5 message analyses per month", "Basic phishing detection", "Automated responses", "Email support"],
+      },
+      basic: {
+        name: "Basic",
+        price: "AR$1.999",
+        period: "/month",
+        description: "Ideal for complete daily protection",
+        features: [
+          "50 message analyses per month",
+          "Advanced scam detection",
+          "Image and audio analysis",
+          "Personalized step-by-step guide",
+          "24/7 priority support",
+          "Real-time alerts",
+        ],
+      },
+      premium: {
+        name: "Premium",
+        price: "AR$5.999",
+        period: "/month",
+        description: "Maximum protection for you and your family",
+        features: [
+          "Unlimited analyses",
+          "Advanced AI with continuous learning",
+          "Protection for up to 5 numbers",
+          "Threat forensic analysis",
+          "Monthly security reports",
+          "Dedicated security consultant",
+          "Early access to new features",
+        ],
+      },
+    },
+    social: {
+      title: "Made for those seeking digital peace of mind",
+      subtitle: "Join thousands of users who already protect their conversations with Zecubot",
+      comingSoon: "Coming soon: user testimonials",
+    },
+    finalCta: {
+      title: "Protect yourself right now",
+      subtitle: "Don't wait to become a victim of a scam. Start using Zecubot today.",
+    },
+  },
+}
+
 export default function Home() {
   const [currentConversation, setCurrentConversation] = useState(0)
+  const [language, setLanguage] = useState<"es" | "en">("es")
+
+  useEffect(() => {
+    const browserLang = navigator.language.toLowerCase()
+    if (browserLang.startsWith("en")) {
+      setLanguage("en")
+    }
+  }, [])
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -13,21 +263,23 @@ export default function Home() {
     return () => clearInterval(interval)
   }, [])
 
+  const t = translations[language]
+
   const conversations = [
     // Conversation 1: Prevention
     {
       messages: [
         {
           type: "bot",
-          content: "Hola! Envíame el mensaje sospechoso que recibiste y te ayudo a identificar si es una estafa.",
+          content: t.chat.conversation1.bot1,
         },
         {
           type: "user",
-          content: '"Felicidades! Has ganado $1000. Haz clic aquí para reclamar tu premio..."',
+          content: t.chat.conversation1.user1,
         },
         {
           type: "bot",
-          content: "Este es un mensaje de phishing típico. NO hagas clic en ningún enlace.",
+          content: t.chat.conversation1.bot2,
           isAlert: true,
           alertType: "danger",
         },
@@ -38,17 +290,16 @@ export default function Home() {
       messages: [
         {
           type: "user",
-          content: "Ya compartí mis datos en un enlace sospechoso... ¿qué hago?",
+          content: t.chat.conversation2.user1,
         },
         {
           type: "bot",
-          content: "No te preocupes, actuemos rápido:",
+          content: t.chat.conversation2.bot1,
           isAlert: false,
         },
         {
           type: "bot",
-          content:
-            "1. Cambia tus contraseñas inmediatamente\n2. Contacta a tu banco si compartiste datos financieros\n3. Revisa tus cuentas por actividad sospechosa",
+          content: t.chat.conversation2.bot2,
           isAlert: true,
           alertType: "info",
         },
@@ -72,14 +323,29 @@ export default function Home() {
               href="#suscripcion"
               className="nav-link text-gray-700 hover:text-gray-900 font-medium px-4 py-2 rounded-lg"
             >
-              Suscripción
+              {t.nav.subscription}
             </a>
             <a
               href="#privacidad"
               className="nav-link text-gray-700 hover:text-gray-900 font-medium px-4 py-2 rounded-lg"
             >
-              Política de Privacidad
+              {t.nav.privacy}
             </a>
+            <button
+              onClick={() => setLanguage(language === "es" ? "en" : "es")}
+              className="nav-link text-gray-700 hover:text-gray-900 font-medium px-4 py-2 rounded-lg flex items-center gap-2 border border-gray-300 hover:border-gray-400 transition-colors"
+              aria-label="Switch language"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"
+                />
+              </svg>
+              <span className="font-semibold">{language === "es" ? "EN" : "ES"}</span>
+            </button>
           </div>
         </div>
       </nav>
@@ -93,21 +359,19 @@ export default function Home() {
               <div className="text-center lg:text-left space-y-8">
                 <div className="space-y-4">
                   <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
-                    Tu asistente digital contra{" "}
+                    {t.hero.title}{" "}
                     <span className="bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
-                      estafas online
+                      {t.hero.titleHighlight}
                     </span>
                   </h1>
-                  <p className="text-xl md:text-2xl text-gray-600 max-w-2xl">
-                    ¿Es una estafa o un mensaje seguro? ¿Qué debo hacer? Resuelve en segundos con Zecubot.
-                  </p>
+                  <p className="text-xl md:text-2xl text-gray-600 max-w-2xl">{t.hero.subtitle}</p>
                 </div>
 
                 <button className="cta-button text-white font-bold text-lg px-10 py-5 rounded-2xl inline-flex items-center gap-3 shadow-lg">
                   <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488" />
                   </svg>
-                  Probar gratis en WhatsApp
+                  {t.hero.cta}
                 </button>
               </div>
 
@@ -119,8 +383,8 @@ export default function Home() {
                       <span className="text-green-500 font-bold text-sm">Z</span>
                     </div>
                     <div>
-                      <div className="font-semibold">Zecubot</div>
-                      <div className="text-xs opacity-90">en línea</div>
+                      <div className="font-semibold">{t.chat.botName}</div>
+                      <div className="text-xs opacity-90">{t.chat.online}</div>
                     </div>
                   </div>
 
@@ -163,7 +427,7 @@ export default function Home() {
                                         clipRule="evenodd"
                                       />
                                     </svg>
-                                    <span className="font-semibold text-red-700 text-sm">ALTO RIESGO</span>
+                                    <span className="font-semibold text-red-700 text-sm">{t.chat.highRisk}</span>
                                   </div>
                                 )}
                                 {message.isAlert && message.alertType === "info" && (
@@ -175,7 +439,7 @@ export default function Home() {
                                         clipRule="evenodd"
                                       />
                                     </svg>
-                                    <span className="font-semibold text-blue-700 text-sm">PASOS A SEGUIR</span>
+                                    <span className="font-semibold text-blue-700 text-sm">{t.chat.steps}</span>
                                   </div>
                                 )}
                                 <p
@@ -212,8 +476,8 @@ export default function Home() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-4">Rápido y claro</h3>
-                <p className="text-gray-600">Respuesta en segundos para que puedas actuar inmediatamente.</p>
+                <h3 className="text-xl font-semibold text-gray-900 mb-4">{t.benefits.fast.title}</h3>
+                <p className="text-gray-600">{t.benefits.fast.description}</p>
               </div>
 
               <div className="glass-card glass-card-hover rounded-2xl p-8 text-center">
@@ -227,8 +491,8 @@ export default function Home() {
                     />
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-4">Confidencial</h3>
-                <p className="text-gray-600">No necesitas preguntar a nadie más. Tu privacidad está protegida.</p>
+                <h3 className="text-xl font-semibold text-gray-900 mb-4">{t.benefits.confidential.title}</h3>
+                <p className="text-gray-600">{t.benefits.confidential.description}</p>
               </div>
 
               <div className="glass-card glass-card-hover rounded-2xl p-8 text-center">
@@ -242,8 +506,8 @@ export default function Home() {
                     />
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-4">Acción inmediata</h3>
-                <p className="text-gray-600">Consejos prácticos para actuar si ya caíste en una estafa.</p>
+                <h3 className="text-xl font-semibold text-gray-900 mb-4">{t.benefits.action.title}</h3>
+                <p className="text-gray-600">{t.benefits.action.description}</p>
               </div>
             </div>
           </div>
@@ -253,10 +517,8 @@ export default function Home() {
         <section className="py-20 px-4">
           <div className="container mx-auto max-w-6xl">
             <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">¿Cómo funciona?</h2>
-              <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-                Tres pasos simples para protegerte de las estafas digitales
-              </p>
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">{t.howItWorks.title}</h2>
+              <p className="text-xl text-gray-600 max-w-2xl mx-auto">{t.howItWorks.subtitle}</p>
             </div>
 
             <div className="grid md:grid-cols-3 gap-8">
@@ -264,24 +526,24 @@ export default function Home() {
                 <div className="w-20 h-20 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-6">
                   <span className="text-2xl font-bold text-white">1</span>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-4">Envía el mensaje</h3>
-                <p className="text-gray-600">Envía el mensaje sospechoso a Zecubot (texto, audio o imagen).</p>
+                <h3 className="text-xl font-semibold text-gray-900 mb-4">{t.howItWorks.step1.title}</h3>
+                <p className="text-gray-600">{t.howItWorks.step1.description}</p>
               </div>
 
               <div className="glass-card rounded-2xl p-8 text-center">
                 <div className="w-20 h-20 bg-gradient-to-r from-purple-400 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-6">
                   <span className="text-2xl font-bold text-white">2</span>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-4">Recibe el análisis</h3>
-                <p className="text-gray-600">Obtén el nivel de riesgo: seguro, posible estafa o alto riesgo.</p>
+                <h3 className="text-xl font-semibold text-gray-900 mb-4">{t.howItWorks.step2.title}</h3>
+                <p className="text-gray-600">{t.howItWorks.step2.description}</p>
               </div>
 
               <div className="glass-card rounded-2xl p-8 text-center">
                 <div className="w-20 h-20 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6">
                   <span className="text-2xl font-bold text-white">3</span>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-4">Actúa con claridad</h3>
-                <p className="text-gray-600">Sigue las instrucciones de Zecubot para protegerte.</p>
+                <h3 className="text-xl font-semibold text-gray-900 mb-4">{t.howItWorks.step3.title}</h3>
+                <p className="text-gray-600">{t.howItWorks.step3.description}</p>
               </div>
             </div>
           </div>
@@ -291,16 +553,129 @@ export default function Home() {
         <section className="py-20 px-4">
           <div className="container mx-auto max-w-4xl">
             <div className="glass-card rounded-3xl p-12 text-center">
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8">¿Qué es el phishing?</h2>
-              <p className="text-lg text-gray-600 mb-8 leading-relaxed">
-                El phishing es un engaño digital en el que alguien intenta robarte información personal o dinero
-                haciéndose pasar por una entidad confiable.
-              </p>
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8">{t.education.title}</h2>
+              <p className="text-lg text-gray-600 mb-8 leading-relaxed">{t.education.description}</p>
               <div className="bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 rounded-2xl p-6 border border-emerald-400/30">
-                <p className="text-gray-800 font-medium">
-                  Zecubot te ayuda a prevenir estas estafas antes de caer y también te guía con los pasos a seguir si ya
-                  fuiste víctima.
-                </p>
+                <p className="text-gray-800 font-medium">{t.education.highlight}</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Pricing Section */}
+        <section id="suscripcion" className="py-20 px-4">
+          <div className="container mx-auto max-w-7xl">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">{t.pricing.title}</h2>
+              <p className="text-xl text-gray-600 max-w-2xl mx-auto">{t.pricing.subtitle}</p>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-8 items-stretch">
+              {/* Free Plan */}
+              <div className="glass-card rounded-3xl p-8 hover:shadow-xl transition-shadow flex flex-col">
+                <div className="text-center mb-8">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">{t.pricing.free.name}</h3>
+                  <p className="text-gray-600 mb-6 min-h-[48px]">{t.pricing.free.description}</p>
+                </div>
+
+                <ul className="space-y-4 mb-8 flex-grow">
+                  {t.pricing.free.features.map((feature, index) => (
+                    <li key={index} className="flex items-start gap-3">
+                      <svg
+                        className="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span className="text-gray-700">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="text-center mt-auto">
+                  <div className="mb-6">
+                    <span className="text-5xl font-bold text-gray-900">{t.pricing.free.price}</span>
+                    <span className="text-gray-600">{t.pricing.free.period}</span>
+                  </div>
+                  <button className="w-full bg-gray-200 hover:bg-gray-300 text-gray-900 font-semibold py-3 px-6 rounded-xl transition-colors">
+                    {t.pricing.cta}
+                  </button>
+                </div>
+              </div>
+
+              {/* Basic Plan - Most Popular */}
+              <div className="glass-card rounded-3xl p-8 relative border-2 border-emerald-400 shadow-2xl flex flex-col">
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white px-6 py-2 rounded-full text-sm font-bold shadow-lg">
+                  {t.pricing.popular}
+                </div>
+                <div className="text-center mb-8 mt-4">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">{t.pricing.basic.name}</h3>
+                  <p className="text-gray-600 mb-6 min-h-[48px]">{t.pricing.basic.description}</p>
+                </div>
+
+                <ul className="space-y-4 mb-8 flex-grow">
+                  {t.pricing.basic.features.map((feature, index) => (
+                    <li key={index} className="flex items-start gap-3">
+                      <svg
+                        className="w-6 h-6 text-emerald-500 flex-shrink-0 mt-0.5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span className="text-gray-700 font-medium">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="text-center mt-auto">
+                  <div className="mb-6">
+                    <span className="text-5xl font-bold bg-gradient-to-r from-emerald-500 to-cyan-500 bg-clip-text text-transparent">
+                      {t.pricing.basic.price}
+                    </span>
+                    <span className="text-gray-600">{t.pricing.basic.period}</span>
+                  </div>
+                  <button className="w-full cta-button text-white font-semibold py-3 px-6 rounded-xl shadow-lg">
+                    {t.pricing.cta}
+                  </button>
+                </div>
+              </div>
+
+              {/* Premium Plan */}
+              <div className="glass-card rounded-3xl p-8 hover:shadow-xl transition-shadow flex flex-col">
+                <div className="text-center mb-8">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">{t.pricing.premium.name}</h3>
+                  <p className="text-gray-600 mb-6 min-h-[48px]">{t.pricing.premium.description}</p>
+                </div>
+
+                <ul className="space-y-4 mb-8 flex-grow">
+                  {t.pricing.premium.features.map((feature, index) => (
+                    <li key={index} className="flex items-start gap-3">
+                      <svg
+                        className="w-6 h-6 text-purple-500 flex-shrink-0 mt-0.5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span className="text-gray-700">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="text-center mt-auto">
+                  <div className="mb-6">
+                    <span className="text-5xl font-bold text-gray-900">{t.pricing.premium.price}</span>
+                    <span className="text-gray-600">{t.pricing.premium.period}</span>
+                  </div>
+                  <button className="w-full bg-gray-900 hover:bg-gray-800 text-white font-semibold py-3 px-6 rounded-xl transition-colors">
+                    {t.pricing.cta}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -310,12 +685,10 @@ export default function Home() {
         <section className="py-20 px-4">
           <div className="container mx-auto max-w-4xl text-center">
             <div className="glass-card rounded-2xl p-12">
-              <h2 className="text-3xl font-bold text-gray-900 mb-6">Hecho para quienes buscan tranquilidad digital</h2>
-              <p className="text-gray-600 text-lg mb-8">
-                Únete a miles de usuarios que ya protegen sus conversaciones con Zecubot
-              </p>
+              <h2 className="text-3xl font-bold text-gray-900 mb-6">{t.social.title}</h2>
+              <p className="text-gray-600 text-lg mb-8">{t.social.subtitle}</p>
               <div className="flex justify-center items-center gap-8 opacity-60">
-                <div className="text-gray-500 text-sm">Próximamente: testimonios de usuarios</div>
+                <div className="text-gray-500 text-sm">{t.social.comingSoon}</div>
               </div>
             </div>
           </div>
@@ -325,15 +698,13 @@ export default function Home() {
         <section className="py-20 px-4">
           <div className="container mx-auto max-w-4xl text-center">
             <div className="glass-card rounded-3xl p-12">
-              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">Protégete ahora mismo</h2>
-              <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-                No esperes a ser víctima de una estafa. Empieza a usar Zecubot hoy mismo.
-              </p>
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">{t.finalCta.title}</h2>
+              <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">{t.finalCta.subtitle}</p>
               <button className="cta-button text-white font-bold text-xl px-12 py-6 rounded-2xl inline-flex items-center gap-3">
                 <svg className="w-7 h-7" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488" />
                 </svg>
-                Empieza ahora gratis en WhatsApp
+                {t.hero.ctaFinal}
               </button>
             </div>
           </div>
