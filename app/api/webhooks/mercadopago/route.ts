@@ -1,36 +1,60 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { MercadoPagoConfig, Payment } from 'mercadopago';
+
+// Configurar cliente de Mercado Pago
+const client = new MercadoPagoConfig({
+  accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN!,
+  options: {
+    timeout: 5000,
+  }
+});
+
+const payment = new Payment(client);
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     
+    console.log('Webhook received:', body);
+    
     // Verificar que sea una notificación de pago
     if (body.type === 'payment') {
       const paymentId = body.data.id;
       
-      // Aquí puedes agregar lógica para:
-      // 1. Verificar el estado del pago con la API de Mercado Pago
-      // 2. Actualizar el estado de la suscripción en tu base de datos
-      // 3. Enviar emails de confirmación
-      // 4. Activar el acceso al servicio
-      
-      console.log('Payment notification received:', {
-        paymentId,
-        type: body.type,
-        action: body.action
-      });
+      try {
+        // Obtener información completa del pago desde Mercado Pago
+        const paymentInfo = await payment.get({ id: paymentId });
+        
+        console.log('Payment info:', {
+          id: paymentInfo.id,
+          status: paymentInfo.status,
+          status_detail: paymentInfo.status_detail,
+          amount: paymentInfo.transaction_amount,
+          currency: paymentInfo.currency_id,
+          external_reference: paymentInfo.external_reference,
+          payer_email: paymentInfo.payer?.email
+        });
 
-      // Ejemplo de cómo podrías manejar diferentes estados
-      switch (body.action) {
-        case 'payment.created':
-          console.log('Pago creado:', paymentId);
-          break;
-        case 'payment.updated':
-          console.log('Pago actualizado:', paymentId);
-          // Aquí verificarías el estado del pago y actualizarías tu DB
-          break;
-        default:
-          console.log('Acción no manejada:', body.action);
+        // Procesar según el estado del pago
+        switch (paymentInfo.status) {
+          case 'approved':
+            await handleApprovedPayment(paymentInfo);
+            break;
+          case 'rejected':
+            await handleRejectedPayment(paymentInfo);
+            break;
+          case 'pending':
+            await handlePendingPayment(paymentInfo);
+            break;
+          case 'cancelled':
+            await handleCancelledPayment(paymentInfo);
+            break;
+          default:
+            console.log('Estado de pago no manejado:', paymentInfo.status);
+        }
+
+      } catch (paymentError) {
+        console.error('Error fetching payment info:', paymentError);
       }
     }
 
@@ -44,6 +68,58 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
+}
+
+// Funciones para manejar diferentes estados de pago
+async function handleApprovedPayment(paymentInfo: any) {
+  console.log('✅ Pago aprobado:', paymentInfo.id);
+  
+  // Aquí implementarías:
+  // 1. Activar la suscripción del usuario
+  // 2. Enviar email de confirmación
+  // 3. Actualizar base de datos
+  // 4. Registrar en analytics
+  
+  // Ejemplo de lógica:
+  const planId = extractPlanFromReference(paymentInfo.external_reference);
+  const userEmail = paymentInfo.payer?.email;
+  
+  console.log(`Activando plan ${planId} para ${userEmail}`);
+}
+
+async function handleRejectedPayment(paymentInfo: any) {
+  console.log('❌ Pago rechazado:', paymentInfo.id);
+  
+  // Implementar lógica para pagos rechazados:
+  // 1. Notificar al usuario
+  // 2. Registrar intento fallido
+  // 3. Sugerir métodos alternativos
+}
+
+async function handlePendingPayment(paymentInfo: any) {
+  console.log('⏳ Pago pendiente:', paymentInfo.id);
+  
+  // Implementar lógica para pagos pendientes:
+  // 1. Notificar al usuario sobre el estado
+  // 2. Configurar seguimiento del pago
+}
+
+async function handleCancelledPayment(paymentInfo: any) {
+  console.log('🚫 Pago cancelado:', paymentInfo.id);
+  
+  // Implementar lógica para pagos cancelados:
+  // 1. Limpiar datos temporales
+  // 2. Registrar cancelación
+}
+
+// Función auxiliar para extraer el plan de la referencia externa
+function extractPlanFromReference(externalReference: string): string {
+  // El formato es: "zecu-{planId}-{timestamp}"
+  if (externalReference) {
+    const parts = externalReference.split('-');
+    return parts[1] || 'unknown';
+  }
+  return 'unknown';
 }
 
 // Manejar GET para verificación del webhook

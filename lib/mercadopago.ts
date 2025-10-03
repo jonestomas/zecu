@@ -66,6 +66,9 @@ export async function createPaymentPreference(planId: string, userEmail?: string
     throw new Error('Plan no encontrado');
   }
 
+  // Asegurar que tenemos una URL base válida
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+  
   const preference = {
     items: [
       {
@@ -81,17 +84,13 @@ export async function createPaymentPreference(planId: string, userEmail?: string
       email: userEmail || 'test@test.com'
     },
     back_urls: {
-      success: `${process.env.NEXT_PUBLIC_BASE_URL}/payment/success`,
-      failure: `${process.env.NEXT_PUBLIC_BASE_URL}/payment/failure`,
-      pending: `${process.env.NEXT_PUBLIC_BASE_URL}/payment/pending`
+      success: `${baseUrl}/payment/success`,
+      failure: `${baseUrl}/payment/failure`,
+      pending: `${baseUrl}/payment/pending`
     },
-    auto_return: 'approved' as const,
     external_reference: `zecu-${plan.id}-${Date.now()}`,
-    notification_url: `${process.env.NEXT_PUBLIC_BASE_URL}/api/webhooks/mercadopago`,
-    statement_descriptor: 'ZECU',
-    expires: true,
-    expiration_date_from: new Date().toISOString(),
-    expiration_date_to: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() // 24 horas
+    notification_url: `${baseUrl}/api/webhooks/mercadopago`,
+    statement_descriptor: 'ZECU'
   };
 
   try {
