@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { BasicPlanPaymentButton, PremiumPlanPaymentButton } from "@/components/payment-button"
 
 const translations = {
   es: {
@@ -638,9 +639,7 @@ export default function Home() {
                     </span>
                     <span className="text-gray-600">{t.pricing.basic.period}</span>
                   </div>
-                  <button className="w-full cta-button text-white font-semibold py-3 px-6 rounded-xl shadow-lg">
-                    {t.pricing.cta}
-                  </button>
+                  <BasicPlanPaymentButton />
                 </div>
               </div>
 
@@ -672,9 +671,7 @@ export default function Home() {
                     <span className="text-5xl font-bold text-gray-900">{t.pricing.premium.price}</span>
                     <span className="text-gray-600">{t.pricing.premium.period}</span>
                   </div>
-                  <button className="w-full bg-gray-900 hover:bg-gray-800 text-white font-semibold py-3 px-6 rounded-xl transition-colors">
-                    {t.pricing.cta}
-                  </button>
+                  <PremiumPlanPaymentButton />
                 </div>
               </div>
             </div>

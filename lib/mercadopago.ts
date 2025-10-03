@@ -1,0 +1,105 @@
+import { MercadoPagoConfig, Preference } from 'mercadopago';
+
+// Configuración de Mercado Pago
+const client = new MercadoPagoConfig({
+  accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN!,
+  options: {
+    timeout: 5000,
+    idempotencyKey: 'abc'
+  }
+});
+
+export const mercadopago = {
+  preference: new Preference(client)
+};
+
+// Tipos para los planes
+export interface Plan {
+  id: string;
+  name: string;
+  price: number;
+  currency: string;
+  description: string;
+  features: string[];
+}
+
+// Definición de los planes
+export const plans: Record<string, Plan> = {
+  basic: {
+    id: 'basic',
+    name: 'Básico',
+    price: 1999,
+    currency: 'ARS',
+    description: 'Ideal para protección diaria completa',
+    features: [
+      '50 análisis de mensajes al mes',
+      'Detección avanzada de estafas',
+      'Análisis de imágenes y audios',
+      'Guía paso a paso personalizada',
+      'Soporte prioritario 24/7',
+      'Alertas en tiempo real'
+    ]
+  },
+  premium: {
+    id: 'premium',
+    name: 'Premium',
+    price: 5999,
+    currency: 'ARS',
+    description: 'Protección máxima para ti y tu familia',
+    features: [
+      'Análisis ilimitados',
+      'IA avanzada con aprendizaje continuo',
+      'Protección para hasta 5 números',
+      'Análisis forense de amenazas',
+      'Reportes mensuales de seguridad',
+      'Consultor de seguridad dedicado',
+      'Acceso anticipado a nuevas funciones'
+    ]
+  }
+};
+
+// Función para crear una preferencia de pago
+export async function createPaymentPreference(planId: string, userEmail?: string) {
+  const plan = plans[planId];
+  
+  if (!plan) {
+    throw new Error('Plan no encontrado');
+  }
+
+  const preference = {
+    items: [
+      {
+        id: plan.id,
+        title: `Plan ${plan.name} - Zecu`,
+        description: plan.description,
+        quantity: 1,
+        currency_id: plan.currency,
+        unit_price: plan.price
+      }
+    ],
+    payer: {
+      email: userEmail || 'test@test.com'
+    },
+    back_urls: {
+      success: `${process.env.NEXT_PUBLIC_BASE_URL}/payment/success`,
+      failure: `${process.env.NEXT_PUBLIC_BASE_URL}/payment/failure`,
+      pending: `${process.env.NEXT_PUBLIC_BASE_URL}/payment/pending`
+    },
+    auto_return: 'approved' as const,
+    external_reference: `zecu-${plan.id}-${Date.now()}`,
+    notification_url: `${process.env.NEXT_PUBLIC_BASE_URL}/api/webhooks/mercadopago`,
+    statement_descriptor: 'ZECU',
+    expires: true,
+    expiration_date_from: new Date().toISOString(),
+    expiration_date_to: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() // 24 horas
+  };
+
+  try {
+    const response = await mercadopago.preference.create({ body: preference });
+    return response;
+  } catch (error) {
+    console.error('Error creating payment preference:', error);
+    throw error;
+  }
+}
+
