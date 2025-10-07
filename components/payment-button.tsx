@@ -73,14 +73,28 @@ export function PaymentButton({ planId, planName, price, className = "", childre
   )
 }
 
-// Componente específico para el plan Plus
-export function PlusPlanPaymentButton() {
+// Componente específico para el plan básico
+export function BasicPlanPaymentButton() {
   return (
     <PaymentButton
-      planId="plus"
-      planName="Plus"
-      price="AR$5.499"
+      planId="basic"
+      planName="Básico"
+      price="AR$1.999"
       className="cta-button text-white font-semibold py-3 px-6 rounded-xl shadow-lg"
+    >
+      Comenzar con Mercado Pago
+    </PaymentButton>
+  )
+}
+
+// Componente específico para el plan premium
+export function PremiumPlanPaymentButton() {
+  return (
+    <PaymentButton
+      planId="premium"
+      planName="Premium"
+      price="AR$5.999"
+      className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-3 px-6 rounded-xl transition-colors"
     >
       Comenzar con Mercado Pago
     </PaymentButton>
