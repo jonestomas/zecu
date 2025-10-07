@@ -1,13 +1,15 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { BasicPlanPaymentButton, PremiumPlanPaymentButton } from "@/components/payment-button"
+import { BasicPlanPaymentButton } from "@/components/payment-button"
+import Image from "next/image"
 
 const translations = {
   es: {
     nav: {
       subscription: "Suscripción",
       privacy: "Política de Privacidad",
+      login: "Iniciar sesión",
     },
     hero: {
       title: "Tu asistente digital contra",
@@ -73,7 +75,7 @@ const translations = {
       title: "Elige tu plan",
       subtitle: "Protección contra estafas para cada necesidad",
       popular: "Más Popular",
-      cta: "Comenzar",
+      cta: "Comenzar gratis ahora",
       free: {
         name: "Free",
         price: "AR$0",
@@ -87,8 +89,8 @@ const translations = {
         ],
       },
       basic: {
-        name: "Básico",
-        price: "AR$1.999",
+        name: "Plus",
+        price: "AR$5.499",
         period: "/mes",
         description: "Ideal para protección diaria completa",
         features: [
@@ -100,21 +102,6 @@ const translations = {
           "Alertas en tiempo real",
         ],
       },
-      premium: {
-        name: "Premium",
-        price: "AR$5.999",
-        period: "/mes",
-        description: "Protección máxima para ti y tu familia",
-        features: [
-          "Análisis ilimitados",
-          "IA avanzada con aprendizaje continuo",
-          "Protección para hasta 5 números",
-          "Análisis forense de amenazas",
-          "Reportes mensuales de seguridad",
-          "Consultor de seguridad dedicado",
-          "Acceso anticipado a nuevas funciones",
-        ],
-      },
     },
     social: {
       title: "Hecho para quienes buscan tranquilidad digital",
@@ -122,7 +109,7 @@ const translations = {
       comingSoon: "Próximamente: testimonios de usuarios",
     },
     finalCta: {
-      title: "Protégete ahora mismo",
+      title: "Prorotége ahora mismo",
       subtitle: "No esperes a ser víctima de una estafa. Empieza a usar Zecubot hoy mismo.",
     },
   },
@@ -130,6 +117,7 @@ const translations = {
     nav: {
       subscription: "Subscription",
       privacy: "Privacy Policy",
+      login: "Log in",
     },
     hero: {
       title: "Your digital assistant against",
@@ -195,7 +183,7 @@ const translations = {
       title: "Choose your plan",
       subtitle: "Scam protection for every need",
       popular: "Most Popular",
-      cta: "Get Started",
+      cta: "Start free now",
       free: {
         name: "Free",
         price: "AR$0",
@@ -204,8 +192,8 @@ const translations = {
         features: ["5 message analyses per month", "Basic phishing detection", "Automated responses", "Email support"],
       },
       basic: {
-        name: "Basic",
-        price: "AR$1.999",
+        name: "Plus",
+        price: "AR$5.499",
         period: "/month",
         description: "Ideal for complete daily protection",
         features: [
@@ -215,21 +203,6 @@ const translations = {
           "Personalized step-by-step guide",
           "24/7 priority support",
           "Real-time alerts",
-        ],
-      },
-      premium: {
-        name: "Premium",
-        price: "AR$5.999",
-        period: "/month",
-        description: "Maximum protection for you and your family",
-        features: [
-          "Unlimited analyses",
-          "Advanced AI with continuous learning",
-          "Protection for up to 5 numbers",
-          "Threat forensic analysis",
-          "Monthly security reports",
-          "Dedicated security consultant",
-          "Early access to new features",
         ],
       },
     },
@@ -309,32 +282,42 @@ export default function Home() {
   ]
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-background">
       <nav className="navbar fixed top-0 left-0 right-0 z-50 px-4 py-4">
         <div className="container mx-auto max-w-6xl flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-r from-emerald-500 to-cyan-500 rounded-full flex items-center justify-center">
-              <span className="text-white font-bold text-lg">Z</span>
-            </div>
-            <span className="text-gray-900 font-bold text-xl">Zecu</span>
+            <Image
+              src="/zecu-logo.png"
+              alt="Zecubot Logo"
+              width={64}
+              height={64}
+              className="w-16 h-16 object-contain rounded-full"
+            />
+            <span className="text-foreground font-bold text-2xl">Zecu</span>
           </div>
 
           <div className="flex items-center gap-6">
             <a
               href="#suscripcion"
-              className="nav-link text-gray-700 hover:text-gray-900 font-medium px-4 py-2 rounded-lg"
+              className="nav-link text-foreground hover:text-primary font-medium px-4 py-2 rounded-lg transition-colors"
             >
               {t.nav.subscription}
             </a>
             <a
+              href="/login"
+              className="nav-link text-foreground hover:text-primary font-medium px-4 py-2 rounded-lg transition-colors"
+            >
+              {t.nav.login}
+            </a>
+            <a
               href="#privacidad"
-              className="nav-link text-gray-700 hover:text-gray-900 font-medium px-4 py-2 rounded-lg"
+              className="nav-link text-foreground hover:text-primary font-medium px-4 py-2 rounded-lg transition-colors"
             >
               {t.nav.privacy}
             </a>
             <button
               onClick={() => setLanguage(language === "es" ? "en" : "es")}
-              className="nav-link text-gray-700 hover:text-gray-900 font-medium px-4 py-2 rounded-lg flex items-center gap-2 border border-gray-300 hover:border-gray-400 transition-colors"
+              className="nav-link text-foreground hover:text-primary font-medium px-4 py-2 rounded-lg flex items-center gap-2 border border-border hover:border-primary transition-colors"
               aria-label="Switch language"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -351,24 +334,29 @@ export default function Home() {
         </div>
       </nav>
 
-      <main className="pt-20">
+      <main className="pt-16">
         {/* Hero Section */}
-        <section className="relative min-h-screen flex items-center justify-center px-4 py-20">
-          <div className="container mx-auto max-w-6xl">
+        <section className="relative min-h-screen flex items-center justify-center px-4 py-6">
+          {/* Subtle gradient background */}
+          <div className="absolute inset-0 bg-gradient-to-br from-background via-muted to-background opacity-50" />
+
+          <div className="container mx-auto max-w-6xl relative z-10">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               {/* Left Content */}
               <div className="text-center lg:text-left space-y-8">
                 <div className="space-y-4">
-                  <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
+                  <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-foreground leading-tight">
                     {t.hero.title}{" "}
-                    <span className="bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
+                    <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
                       {t.hero.titleHighlight}
                     </span>
                   </h1>
-                  <p className="text-xl md:text-2xl text-gray-600 max-w-2xl">{t.hero.subtitle}</p>
+                  <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl leading-relaxed">
+                    {t.hero.subtitle}
+                  </p>
                 </div>
 
-                <button className="cta-button text-white font-bold text-lg px-10 py-5 rounded-2xl inline-flex items-center gap-3 shadow-lg">
+                <button className="cta-button text-white font-bold text-lg px-10 py-5 rounded-2xl inline-flex items-center gap-3">
                   <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488" />
                   </svg>
@@ -376,20 +364,23 @@ export default function Home() {
                 </button>
               </div>
 
-              {/* Right Content - WhatsApp Mockup with Transitions */}
               <div className="flex justify-center lg:justify-end">
-                <div className="whatsapp-mockup rounded-3xl p-6 max-w-sm w-full">
-                  <div className="bg-green-500 text-white p-3 rounded-t-2xl flex items-center gap-3">
-                    <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
-                      <span className="text-green-500 font-bold text-sm">Z</span>
-                    </div>
+                <div className="glass-card rounded-3xl p-6 max-w-sm w-full">
+                  <div className="bg-gradient-to-r from-primary to-accent text-secondary p-4 rounded-t-2xl flex items-center gap-3">
+                    <Image
+                      src="/zecu-logo.png"
+                      alt="Zecubot"
+                      width={48}
+                      height={48}
+                      className="w-12 h-12 object-contain rounded-full"
+                    />
                     <div>
-                      <div className="font-semibold">{t.chat.botName}</div>
-                      <div className="text-xs opacity-90">{t.chat.online}</div>
+                      <div className="font-semibold text-lg">{t.chat.botName}</div>
+                      <div className="text-sm opacity-90">{t.chat.online}</div>
                     </div>
                   </div>
 
-                  <div className="bg-gray-50 p-4 space-y-4 min-h-[350px] relative overflow-hidden">
+                  <div className="bg-background/30 backdrop-blur-md p-4 space-y-4 min-h-[450px] relative overflow-hidden rounded-b-2xl border border-border/20">
                     {conversations.map((conversation, convIndex) => (
                       <div
                         key={convIndex}
@@ -406,50 +397,50 @@ export default function Home() {
                             style={{ animationDelay: `${msgIndex * 0.8}s` }}
                           >
                             {message.type === "user" ? (
-                              <div className="bg-blue-500 text-white p-3 rounded-lg shadow-sm max-w-[85%] ml-auto">
-                                <p className="text-sm whitespace-pre-line">{message.content}</p>
+                              <div className="bg-primary text-secondary p-3 rounded-lg shadow-sm max-w-[85%] ml-auto">
+                                <p className="text-sm whitespace-pre-line font-medium">{message.content}</p>
                               </div>
                             ) : (
                               <div
                                 className={`p-3 rounded-lg shadow-sm max-w-[85%] ${
                                   message.isAlert
                                     ? message.alertType === "danger"
-                                      ? "bg-red-100 border-l-4 border-red-500"
-                                      : "bg-blue-100 border-l-4 border-blue-500"
-                                    : "bg-white"
+                                      ? "bg-destructive/10 border-l-4 border-destructive backdrop-blur-sm"
+                                      : "bg-primary/10 border-l-4 border-primary backdrop-blur-sm"
+                                    : "bg-card/80 backdrop-blur-sm"
                                 }`}
                               >
                                 {message.isAlert && message.alertType === "danger" && (
                                   <div className="flex items-center gap-2 mb-2">
-                                    <svg className="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                                    <svg className="w-5 h-5 text-destructive" fill="currentColor" viewBox="0 0 20 20">
                                       <path
                                         fillRule="evenodd"
                                         d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
                                         clipRule="evenodd"
                                       />
                                     </svg>
-                                    <span className="font-semibold text-red-700 text-sm">{t.chat.highRisk}</span>
+                                    <span className="font-semibold text-destructive text-sm">{t.chat.highRisk}</span>
                                   </div>
                                 )}
                                 {message.isAlert && message.alertType === "info" && (
                                   <div className="flex items-center gap-2 mb-2">
-                                    <svg className="w-5 h-5 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                                    <svg className="w-5 h-5 text-primary" fill="currentColor" viewBox="0 0 20 20">
                                       <path
                                         fillRule="evenodd"
-                                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zm-1 8a1 1 0 000 2v3a1 1 0 002 0V6a1 1 0 000-2v-3a1 1 0 00-1-1H9z"
                                         clipRule="evenodd"
                                       />
                                     </svg>
-                                    <span className="font-semibold text-blue-700 text-sm">{t.chat.steps}</span>
+                                    <span className="font-semibold text-primary text-sm">{t.chat.steps}</span>
                                   </div>
                                 )}
                                 <p
                                   className={`text-sm whitespace-pre-line ${
                                     message.isAlert
                                       ? message.alertType === "danger"
-                                        ? "text-red-700"
-                                        : "text-blue-700"
-                                      : "text-gray-700"
+                                        ? "text-destructive"
+                                        : "text-primary"
+                                      : "text-card-foreground"
                                   }`}
                                 >
                                   {message.content}
@@ -472,18 +463,18 @@ export default function Home() {
           <div className="container mx-auto max-w-6xl">
             <div className="grid md:grid-cols-3 gap-8">
               <div className="glass-card glass-card-hover rounded-2xl p-8 text-center">
-                <div className="w-16 h-16 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-16 h-16 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center mx-auto mb-6 yellow-glow">
+                  <svg className="w-8 h-8 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-4">{t.benefits.fast.title}</h3>
-                <p className="text-gray-600">{t.benefits.fast.description}</p>
+                <h3 className="text-xl font-semibold text-foreground mb-4">{t.benefits.fast.title}</h3>
+                <p className="text-muted-foreground leading-relaxed">{t.benefits.fast.description}</p>
               </div>
 
               <div className="glass-card glass-card-hover rounded-2xl p-8 text-center">
-                <div className="w-16 h-16 bg-gradient-to-r from-purple-400 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-16 h-16 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center mx-auto mb-6 yellow-glow">
+                  <svg className="w-8 h-8 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -492,13 +483,13 @@ export default function Home() {
                     />
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-4">{t.benefits.confidential.title}</h3>
-                <p className="text-gray-600">{t.benefits.confidential.description}</p>
+                <h3 className="text-xl font-semibold text-foreground mb-4">{t.benefits.confidential.title}</h3>
+                <p className="text-muted-foreground leading-relaxed">{t.benefits.confidential.description}</p>
               </div>
 
               <div className="glass-card glass-card-hover rounded-2xl p-8 text-center">
-                <div className="w-16 h-16 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-16 h-16 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center mx-auto mb-6 yellow-glow">
+                  <svg className="w-8 h-8 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -507,44 +498,44 @@ export default function Home() {
                     />
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-4">{t.benefits.action.title}</h3>
-                <p className="text-gray-600">{t.benefits.action.description}</p>
+                <h3 className="text-xl font-semibold text-foreground mb-4">{t.benefits.action.title}</h3>
+                <p className="text-muted-foreground leading-relaxed">{t.benefits.action.description}</p>
               </div>
             </div>
           </div>
         </section>
 
         {/* Cómo Funciona */}
-        <section className="py-20 px-4">
-          <div className="container mx-auto max-w-6xl">
+        <section className="py-20 px-4 piano-black-section">
+          <div className="container mx-auto max-w-6xl relative z-10">
             <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">{t.howItWorks.title}</h2>
-              <p className="text-xl text-gray-600 max-w-2xl mx-auto">{t.howItWorks.subtitle}</p>
+              <h2 className="text-4xl md:text-5xl font-bold text-secondary-foreground mb-6">{t.howItWorks.title}</h2>
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">{t.howItWorks.subtitle}</p>
             </div>
 
             <div className="grid md:grid-cols-3 gap-8">
               <div className="glass-card rounded-2xl p-8 text-center">
-                <div className="w-20 h-20 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <span className="text-2xl font-bold text-white">1</span>
+                <div className="w-20 h-20 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center mx-auto mb-6 yellow-glow">
+                  <span className="text-3xl font-bold text-secondary">1</span>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-4">{t.howItWorks.step1.title}</h3>
-                <p className="text-gray-600">{t.howItWorks.step1.description}</p>
+                <h3 className="text-xl font-semibold text-secondary-foreground mb-4">{t.howItWorks.step1.title}</h3>
+                <p className="text-muted-foreground leading-relaxed">{t.howItWorks.step1.description}</p>
               </div>
 
               <div className="glass-card rounded-2xl p-8 text-center">
-                <div className="w-20 h-20 bg-gradient-to-r from-purple-400 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <span className="text-2xl font-bold text-white">2</span>
+                <div className="w-20 h-20 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center mx-auto mb-6 yellow-glow">
+                  <span className="text-3xl font-bold text-secondary">2</span>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-4">{t.howItWorks.step2.title}</h3>
-                <p className="text-gray-600">{t.howItWorks.step2.description}</p>
+                <h3 className="text-xl font-semibold text-secondary-foreground mb-4">{t.howItWorks.step2.title}</h3>
+                <p className="text-muted-foreground leading-relaxed">{t.howItWorks.step2.description}</p>
               </div>
 
               <div className="glass-card rounded-2xl p-8 text-center">
-                <div className="w-20 h-20 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <span className="text-2xl font-bold text-white">3</span>
+                <div className="w-20 h-20 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center mx-auto mb-6 yellow-glow">
+                  <span className="text-3xl font-bold text-secondary">3</span>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-4">{t.howItWorks.step3.title}</h3>
-                <p className="text-gray-600">{t.howItWorks.step3.description}</p>
+                <h3 className="text-xl font-semibold text-secondary-foreground mb-4">{t.howItWorks.step3.title}</h3>
+                <p className="text-muted-foreground leading-relaxed">{t.howItWorks.step3.description}</p>
               </div>
             </div>
           </div>
@@ -554,10 +545,10 @@ export default function Home() {
         <section className="py-20 px-4">
           <div className="container mx-auto max-w-4xl">
             <div className="glass-card rounded-3xl p-12 text-center">
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8">{t.education.title}</h2>
-              <p className="text-lg text-gray-600 mb-8 leading-relaxed">{t.education.description}</p>
-              <div className="bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 rounded-2xl p-6 border border-emerald-400/30">
-                <p className="text-gray-800 font-medium">{t.education.highlight}</p>
+              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-8">{t.education.title}</h2>
+              <p className="text-lg text-muted-foreground mb-8 leading-relaxed">{t.education.description}</p>
+              <div className="bg-gradient-to-r from-primary/20 to-accent/20 rounded-2xl p-6 border border-primary/30 backdrop-blur-sm">
+                <p className="text-foreground font-medium leading-relaxed">{t.education.highlight}</p>
               </div>
             </div>
           </div>
@@ -567,111 +558,79 @@ export default function Home() {
         <section id="suscripcion" className="py-20 px-4">
           <div className="container mx-auto max-w-7xl">
             <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">{t.pricing.title}</h2>
-              <p className="text-xl text-gray-600 max-w-2xl mx-auto">{t.pricing.subtitle}</p>
+              <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">{t.pricing.title}</h2>
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">{t.pricing.subtitle}</p>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-8 items-stretch">
+            <div className="grid md:grid-cols-2 gap-8 items-stretch max-w-4xl mx-auto">
               {/* Free Plan */}
               <div className="glass-card rounded-3xl p-8 hover:shadow-xl transition-shadow flex flex-col">
                 <div className="text-center mb-8">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">{t.pricing.free.name}</h3>
-                  <p className="text-gray-600 mb-6 min-h-[48px]">{t.pricing.free.description}</p>
+                  <h3 className="text-2xl font-bold text-foreground mb-2">{t.pricing.free.name}</h3>
+                  <p className="text-muted-foreground mb-6 min-h-[48px]">{t.pricing.free.description}</p>
                 </div>
 
                 <ul className="space-y-4 mb-8 flex-grow">
                   {t.pricing.free.features.map((feature, index) => (
                     <li key={index} className="flex items-start gap-3">
                       <svg
-                        className="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5"
+                        className="w-6 h-6 text-primary flex-shrink-0 mt-0.5"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
                       >
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
-                      <span className="text-gray-700">{feature}</span>
+                      <span className="text-foreground">{feature}</span>
                     </li>
                   ))}
                 </ul>
 
                 <div className="text-center mt-auto">
                   <div className="mb-6">
-                    <span className="text-5xl font-bold text-gray-900">{t.pricing.free.price}</span>
-                    <span className="text-gray-600">{t.pricing.free.period}</span>
+                    <span className="text-5xl font-bold text-foreground">{t.pricing.free.price}</span>
+                    <span className="text-muted-foreground">{t.pricing.free.period}</span>
                   </div>
-                  <button className="w-full bg-gray-200 hover:bg-gray-300 text-gray-900 font-semibold py-3 px-6 rounded-xl transition-colors">
+                  <button className="w-full bg-muted hover:bg-muted/80 text-foreground font-semibold py-3 px-6 rounded-xl transition-colors border border-border">
                     {t.pricing.cta}
                   </button>
                 </div>
               </div>
 
-              {/* Basic Plan - Most Popular */}
-              <div className="glass-card rounded-3xl p-8 relative border-2 border-emerald-400 shadow-2xl flex flex-col">
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white px-6 py-2 rounded-full text-sm font-bold shadow-lg">
+              {/* Plus Plan - Most Popular */}
+              <div className="glass-card rounded-3xl p-8 relative border-2 border-primary shadow-2xl flex flex-col yellow-glow">
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-primary to-accent text-secondary px-6 py-2 rounded-full text-sm font-bold shadow-lg">
                   {t.pricing.popular}
                 </div>
                 <div className="text-center mb-8 mt-4">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">{t.pricing.basic.name}</h3>
-                  <p className="text-gray-600 mb-6 min-h-[48px]">{t.pricing.basic.description}</p>
+                  <h3 className="text-2xl font-bold text-foreground mb-2">{t.pricing.basic.name}</h3>
+                  <p className="text-muted-foreground mb-6 min-h-[48px]">{t.pricing.basic.description}</p>
                 </div>
 
                 <ul className="space-y-4 mb-8 flex-grow">
                   {t.pricing.basic.features.map((feature, index) => (
                     <li key={index} className="flex items-start gap-3">
                       <svg
-                        className="w-6 h-6 text-emerald-500 flex-shrink-0 mt-0.5"
+                        className="w-6 h-6 text-primary flex-shrink-0 mt-0.5"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
                       >
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
-                      <span className="text-gray-700 font-medium">{feature}</span>
+                      <span className="text-foreground font-medium">{feature}</span>
                     </li>
                   ))}
                 </ul>
 
                 <div className="text-center mt-auto">
                   <div className="mb-6">
-                    <span className="text-5xl font-bold bg-gradient-to-r from-emerald-500 to-cyan-500 bg-clip-text text-transparent">
+                    <span className="text-5xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
                       {t.pricing.basic.price}
                     </span>
-                    <span className="text-gray-600">{t.pricing.basic.period}</span>
+                    <span className="text-muted-foreground">{t.pricing.basic.period}</span>
                   </div>
                   <BasicPlanPaymentButton />
-                </div>
-              </div>
-
-              {/* Premium Plan */}
-              <div className="glass-card rounded-3xl p-8 hover:shadow-xl transition-shadow flex flex-col">
-                <div className="text-center mb-8">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">{t.pricing.premium.name}</h3>
-                  <p className="text-gray-600 mb-6 min-h-[48px]">{t.pricing.premium.description}</p>
-                </div>
-
-                <ul className="space-y-4 mb-8 flex-grow">
-                  {t.pricing.premium.features.map((feature, index) => (
-                    <li key={index} className="flex items-start gap-3">
-                      <svg
-                        className="w-6 h-6 text-purple-500 flex-shrink-0 mt-0.5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                      <span className="text-gray-700">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-
-                <div className="text-center mt-auto">
-                  <div className="mb-6">
-                    <span className="text-5xl font-bold text-gray-900">{t.pricing.premium.price}</span>
-                    <span className="text-gray-600">{t.pricing.premium.period}</span>
-                  </div>
-                  <PremiumPlanPaymentButton />
                 </div>
               </div>
             </div>
@@ -682,21 +641,23 @@ export default function Home() {
         <section className="py-20 px-4">
           <div className="container mx-auto max-w-4xl text-center">
             <div className="glass-card rounded-2xl p-12">
-              <h2 className="text-3xl font-bold text-gray-900 mb-6">{t.social.title}</h2>
-              <p className="text-gray-600 text-lg mb-8">{t.social.subtitle}</p>
+              <h2 className="text-3xl font-bold text-foreground mb-6">{t.social.title}</h2>
+              <p className="text-muted-foreground text-lg mb-8">{t.social.subtitle}</p>
               <div className="flex justify-center items-center gap-8 opacity-60">
-                <div className="text-gray-500 text-sm">{t.social.comingSoon}</div>
+                <div className="text-muted-foreground text-sm">{t.social.comingSoon}</div>
               </div>
             </div>
           </div>
         </section>
 
         {/* CTA Final */}
-        <section className="py-20 px-4">
-          <div className="container mx-auto max-w-4xl text-center">
+        <section className="py-20 px-4 piano-black-section">
+          <div className="container mx-auto max-w-4xl text-center relative z-10">
             <div className="glass-card rounded-3xl p-12">
-              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">{t.finalCta.title}</h2>
-              <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">{t.finalCta.subtitle}</p>
+              <h2 className="text-4xl md:text-5xl font-bold text-secondary-foreground mb-6">{t.finalCta.title}</h2>
+              <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto leading-relaxed">
+                {t.finalCta.subtitle}
+              </p>
               <button className="cta-button text-white font-bold text-xl px-12 py-6 rounded-2xl inline-flex items-center gap-3">
                 <svg className="w-7 h-7" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488" />

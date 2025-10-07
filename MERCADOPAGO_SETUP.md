@@ -10,7 +10,7 @@ Se ha integrado exitosamente Mercado Pago como método de pago para los planes *
 
 Crea un archivo `.env.local` en la raíz del proyecto con las siguientes variables:
 
-```env
+\`\`\`env
 # Mercado Pago Configuration
 MERCADOPAGO_ACCESS_TOKEN=your_mercadopago_access_token_here
 MERCADOPAGO_PUBLIC_KEY=your_mercadopago_public_key_here
@@ -20,7 +20,7 @@ NEXT_PUBLIC_BASE_URL=http://localhost:3000
 
 # Environment
 NODE_ENV=development
-```
+\`\`\`
 
 ### 2. Obtener Credenciales de Mercado Pago
 
@@ -81,15 +81,15 @@ En el panel de Mercado Pago, configura las siguientes URLs:
 
 ### Instalar Dependencias
 
-```bash
+\`\`\`bash
 npm install mercadopago
-```
+\`\`\`
 
 ### Ejecutar en Desarrollo
 
-```bash
+\`\`\`bash
 npm run dev
-```
+\`\`\`
 
 ### Probar Pagos
 
@@ -107,11 +107,11 @@ npm run dev
 
 ### 1. Actualizar Variables de Entorno
 
-```env
+\`\`\`env
 MERCADOPAGO_ACCESS_TOKEN=tu_access_token_de_produccion
 NEXT_PUBLIC_BASE_URL=https://tu-dominio.com
 NODE_ENV=production
-```
+\`\`\`
 
 ### 2. Configurar Webhook
 
@@ -148,4 +148,3 @@ Para dudas sobre la integración:
 ---
 
 **¡La integración está lista para usar!** 🎉
-
