@@ -60,13 +60,40 @@ export default function RegisterPage() {
     e.preventDefault()
     setIsLoading(true)
 
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    try {
+      const fullPhone = `${formData.countryCode}${formData.phoneNumber}`
 
-    sessionStorage.setItem("registerPhone", `${formData.countryCode}${formData.phoneNumber}`)
-    sessionStorage.setItem("registerName", formData.name)
+      // Llamar a la API real para enviar OTP
+      const response = await fetch('/api/auth/send-otp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          phone: fullPhone,
+          name: formData.name,
+        }),
+      })
 
-    setIsLoading(false)
-    router.push("/verify")
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Error al enviar código')
+      }
+
+      console.log('✅ OTP enviado:', data)
+
+      // Guardar en sessionStorage para la página de verificación
+      sessionStorage.setItem("registerPhone", fullPhone)
+      sessionStorage.setItem("registerName", formData.name)
+
+      setIsLoading(false)
+      router.push("/verify")
+    } catch (error) {
+      console.error('Error enviando OTP:', error)
+      alert(error instanceof Error ? error.message : 'Error al enviar código de verificación')
+      setIsLoading(false)
+    }
   }
 
   return (

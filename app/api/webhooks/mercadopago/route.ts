@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { MercadoPagoConfig, Payment } from "mercadopago"
+import { getUserByPhone, createUser, updateUserPlan, createOTPCode } from '@/lib/supabase-client'
 
 // Configurar cliente de Mercado Pago
 const client = new MercadoPagoConfig({
@@ -65,35 +66,111 @@ export async function POST(request: NextRequest) {
   }
 }
 
+// Generar código OTP de 6 dígitos
+function generateOTPCode(): string {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+// Enviar OTP vía n8n → Twilio → WhatsApp
+async function sendOTPViaWhatsApp(phone: string, code: string, name?: string) {
+  const n8nWebhookUrl = process.env.N8N_WEBHOOK_SEND_OTP_URL;
+
+  if (!n8nWebhookUrl) {
+    console.warn('⚠️ N8N_WEBHOOK_SEND_OTP_URL no configurada, saltando envío de WhatsApp');
+    console.log(`📱 [DESARROLLO] Código OTP para ${phone}: ${code}`);
+    return;
+  }
+
+  try {
+    const response = await fetch(n8nWebhookUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        phone,
+        code,
+        name: name || 'Usuario',
+        timestamp: new Date().toISOString()
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`n8n webhook falló: ${response.status}`);
+    }
+
+    console.log(`✅ OTP enviado exitosamente a ${phone}`);
+  } catch (error) {
+    console.error('❌ Error enviando OTP vía n8n:', error);
+    throw new Error('Error al enviar código de verificación');
+  }
+}
+
 // Funciones para manejar diferentes estados de pago
 async function handleApprovedPayment(paymentInfo: any) {
   console.log("✅ Pago aprobado:", paymentInfo.id)
 
-  // Aquí implementarías:
-  // 1. Activar la suscripción del usuario
-  // 2. Enviar email de confirmación
-  // 3. Actualizar base de datos con la información de la compra
-  // 4. Registrar en analytics
+  try {
+    const planId = extractPlanFromReference(paymentInfo.external_reference)
+    const userEmail = paymentInfo.payer?.email
+    const userPhone = paymentInfo.payer?.phone?.number
+    const areaCode = paymentInfo.payer?.phone?.area_code
 
-  // Ejemplo de lógica:
-  const planId = extractPlanFromReference(paymentInfo.external_reference)
-  const userEmail = paymentInfo.payer?.email
+    // Construir número de teléfono completo (con código de país)
+    let fullPhone = userPhone
+    if (areaCode) {
+      fullPhone = `+${areaCode}${userPhone}`
+    } else if (userPhone && !userPhone.startsWith('+')) {
+      fullPhone = `+54${userPhone}` // Por defecto Argentina
+    }
 
-  console.log(`Activando plan ${planId} para ${userEmail}`)
+    console.log(`Activando plan ${planId} para ${fullPhone || userEmail}`)
 
-  // TODO: Guardar en base de datos
-  const purchase = {
-    id: paymentInfo.id,
-    planId,
-    planName: planId === "plus" ? "Plan Plus" : "Plan Desconocido",
-    amount: paymentInfo.transaction_amount,
-    currency: paymentInfo.currency_id,
-    status: paymentInfo.status,
-    date: new Date().toISOString(),
-    paymentId: paymentInfo.id,
-    email: userEmail,
+    if (planId === 'plus' && fullPhone) {
+      // Verificar si el usuario ya existe
+      const existingUser = await getUserByPhone(fullPhone)
+
+      if (existingUser) {
+        // Usuario existe - actualizar plan
+        await updateUserPlan(fullPhone, 'plus')
+        console.log(`✅ Plan actualizado para usuario existente: ${fullPhone}`)
+      } else {
+        // Usuario nuevo - crear con plan Plus
+        await createUser({
+          phone: fullPhone,
+          email: userEmail,
+          plan: 'plus'
+        })
+        console.log(`✅ Nuevo usuario creado con plan Plus: ${fullPhone}`)
+      }
+
+      // Generar y enviar OTP para que complete el login
+      const otpCode = generateOTPCode()
+      await createOTPCode(fullPhone, otpCode, 10) // 10 minutos de expiración
+      await sendOTPViaWhatsApp(fullPhone, otpCode)
+
+      console.log(`✅ OTP enviado a ${fullPhone} para completar registro`)
+    }
+
+    // Guardar registro de la compra
+    const purchase = {
+      id: paymentInfo.id,
+      planId,
+      planName: planId === "plus" ? "Plan Plus" : "Plan Desconocido",
+      amount: paymentInfo.transaction_amount,
+      currency: paymentInfo.currency_id,
+      status: paymentInfo.status,
+      date: new Date().toISOString(),
+      paymentId: paymentInfo.id,
+      email: userEmail,
+      phone: fullPhone
+    }
+    await savePurchaseToDatabase(purchase)
+
+  } catch (error) {
+    console.error('❌ Error procesando pago aprobado:', error)
+    // No lanzar error para no fallar el webhook
   }
-  await savePurchaseToDatabase(purchase)
 }
 
 async function handleRejectedPayment(paymentInfo: any) {

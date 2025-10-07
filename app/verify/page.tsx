@@ -56,21 +56,49 @@ export default function VerifyPage() {
     },
   }
 
-  const handleResend = () => {
-    // Logic to resend code here
-    console.log("Resending code...")
-    setCountdown(60)
-    setCanResend(false)
-    const timer = setInterval(() => {
-      setCountdown((prev) => {
-        if (prev <= 1) {
-          setCanResend(true)
-          clearInterval(timer)
-          return 0
-        }
-        return prev - 1
+  const handleResend = async () => {
+    if (!canResend) return
+
+    try {
+      console.log("Reenviando código...")
+      setCanResend(false)
+      setCountdown(60)
+
+      // Llamar a la API para reenviar OTP
+      const response = await fetch('/api/auth/send-otp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          phone: phoneNumber,
+        }),
       })
-    }, 1000)
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Error al reenviar código')
+      }
+
+      console.log('✅ Código reenviado')
+
+      // Iniciar countdown
+      const timer = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            setCanResend(true)
+            clearInterval(timer)
+            return 0
+          }
+          return prev - 1
+        })
+      }, 1000)
+    } catch (error) {
+      console.error('Error reenviando código:', error)
+      alert(error instanceof Error ? error.message : 'Error al reenviar código')
+      setCanResend(true)
+    }
   }
 
   useEffect(() => {
@@ -143,22 +171,41 @@ export default function VerifyPage() {
 
     setIsLoading(true)
 
-    await new Promise((resolve) => setTimeout(resolve, 1500))
+    try {
+      // Llamar a la API real para verificar OTP
+      const response = await fetch('/api/auth/verify-otp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          phone: phoneNumber,
+          code: verificationCode,
+        }),
+      })
 
-    console.log("[v0] Verification code:", verificationCode)
-    console.log("[v0] Phone number:", phoneNumber)
+      const data = await response.json()
 
-    setIsLoading(false)
-    setIsVerified(true)
+      if (!response.ok) {
+        throw new Error(data.error || 'Código inválido')
+      }
 
-    const userExists = Math.random() > 0.5 // Simulate 50% chance of existing user
+      console.log('✅ OTP verificado:', data)
 
-    if (userExists) {
-      console.log("[v0] Existing user, redirecting to dashboard")
-      router.push("/dashboard")
-    } else {
-      console.log("[v0] New user, showing name capture")
-      setIsNewUser(true)
+      setIsLoading(false)
+      setIsVerified(true)
+
+      if (data.isNewUser) {
+        // Usuario nuevo - mostrar captura de nombre
+        setIsNewUser(true)
+      } else {
+        // Usuario existente - ir al dashboard
+        router.push("/dashboard")
+      }
+    } catch (error) {
+      console.error('Error verificando OTP:', error)
+      alert(error instanceof Error ? error.message : 'Código inválido o expirado')
+      setIsLoading(false)
     }
   }
 
@@ -171,15 +218,34 @@ export default function VerifyPage() {
 
     setIsLoading(true)
 
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    try {
+      // Actualizar el perfil con el nombre
+      const response = await fetch('/api/auth/update-profile', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: userName,
+        }),
+      })
 
-    console.log("[v0] Creating new user with name:", userName)
-    console.log("[v0] Phone:", phoneNumber)
+      const data = await response.json()
 
-    sessionStorage.setItem("userName", userName)
+      if (!response.ok) {
+        throw new Error(data.error || 'Error al actualizar perfil')
+      }
 
-    setIsLoading(false)
-    router.push("/dashboard")
+      console.log('✅ Perfil actualizado:', data)
+      sessionStorage.setItem("userName", userName)
+
+      setIsLoading(false)
+      router.push("/dashboard")
+    } catch (error) {
+      console.error('Error actualizando perfil:', error)
+      alert(error instanceof Error ? error.message : 'Error al guardar tu nombre')
+      setIsLoading(false)
+    }
   }
 
   const isCodeComplete = code.every((digit) => digit !== "")

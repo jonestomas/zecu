@@ -33,11 +33,38 @@ export default function LoginPage() {
     e.preventDefault()
     setIsLoading(true)
 
-    // Simulate sending OTP
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    try {
+      const fullPhone = `${countryCode}${phoneNumber}`
+      
+      // Llamar a la API real para enviar OTP
+      const response = await fetch('/api/auth/send-otp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          phone: fullPhone,
+        }),
+      })
 
-    setIsLoading(false)
-    setStep("otp")
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Error al enviar código')
+      }
+
+      console.log('✅ OTP enviado:', data)
+      
+      // Guardar en sessionStorage para la página de verificación
+      sessionStorage.setItem('registerPhone', fullPhone)
+      
+      setIsLoading(false)
+      setStep("otp")
+    } catch (error) {
+      console.error('Error enviando OTP:', error)
+      alert(error instanceof Error ? error.message : 'Error al enviar código de verificación')
+      setIsLoading(false)
+    }
   }
 
   const handleOtpChange = (index: number, value: string) => {
@@ -59,20 +86,43 @@ export default function LoginPage() {
     e.preventDefault()
     setIsLoading(true)
 
-    // Simulate OTP verification
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    try {
+      const fullPhone = `${countryCode}${phoneNumber}`
+      const otpCode = otp.join('')
 
-    // Simulate checking if user exists (50% chance for demo)
-    const userExists = Math.random() > 0.5
+      // Llamar a la API real para verificar OTP
+      const response = await fetch('/api/auth/verify-otp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          phone: fullPhone,
+          code: otpCode,
+        }),
+      })
 
-    setIsLoading(false)
+      const data = await response.json()
 
-    if (userExists) {
-      // Existing user - go to dashboard
-      router.push("/dashboard")
-    } else {
-      // New user - ask for name
-      setStep("name")
+      if (!response.ok) {
+        throw new Error(data.error || 'Código inválido')
+      }
+
+      console.log('✅ OTP verificado:', data)
+
+      setIsLoading(false)
+
+      if (data.isNewUser) {
+        // Usuario nuevo - pedir nombre
+        setStep("name")
+      } else {
+        // Usuario existente - ir al dashboard
+        router.push("/dashboard")
+      }
+    } catch (error) {
+      console.error('Error verificando OTP:', error)
+      alert(error instanceof Error ? error.message : 'Código inválido o expirado')
+      setIsLoading(false)
     }
   }
 
@@ -80,11 +130,33 @@ export default function LoginPage() {
     e.preventDefault()
     setIsLoading(true)
 
-    // Simulate creating user account
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    try {
+      // Actualizar el perfil con el nombre
+      const response = await fetch('/api/auth/update-profile', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name,
+        }),
+      })
 
-    setIsLoading(false)
-    router.push("/dashboard")
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Error al actualizar perfil')
+      }
+
+      console.log('✅ Perfil actualizado:', data)
+
+      setIsLoading(false)
+      router.push("/dashboard")
+    } catch (error) {
+      console.error('Error actualizando perfil:', error)
+      alert(error instanceof Error ? error.message : 'Error al guardar tu nombre')
+      setIsLoading(false)
+    }
   }
 
   const handleOtpKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
