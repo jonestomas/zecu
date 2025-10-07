@@ -105,8 +105,8 @@ const translations = {
     },
     social: {
       title: "Hecho para quienes buscan tranquilidad digital",
-      subtitle: "Únete a miles de usuarios que ya protegen sus conversaciones con Zecubot",
-      comingSoon: "Próximamente: testimonios de usuarios",
+      subtitle:
+        "La prevención es la mejor forma de protegerte. Y si algo falla, también estaremos aquí para asistirte.",
     },
     finalCta: {
       title: "Prorotége ahora mismo",
@@ -208,8 +208,8 @@ const translations = {
     },
     social: {
       title: "Made for those seeking digital peace of mind",
-      subtitle: "Join thousands of users who already protect their conversations with Zecubot",
-      comingSoon: "Coming soon: user testimonials",
+      subtitle:
+        "Prevention is the best way to protect yourself. And if something goes wrong, we'll also be here to assist you.",
     },
     finalCta: {
       title: "Protect yourself right now",
@@ -642,10 +642,7 @@ export default function Home() {
           <div className="container mx-auto max-w-4xl text-center">
             <div className="glass-card rounded-2xl p-12">
               <h2 className="text-3xl font-bold text-foreground mb-6">{t.social.title}</h2>
-              <p className="text-muted-foreground text-lg mb-8">{t.social.subtitle}</p>
-              <div className="flex justify-center items-center gap-8 opacity-60">
-                <div className="text-muted-foreground text-sm">{t.social.comingSoon}</div>
-              </div>
+              <p className="text-muted-foreground text-lg leading-relaxed">{t.social.subtitle}</p>
             </div>
           </div>
         </section>
