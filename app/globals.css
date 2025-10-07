@@ -5,8 +5,9 @@
 /* New design system with yellow, black, grey, and white palette */
 :root {
   /* Font families */
-  --font-sans: var(--font-inter);
-  --font-mono: var(--font-geist-mono);
+  /* Updated to use Plus Jakarta Sans (similar to Geist) as primary sans font */
+  --font-sans: var(--font-plus-jakarta-sans);
+  --font-mono: var(--font-jetbrains-mono);
 
   /* Color palette - Yellow, Black, Grey, White design system */
   --background: oklch(0.99 0 0); /* Off-white background */
