@@ -13,7 +13,7 @@ const _geistMono = V0_Font_Geist_Mono({ subsets: ['latin'], weight: ["100","200"
 const _sourceSerif_4 = V0_Font_Source_Serif_4({ subsets: ['latin'], weight: ["200","300","400","500","600","700","800","900"], variable: '--v0-font-source-serif-4' })
 const _v0_fontVariables = `${_geist.variable} ${_geistMono.variable} ${_sourceSerif_4.variable}`
 
-const _v0_fontVariables = `${GeistSans.variable} ${GeistMono.variable}`
+const fontVariables = `${GeistSans.variable} ${GeistMono.variable}`
 
 const inter = Inter({
   subsets: ["latin"],
@@ -46,7 +46,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es" className={`${poppins.variable} ${inter.variable} ${jetbrainsMono.variable}`}>
-      <body className={`font-sans antialiased ${_v0_fontVariables}`}>{children}</body>
+      <body className={`font-sans antialiased ${fontVariables} ${_v0_fontVariables}`}>{children}</body>
     </html>
   )
 }
