@@ -57,7 +57,7 @@ npm run preview
 - **UI Components**: Radix UI + shadcn/ui
 - **Icons**: Lucide React
 - **Analytics**: Vercel Analytics integrado
-- **Fonts**: Geist (optimizada para web)
+- **Fonts**: Plus Jakarta Sans, Inter, JetBrains Mono (Google Fonts)
 
 ## 🔒 Seguridad
 
