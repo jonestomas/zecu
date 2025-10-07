@@ -12,8 +12,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validar que el plan sea plus (no free)
-    if (!['plus'].includes(planId)) {
+    // Validar que el plan sea básico o premium (no free)
+    if (!['basic', 'premium'].includes(planId)) {
       return NextResponse.json(
         { error: 'Plan no válido para pago' },
         { status: 400 }

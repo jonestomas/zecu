@@ -25,10 +25,10 @@ export interface Plan {
 
 // Definición de los planes
 export const plans: Record<string, Plan> = {
-  plus: {
-    id: 'plus',
-    name: 'Plus',
-    price: 5499,
+  basic: {
+    id: 'basic',
+    name: 'Básico',
+    price: 1999,
     currency: 'ARS',
     description: 'Ideal para protección diaria completa',
     features: [
@@ -38,6 +38,22 @@ export const plans: Record<string, Plan> = {
       'Guía paso a paso personalizada',
       'Soporte prioritario 24/7',
       'Alertas en tiempo real'
+    ]
+  },
+  premium: {
+    id: 'premium',
+    name: 'Premium',
+    price: 5999,
+    currency: 'ARS',
+    description: 'Protección máxima para ti y tu familia',
+    features: [
+      'Análisis ilimitados',
+      'IA avanzada con aprendizaje continuo',
+      'Protección para hasta 5 números',
+      'Análisis forense de amenazas',
+      'Reportes mensuales de seguridad',
+      'Consultor de seguridad dedicado',
+      'Acceso anticipado a nuevas funciones'
     ]
   }
 };
