@@ -13,10 +13,6 @@ const envSchema = z.object({
   // Opcional: Webhook secret para validación
   MERCADOPAGO_WEBHOOK_SECRET: z.string().optional(),
   
-  // n8n Integration
-  N8N_WEBHOOK_URL: z.string().url("URL del webhook de n8n requerida"),
-  N8N_API_KEY: z.string().optional(),
-  
   // Ambiente
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
 });
