@@ -101,4 +101,3 @@ export async function createPaymentPreference(planId: string, userEmail?: string
     throw error;
   }
 }
-
