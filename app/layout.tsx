@@ -31,7 +31,7 @@ const poppins = Poppins({
 export const metadata: Metadata = {
   title: "Zecubot - Tu asistente digital contra estafas online",
   description: "¿Es una estafa o un mensaje seguro? ¿Qué debo hacer? Resuélvelo en segundos con Zecubot.",
-    generator: 'v0.app'
+  generator: "v0.app",
 }
 
 export default function RootLayout({
