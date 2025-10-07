@@ -1,85 +1,186 @@
-# Zecu Landing Page
+# 🤖 Zecubot - Plataforma de Suscripciones
 
-Landing page para Zecu - Tu asistente contra el phishing en WhatsApp.
+Una plataforma completa de gestión de suscripciones con integración de pagos, automatización y análisis de usuarios.
 
-## 🚀 Implementación en Vercel
+## 🚀 Características Principales
 
-Este proyecto está optimizado para ser desplegado en Vercel. Sigue estos pasos:
+- 💳 **Integración con MercadoPago** para procesamiento de pagos
+- 🔄 **Automatización con N8N** para flujos de trabajo
+- 🗄️ **Base de datos Supabase** para gestión de datos
+- 🎨 **Interfaz moderna** con Next.js y Tailwind CSS
+- 📊 **Gestión de planes** (Free, Basic, Premium, Enterprise)
+- 🔐 **Seguridad robusta** con validación de webhooks
+- 📱 **Responsive design** para todos los dispositivos
 
-### 1. Preparación del repositorio
+## 🏗️ Estructura del Proyecto
 
-\`\`\`bash
-# Clona o sube tu código a un repositorio de Git
-git init
-git add .
-git commit -m "Initial commit"
-git remote add origin [tu-repositorio-url]
-git push -u origin main
-\`\`\`
+```
+zecu/
+├── 📁 app/                    # Aplicación Next.js
+├── 📁 components/             # Componentes React
+├── 📁 config/                 # Archivos de configuración
+├── 📁 docs/                   # Documentación
+├── 📁 lib/                    # Librerías y servicios
+├── 📁 public/                 # Archivos estáticos
+├── 📁 scripts/                # Scripts de utilidad
+├── 📁 styles/                 # Estilos adicionales
+└── 📁 supabase/               # Migraciones de base de datos
+```
 
-### 2. Implementación en Vercel
+> 📋 Ver [PROJECT_STRUCTURE.md](./PROJECT_STRUCTURE.md) para detalles completos de la estructura.
 
-1. Ve a [vercel.com](https://vercel.com) e inicia sesión
-2. Haz clic en "New Project"
-3. Importa tu repositorio de GitHub/GitLab/Bitbucket
-4. Vercel detectará automáticamente que es un proyecto Next.js
-5. Haz clic en "Deploy"
+## 🛠️ Instalación
 
-### 3. Configuración automática
+1. **Clonar el repositorio**
+   ```bash
+   git clone <repository-url>
+   cd zecu
+   ```
 
-El proyecto incluye:
-- ✅ `vercel.json` con configuración optimizada
-- ✅ `next.config.mjs` configurado para producción
-- ✅ Variables de entorno preparadas
-- ✅ Headers de seguridad configurados
-- ✅ Optimización de imágenes
+2. **Instalar dependencias**
+   ```bash
+   npm install
+   ```
 
-## 🛠️ Desarrollo Local
+3. **Configurar variables de entorno**
+   ```bash
+   cp .env.example .env.local
+   # Editar .env.local con tus credenciales
+   ```
 
-\`\`\`bash
-# Instalar dependencias
-npm install
+4. **Configurar Supabase**
+   ```bash
+   npm run setup-db
+   ```
 
-# Ejecutar en modo desarrollo
-npm run dev
+5. **Iniciar desarrollo**
+   ```bash
+   npm run dev
+   ```
 
-# Construir para producción
-npm run build
+## 📋 Scripts Disponibles
 
-# Vista previa de producción
-npm run preview
-\`\`\`
+### **Desarrollo**
+```bash
+npm run dev          # Servidor de desarrollo
+npm run build        # Construir para producción
+npm run start        # Servidor de producción
+npm run lint         # Linting del código
+```
 
-## 📦 Características técnicas
+### **Base de Datos**
+```bash
+npm run create-test-user    # Crear usuario de prueba
+npm run verify-supabase     # Verificar conexión Supabase
+npm run get-users-data      # Obtener datos de usuarios
+npm run diagnose-db         # Diagnosticar problemas de BD
+npm run fix-rls             # Arreglar políticas RLS
+```
 
-- **Framework**: Next.js 14.2.16
-- **Styling**: Tailwind CSS 4.1.9
-- **UI Components**: Radix UI + shadcn/ui
-- **Icons**: Lucide React
-- **Analytics**: Vercel Analytics integrado
-- **Fonts**: Geist (optimizada para web)
+## 🔧 Configuración
+
+### **Variables de Entorno Requeridas**
+
+```env
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+
+# MercadoPago
+MERCADOPAGO_ACCESS_TOKEN=your_mercadopago_token
+MERCADOPAGO_WEBHOOK_SECRET=your_webhook_secret
+
+# N8N
+N8N_WEBHOOK_URL=your_n8n_webhook_url
+N8N_API_KEY=your_n8n_api_key
+```
+
+### **Configuración de Supabase**
+
+1. Crear proyecto en [Supabase](https://supabase.com)
+2. Ejecutar migraciones desde `supabase/`
+3. Configurar políticas RLS según necesidades
+
+### **Configuración de MercadoPago**
+
+1. Crear aplicación en [MercadoPago](https://mercadopago.com)
+2. Obtener access token y webhook secret
+3. Configurar URLs de webhook
+
+## 📚 Documentación
+
+- [Configuración de MercadoPago](./docs/MERCADOPAGO_SETUP.md)
+- [Integración con N8N](./docs/N8N_INTEGRATION.md)
+- [Configuración de Supabase](./docs/SUPABASE_SETUP.md)
+- [Flujos de Usuario](./docs/USER_FLOWS_DIAGRAM.md)
+- [Estructura del Proyecto](./PROJECT_STRUCTURE.md)
+
+## 🎯 Funcionalidades
+
+### **Gestión de Usuarios**
+- Registro y autenticación
+- Perfiles de usuario
+- Historial de suscripciones
+- Gestión de planes
+
+### **Sistema de Pagos**
+- Integración con MercadoPago
+- Procesamiento seguro de pagos
+- Gestión de suscripciones
+- Webhooks de confirmación
+
+### **Automatización**
+- Flujos de trabajo con N8N
+- Notificaciones automáticas
+- Gestión de trials
+- Onboarding de usuarios
+
+### **Panel de Administración**
+- Dashboard de métricas
+- Gestión de usuarios
+- Configuración de planes
+- Logs de webhooks
 
 ## 🔒 Seguridad
 
-- Headers de seguridad configurados
-- X-Frame-Options, X-Content-Type-Options, Referrer-Policy
-- Configuración optimizada para producción
+- Validación de webhooks con firmas
+- Políticas RLS en Supabase
+- Sanitización de datos
+- Rate limiting en APIs
 
-## 📱 Responsive Design
+## 🚀 Despliegue
 
-La landing page está completamente optimizada para:
-- 📱 Móviles (320px+)
-- 📱 Tablets (768px+)
-- 💻 Desktop (1024px+)
+### **Vercel (Recomendado)**
+```bash
+npm run build
+vercel --prod
+```
 
-## 🎨 Personalización
+### **Docker**
+```bash
+docker build -t zecubot .
+docker run -p 3000:3000 zecubot
+```
 
-Los colores y estilos principales se pueden personalizar en:
-- `app/globals.css` - Estilos globales
-- `components/ui/` - Componentes de UI reutilizables
+## 🤝 Contribución
+
+1. Fork el proyecto
+2. Crear rama para feature (`git checkout -b feature/AmazingFeature`)
+3. Commit cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abrir Pull Request
+
+## 📄 Licencia
+
+Este proyecto está bajo la Licencia MIT. Ver [LICENSE](LICENSE) para más detalles.
+
+## 📞 Soporte
+
+Para soporte y preguntas:
+- 📧 Email: support@zecubot.com
+- 📱 Discord: [Zecubot Community](https://discord.gg/zecubot)
+- 🐛 Issues: [GitHub Issues](https://github.com/zecubot/zecu/issues)
 
 ---
 
-Creado con ❤️ para proteger usuarios de phishing en WhatsApp.
-
-<!-- Deploy fix: Eliminado vercel.json problemático -->
+**Desarrollado con ❤️ por el equipo de Zecubot**

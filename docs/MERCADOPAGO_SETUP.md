@@ -18,6 +18,10 @@ MERCADOPAGO_PUBLIC_KEY=your_mercadopago_public_key_here
 # Base URL for callbacks
 NEXT_PUBLIC_BASE_URL=http://localhost:3000
 
+# n8n Integration
+N8N_WEBHOOK_URL=https://tu-instancia-n8n.com/webhook/zecu-mercadopago
+N8N_API_KEY=tu_api_key_de_n8n_opcional
+
 # Environment
 NODE_ENV=development
 ```
@@ -132,12 +136,45 @@ NODE_ENV=production
 | **Básico** | AR$1.999/mes | `basic` | 50 análisis, detección avanzada, soporte 24/7 |
 | **Premium** | AR$5.999/mes | `premium` | Análisis ilimitados, IA avanzada, 5 números |
 
+## 🔗 Integración con n8n
+
+### Configuración de n8n
+1. **Crear webhook en n8n:**
+   - URL: `https://tu-instancia-n8n.com/webhook/zecu-mercadopago`
+   - Método: POST
+   - Autenticación: Bearer Token (opcional)
+
+2. **Configurar workflow:**
+   - Recibir webhook de Mercado Pago
+   - Procesar según tipo de evento
+   - Actualizar Supabase con datos del usuario
+   - Enviar notificaciones por email
+
+3. **Probar integración:**
+   ```bash
+   # Verificar configuración
+   curl http://localhost:3000/api/test-n8n
+   
+   # Probar envío de datos
+   curl -X POST http://localhost:3000/api/test-n8n \
+     -H "Content-Type: application/json" \
+     -d '{"event": "payment_approved", "planId": "basic"}'
+   ```
+
+### Eventos enviados a n8n
+- `payment_approved` - Pago aprobado
+- `payment_rejected` - Pago rechazado  
+- `payment_pending` - Pago pendiente
+- `payment_cancelled` - Pago cancelado
+
 ## 🔐 Seguridad
 
 - ✅ Validación de planes en backend
 - ✅ Verificación de webhooks
 - ✅ Manejo seguro de credenciales
 - ✅ URLs de callback configurables
+- ✅ Integración robusta con n8n
+- ✅ Tolerancia a fallos de n8n
 
 ## 📞 Soporte
 
