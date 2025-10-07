@@ -21,7 +21,25 @@ export function PaymentButton({ planId, planName, price, className = "", childre
     setIsLoading(true)
 
     try {
-      // Crear preferencia de pago
+      // Verificar si el usuario tiene sesión activa
+      const sessionCheck = await fetch("/api/auth/check-session")
+      const { authenticated } = await sessionCheck.json()
+
+      if (!authenticated) {
+        // Usuario NO autenticado → Guardar intención de compra y redirigir a login
+        sessionStorage.setItem("pendingPurchase", JSON.stringify({
+          planId,
+          planName,
+          price,
+          timestamp: Date.now()
+        }))
+        
+        alert("Primero necesitas crear una cuenta o iniciar sesión")
+        window.location.href = "/login"
+        return
+      }
+
+      // Usuario SÍ autenticado → Proceder al pago
       const response = await fetch("/api/create-payment", {
         method: "POST",
         headers: {
@@ -29,7 +47,6 @@ export function PaymentButton({ planId, planName, price, className = "", childre
         },
         body: JSON.stringify({
           planId,
-          userEmail: "usuario@ejemplo.com", // En producción, obtener del usuario autenticado
         }),
       })
 
@@ -40,7 +57,6 @@ export function PaymentButton({ planId, planName, price, className = "", childre
       const { initPoint, sandboxInitPoint } = await response.json()
 
       // Redirigir a Mercado Pago
-      // En desarrollo usar sandboxInitPoint, en producción usar initPoint
       const paymentUrl = process.env.NODE_ENV === "development" ? sandboxInitPoint : initPoint
 
       if (paymentUrl) {

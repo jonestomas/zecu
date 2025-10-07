@@ -199,8 +199,15 @@ export default function VerifyPage() {
         // Usuario nuevo - mostrar captura de nombre
         setIsNewUser(true)
       } else {
-        // Usuario existente - ir al dashboard
-        router.push("/dashboard")
+        // Usuario existente - verificar si hay compra pendiente
+        const pendingPurchase = sessionStorage.getItem('pendingPurchase')
+        if (pendingPurchase) {
+          // Hay una compra pendiente - redirigir al checkout
+          router.push('/checkout')
+        } else {
+          // No hay compra pendiente - ir al dashboard
+          router.push("/dashboard")
+        }
       }
     } catch (error) {
       console.error('Error verificando OTP:', error)
@@ -240,7 +247,16 @@ export default function VerifyPage() {
       sessionStorage.setItem("userName", userName)
 
       setIsLoading(false)
-      router.push("/dashboard")
+      
+      // Verificar si hay compra pendiente
+      const pendingPurchase = sessionStorage.getItem('pendingPurchase')
+      if (pendingPurchase) {
+        // Hay una compra pendiente - redirigir al checkout
+        router.push('/checkout')
+      } else {
+        // No hay compra pendiente - ir al dashboard
+        router.push("/dashboard")
+      }
     } catch (error) {
       console.error('Error actualizando perfil:', error)
       alert(error instanceof Error ? error.message : 'Error al guardar tu nombre')

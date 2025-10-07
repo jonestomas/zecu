@@ -126,30 +126,35 @@ async function handleApprovedPayment(paymentInfo: any) {
 
     console.log(`Activando plan ${planId} para ${fullPhone || userEmail}`)
 
-    if (planId === 'plus' && fullPhone) {
-      // Verificar si el usuario ya existe
-      const existingUser = await getUserByPhone(fullPhone)
+    if (planId === 'plus') {
+      if (fullPhone) {
+        // Buscar usuario por teléfono
+        const existingUser = await getUserByPhone(fullPhone)
 
-      if (existingUser) {
-        // Usuario existe - actualizar plan
-        await updateUserPlan(fullPhone, 'plus')
-        console.log(`✅ Plan actualizado para usuario existente: ${fullPhone}`)
-      } else {
-        // Usuario nuevo - crear con plan Plus
-        await createUser({
-          phone: fullPhone,
-          email: userEmail,
-          plan: 'plus'
-        })
-        console.log(`✅ Nuevo usuario creado con plan Plus: ${fullPhone}`)
+        if (existingUser) {
+          // Usuario existe - actualizar plan
+          await updateUserPlan(fullPhone, 'plus')
+          console.log(`✅ Plan Plus activado para: ${fullPhone}`)
+        } else {
+          // Usuario no existe pero pagó (flujo legacy o directo a MP)
+          // Crear usuario con plan Plus y enviar OTP
+          await createUser({
+            phone: fullPhone,
+            email: userEmail,
+            plan: 'plus'
+          })
+          console.log(`✅ Nuevo usuario creado con plan Plus: ${fullPhone}`)
+
+          // Generar y enviar OTP para que complete el registro
+          const otpCode = generateOTPCode()
+          await createOTPCode(fullPhone, otpCode, 10) // 10 minutos de expiración
+          await sendOTPViaWhatsApp(fullPhone, otpCode)
+          console.log(`✅ OTP enviado a ${fullPhone} para completar registro`)
+        }
+      } else if (userEmail) {
+        // No hay teléfono pero sí email (edge case)
+        console.warn(`⚠️ Pago Plus sin teléfono. Email: ${userEmail}`)
       }
-
-      // Generar y enviar OTP para que complete el login
-      const otpCode = generateOTPCode()
-      await createOTPCode(fullPhone, otpCode, 10) // 10 minutos de expiración
-      await sendOTPViaWhatsApp(fullPhone, otpCode)
-
-      console.log(`✅ OTP enviado a ${fullPhone} para completar registro`)
     }
 
     // Guardar registro de la compra
