@@ -85,7 +85,7 @@ async function handleApprovedPayment(paymentInfo: any) {
   const purchase = {
     id: paymentInfo.id,
     planId,
-    planName: planId === "basic" ? "Plan Básico" : "Plan Premium",
+    planName: planId === "plus" ? "Plan Plus" : "Plan Desconocido",
     amount: paymentInfo.transaction_amount,
     currency: paymentInfo.currency_id,
     status: paymentInfo.status,

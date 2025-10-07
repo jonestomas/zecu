@@ -78,8 +78,7 @@ export default function MisComprasPage() {
 
   const getPlanDisplayName = (planId: string) => {
     const plans: Record<string, string> = {
-      basic: "Plan Básico",
-      premium: "Plan Premium",
+      plus: "Plan Plus",
       free: "Plan Gratuito",
     }
     return plans[planId] || planId

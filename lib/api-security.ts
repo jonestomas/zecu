@@ -4,8 +4,8 @@ import rateLimit from 'express-rate-limit';
 
 // Esquemas de validación
 export const createPaymentSchema = z.object({
-  planId: z.enum(['basic', 'premium'], {
-    errorMap: () => ({ message: 'Plan debe ser "basic" o "premium"' })
+  planId: z.enum(['plus'], {
+    errorMap: () => ({ message: 'Plan debe ser "plus"' })
   }),
   userEmail: z.string().email('Email inválido').optional(),
   captchaToken: z.string().min(1, 'Token captcha requerido').optional()

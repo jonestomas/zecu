@@ -4,9 +4,9 @@ import { type NextRequest, NextResponse } from "next/server"
 const mockPurchases = [
   {
     id: "1",
-    planName: "Plan Básico",
-    planId: "basic",
-    amount: 1999,
+    planName: "Plan Plus",
+    planId: "plus",
+    amount: 5499,
     currency: "ARS",
     status: "approved" as const,
     date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 días atrás
@@ -15,9 +15,9 @@ const mockPurchases = [
   },
   {
     id: "2",
-    planName: "Plan Premium",
-    planId: "premium",
-    amount: 5999,
+    planName: "Plan Plus",
+    planId: "plus",
+    amount: 5499,
     currency: "ARS",
     status: "pending" as const,
     date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), // 2 días atrás
@@ -26,9 +26,9 @@ const mockPurchases = [
   },
   {
     id: "3",
-    planName: "Plan Básico",
-    planId: "basic",
-    amount: 1999,
+    planName: "Plan Plus",
+    planId: "plus",
+    amount: 5499,
     currency: "ARS",
     status: "rejected" as const,
     date: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 días atrás

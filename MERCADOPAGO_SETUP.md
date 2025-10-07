@@ -2,7 +2,7 @@
 
 ## 🚀 Integración Completada
 
-Se ha integrado exitosamente Mercado Pago como método de pago para los planes **Básico** y **Premium** de Zecu.
+Se ha integrado exitosamente Mercado Pago como método de pago para el plan **Plus** de Zecu.
 
 ## 📋 Configuración Requerida
 
@@ -57,8 +57,7 @@ En el panel de Mercado Pago, configura las siguientes URLs:
    - Integración con API de Mercado Pago
 
 2. **Botones Específicos:**
-   - `BasicPlanPaymentButton` - Para plan Básico (AR$1.999)
-   - `PremiumPlanPaymentButton` - Para plan Premium (AR$5.999)
+   - `PlusPlanPaymentButton` - Para plan Plus (AR$5.499)
 
 ### ✅ API Routes
 
