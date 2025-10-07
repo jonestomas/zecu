@@ -80,7 +80,7 @@ export function BasicPlanPaymentButton() {
       planId="basic"
       planName="Básico"
       price="AR$1.999"
-      className="cta-button text-white font-semibold py-3 px-6 rounded-xl shadow-lg"
+      className="cta-button text-white font-semibold py-3 px-6 rounded-xl shadow-lg h-12"
     >
       Comenzar con Mercado Pago
     </PaymentButton>

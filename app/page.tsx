@@ -555,80 +555,80 @@ export default function Home() {
         </section>
 
         {/* Pricing Section */}
-        <section id="suscripcion" className="py-20 px-4">
+        <section id="suscripcion" className="py-12 px-4 scroll-mt-20">
           <div className="container mx-auto max-w-7xl">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">{t.pricing.title}</h2>
-              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">{t.pricing.subtitle}</p>
+            <div className="text-center mb-10">
+              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">{t.pricing.title}</h2>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">{t.pricing.subtitle}</p>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-8 items-stretch max-w-4xl mx-auto">
+            <div className="grid md:grid-cols-2 gap-6 items-stretch max-w-5xl mx-auto">
               {/* Free Plan */}
-              <div className="glass-card rounded-3xl p-8 hover:shadow-xl transition-shadow flex flex-col">
-                <div className="text-center mb-8">
+              <div className="glass-card rounded-3xl p-6 hover:shadow-xl transition-shadow flex flex-col h-full">
+                <div className="text-center mb-6 min-h-[100px] flex flex-col justify-center">
                   <h3 className="text-2xl font-bold text-foreground mb-2">{t.pricing.free.name}</h3>
-                  <p className="text-muted-foreground mb-6 min-h-[48px]">{t.pricing.free.description}</p>
+                  <p className="text-muted-foreground text-sm">{t.pricing.free.description}</p>
                 </div>
 
-                <ul className="space-y-4 mb-8 flex-grow">
+                <ul className="space-y-3 mb-6 flex-1">
                   {t.pricing.free.features.map((feature, index) => (
-                    <li key={index} className="flex items-start gap-3">
+                    <li key={index} className="flex items-start gap-2">
                       <svg
-                        className="w-6 h-6 text-primary flex-shrink-0 mt-0.5"
+                        className="w-5 h-5 text-primary flex-shrink-0 mt-0.5"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
                       >
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
-                      <span className="text-foreground">{feature}</span>
+                      <span className="text-foreground text-sm">{feature}</span>
                     </li>
                   ))}
                 </ul>
 
                 <div className="text-center mt-auto">
-                  <div className="mb-6">
-                    <span className="text-5xl font-bold text-foreground">{t.pricing.free.price}</span>
-                    <span className="text-muted-foreground">{t.pricing.free.period}</span>
+                  <div className="mb-4">
+                    <span className="text-4xl font-bold text-foreground">{t.pricing.free.price}</span>
+                    <span className="text-muted-foreground text-sm">{t.pricing.free.period}</span>
                   </div>
-                  <button className="w-full bg-muted hover:bg-muted/80 text-foreground font-semibold py-3 px-6 rounded-xl transition-colors border border-border">
+                  <button className="w-full h-12 bg-muted hover:bg-muted/80 text-foreground font-semibold py-3 px-6 rounded-xl transition-colors border border-border flex items-center justify-center">
                     {t.pricing.cta}
                   </button>
                 </div>
               </div>
 
               {/* Plus Plan - Most Popular */}
-              <div className="glass-card rounded-3xl p-8 relative border-2 border-primary shadow-2xl flex flex-col yellow-glow">
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-primary to-accent text-secondary px-6 py-2 rounded-full text-sm font-bold shadow-lg">
+              <div className="glass-card rounded-3xl p-6 relative border-2 border-primary shadow-2xl flex flex-col h-full yellow-glow">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-primary to-accent text-secondary px-5 py-1.5 rounded-full text-xs font-bold shadow-lg">
                   {t.pricing.popular}
                 </div>
-                <div className="text-center mb-8 mt-4">
+                <div className="text-center mb-6 min-h-[100px] flex flex-col justify-center">
                   <h3 className="text-2xl font-bold text-foreground mb-2">{t.pricing.basic.name}</h3>
-                  <p className="text-muted-foreground mb-6 min-h-[48px]">{t.pricing.basic.description}</p>
+                  <p className="text-muted-foreground text-sm">{t.pricing.basic.description}</p>
                 </div>
 
-                <ul className="space-y-4 mb-8 flex-grow">
+                <ul className="space-y-3 mb-6 flex-1">
                   {t.pricing.basic.features.map((feature, index) => (
-                    <li key={index} className="flex items-start gap-3">
+                    <li key={index} className="flex items-start gap-2">
                       <svg
-                        className="w-6 h-6 text-primary flex-shrink-0 mt-0.5"
+                        className="w-5 h-5 text-primary flex-shrink-0 mt-0.5"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
                       >
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
-                      <span className="text-foreground font-medium">{feature}</span>
+                      <span className="text-foreground font-medium text-sm">{feature}</span>
                     </li>
                   ))}
                 </ul>
 
                 <div className="text-center mt-auto">
-                  <div className="mb-6">
-                    <span className="text-5xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                  <div className="mb-4">
+                    <span className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
                       {t.pricing.basic.price}
                     </span>
-                    <span className="text-muted-foreground">{t.pricing.basic.period}</span>
+                    <span className="text-muted-foreground text-sm">{t.pricing.basic.period}</span>
                   </div>
                   <BasicPlanPaymentButton />
                 </div>
