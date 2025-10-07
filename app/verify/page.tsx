@@ -12,6 +12,9 @@ export default function VerifyPage() {
   const [phoneNumber, setPhoneNumber] = useState("")
   const [canResend, setCanResend] = useState(false)
   const [countdown, setCountdown] = useState(60)
+  const [isVerified, setIsVerified] = useState(false)
+  const [isNewUser, setIsNewUser] = useState(false)
+  const [userName, setUserName] = useState("")
   const inputRefs = useRef<(HTMLInputElement | null)[]>([])
 
   const t = {
@@ -27,6 +30,11 @@ export default function VerifyPage() {
       back: "Volver",
       success: "¡Verificación exitosa!",
       redirecting: "Redirigiendo...",
+      welcomeTitle: "¡Bienvenido a Zecu!",
+      welcomeSubtitle: "Para completar tu registro, necesitamos tu nombre",
+      namePlaceholder: "Nombre completo",
+      continue: "Continuar",
+      nameRequired: "Por favor ingresa tu nombre",
     },
     en: {
       title: "Verify code",
@@ -40,7 +48,29 @@ export default function VerifyPage() {
       back: "Back",
       success: "Verification successful!",
       redirecting: "Redirecting...",
+      welcomeTitle: "Welcome to Zecu!",
+      welcomeSubtitle: "To complete your registration, we need your name",
+      namePlaceholder: "Full name",
+      continue: "Continue",
+      nameRequired: "Please enter your name",
     },
+  }
+
+  const handleResend = () => {
+    // Logic to resend code here
+    console.log("Resending code...")
+    setCountdown(60)
+    setCanResend(false)
+    const timer = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          setCanResend(true)
+          clearInterval(timer)
+          return 0
+        }
+        return prev - 1
+      })
+    }, 1000)
   }
 
   useEffect(() => {
@@ -48,7 +78,7 @@ export default function VerifyPage() {
     if (phone) {
       setPhoneNumber(phone)
     } else {
-      router.push("/register")
+      router.push("/login")
     }
 
     const timer = setInterval(() => {
@@ -119,31 +149,113 @@ export default function VerifyPage() {
     console.log("[v0] Phone number:", phoneNumber)
 
     setIsLoading(false)
+    setIsVerified(true)
 
+    const userExists = Math.random() > 0.5 // Simulate 50% chance of existing user
+
+    if (userExists) {
+      console.log("[v0] Existing user, redirecting to dashboard")
+      router.push("/dashboard")
+    } else {
+      console.log("[v0] New user, showing name capture")
+      setIsNewUser(true)
+    }
+  }
+
+  const handleNameSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    if (!userName.trim()) {
+      return
+    }
+
+    setIsLoading(true)
+
+    await new Promise((resolve) => setTimeout(resolve, 1000))
+
+    console.log("[v0] Creating new user with name:", userName)
+    console.log("[v0] Phone:", phoneNumber)
+
+    sessionStorage.setItem("userName", userName)
+
+    setIsLoading(false)
     router.push("/dashboard")
   }
 
-  const handleResend = async () => {
-    if (!canResend) return
-
-    setCanResend(false)
-    setCountdown(60)
-
-    await new Promise((resolve) => setTimeout(resolve, 500))
-
-    const timer = setInterval(() => {
-      setCountdown((prev) => {
-        if (prev <= 1) {
-          setCanResend(true)
-          clearInterval(timer)
-          return 0
-        }
-        return prev - 1
-      })
-    }, 1000)
-  }
-
   const isCodeComplete = code.every((digit) => digit !== "")
+
+  if (isVerified && isNewUser) {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-4 py-12 relative">
+        {/* Language Switcher */}
+        <button
+          onClick={() => setLanguage(language === "es" ? "en" : "es")}
+          className="absolute top-6 right-6 px-4 py-2 glass-card hover:border-primary transition-colors text-sm font-medium"
+        >
+          {language === "es" ? "EN" : "ES"}
+        </button>
+
+        <div className="w-full max-w-md">
+          {/* Logo */}
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center justify-center mb-4">
+              <img src="/zecu-logo.png" alt="Zecu" className="w-20 h-20 rounded-full" />
+            </div>
+            <h1 className="text-3xl font-bold mb-2">{t[language].welcomeTitle}</h1>
+            <p className="text-muted-foreground">{t[language].welcomeSubtitle}</p>
+          </div>
+
+          {/* Name Form */}
+          <form onSubmit={handleNameSubmit} className="glass-card p-8 space-y-6">
+            <div>
+              <label htmlFor="name" className="block text-sm font-medium mb-2">
+                {t[language].namePlaceholder}
+              </label>
+              <input
+                type="text"
+                id="name"
+                value={userName}
+                onChange={(e) => setUserName(e.target.value)}
+                placeholder={t[language].namePlaceholder}
+                className="w-full px-4 py-3 bg-background border-2 border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all"
+                required
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={!userName.trim() || isLoading}
+              className="w-full cta-button text-white font-bold py-3 px-6 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed h-12 flex items-center justify-center"
+            >
+              {isLoading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                      fill="none"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    />
+                  </svg>
+                  {language === "es" ? "Creando cuenta..." : "Creating account..."}
+                </span>
+              ) : (
+                t[language].continue
+              )}
+            </button>
+          </form>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-12 relative">
@@ -170,7 +282,7 @@ export default function VerifyPage() {
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center mb-4">
-            <img src="/zecu-logo.png" alt="Zecu" className="w-16 h-16 rounded-full" />
+            <img src="/zecu-logo.png" alt="Zecu" className="w-20 h-20 rounded-full" />
           </div>
           <h1 className="text-3xl font-bold mb-2">{t[language].title}</h1>
           <p className="text-muted-foreground mb-1">{t[language].subtitle}</p>

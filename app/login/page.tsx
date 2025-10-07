@@ -2,28 +2,95 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useRef } from "react"
 import Image from "next/image"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 
 export default function LoginPage() {
-  const [phone, setPhone] = useState("")
-  const [password, setPassword] = useState("")
-  const [showPassword, setShowPassword] = useState(false)
+  const router = useRouter()
+  const [step, setStep] = useState<"phone" | "otp" | "name">("phone")
+  const [countryCode, setCountryCode] = useState("+54")
+  const [phoneNumber, setPhoneNumber] = useState("")
+  const [otp, setOtp] = useState(["", "", "", "", "", ""])
+  const [name, setName] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const otpInputs = useRef<(HTMLInputElement | null)[]>([])
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const countryCodes = [
+    { code: "+54", country: "Argentina", flag: "🇦🇷" },
+    { code: "+1", country: "USA/Canada", flag: "🇺🇸" },
+    { code: "+52", country: "México", flag: "🇲🇽" },
+    { code: "+34", country: "España", flag: "🇪🇸" },
+    { code: "+55", country: "Brasil", flag: "🇧🇷" },
+    { code: "+56", country: "Chile", flag: "🇨🇱" },
+    { code: "+57", country: "Colombia", flag: "🇨🇴" },
+    { code: "+51", country: "Perú", flag: "🇵🇪" },
+    { code: "+598", country: "Uruguay", flag: "🇺🇾" },
+  ]
+
+  const handlePhoneSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
 
-    // TODO: Implement actual login logic
-    console.log("[v0] Login attempt with:", { phone, password })
+    // Simulate sending OTP
+    await new Promise((resolve) => setTimeout(resolve, 1000))
 
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false)
-      alert("Login functionality will be implemented soon!")
-    }, 1500)
+    setIsLoading(false)
+    setStep("otp")
+  }
+
+  const handleOtpChange = (index: number, value: string) => {
+    if (value.length > 1) {
+      value = value.slice(0, 1)
+    }
+
+    const newOtp = [...otp]
+    newOtp[index] = value
+    setOtp(newOtp)
+
+    // Auto-focus next input
+    if (value && index < 5) {
+      otpInputs.current[index + 1]?.focus()
+    }
+  }
+
+  const handleOtpSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsLoading(true)
+
+    // Simulate OTP verification
+    await new Promise((resolve) => setTimeout(resolve, 1000))
+
+    // Simulate checking if user exists (50% chance for demo)
+    const userExists = Math.random() > 0.5
+
+    setIsLoading(false)
+
+    if (userExists) {
+      // Existing user - go to dashboard
+      router.push("/dashboard")
+    } else {
+      // New user - ask for name
+      setStep("name")
+    }
+  }
+
+  const handleNameSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsLoading(true)
+
+    // Simulate creating user account
+    await new Promise((resolve) => setTimeout(resolve, 1000))
+
+    setIsLoading(false)
+    router.push("/dashboard")
+  }
+
+  const handleOtpKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Backspace" && !otp[index] && index > 0) {
+      otpInputs.current[index - 1]?.focus()
+    }
   }
 
   return (
@@ -54,140 +121,221 @@ export default function LoginPage() {
             />
           </div>
 
-          <h1 className="text-3xl font-bold text-foreground mb-2">Iniciar sesión</h1>
-          <p className="text-muted-foreground">Accede a tu cuenta de Zecubot</p>
+          <h1 className="text-3xl font-bold text-foreground mb-2">
+            {step === "phone" && "Iniciar sesión"}
+            {step === "otp" && "Verificar código"}
+            {step === "name" && "Completa tu perfil"}
+          </h1>
+          <p className="text-muted-foreground">
+            {step === "phone" && "Te enviaremos un código de verificación"}
+            {step === "otp" && `Código enviado a ${countryCode} ${phoneNumber}`}
+            {step === "name" && "Necesitamos saber tu nombre"}
+          </p>
         </div>
 
-        {/* Login form */}
+        {/* Form container */}
         <div className="glass-card rounded-3xl p-8">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Phone number field */}
-            <div>
-              <label htmlFor="phone" className="block text-sm font-medium text-foreground mb-2">
-                Número de teléfono
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <svg className="w-5 h-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-                    />
-                  </svg>
-                </div>
-                <input
-                  type="tel"
-                  id="phone"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  placeholder="+54 9 11 1234-5678"
-                  className="w-full pl-12 pr-4 py-3 bg-background/50 border-2 border-border rounded-xl text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary transition-colors backdrop-blur-sm"
-                  required
-                />
-              </div>
-            </div>
+          {step === "phone" && (
+            <form onSubmit={handlePhoneSubmit} className="space-y-6">
+              <div>
+                <label htmlFor="phone" className="block text-sm font-medium text-foreground mb-2">
+                  Número de teléfono
+                </label>
+                <div className="flex gap-2">
+                  <div className="relative w-32">
+                    <select
+                      value={countryCode}
+                      onChange={(e) => setCountryCode(e.target.value)}
+                      className="w-full px-3 py-3 bg-background/50 border-2 border-border rounded-xl text-foreground focus:outline-none focus:border-primary transition-colors backdrop-blur-sm appearance-none cursor-pointer"
+                    >
+                      {countryCodes.map((country) => (
+                        <option key={country.code} value={country.code}>
+                          {country.flag} {country.code}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
 
-            {/* Password field */}
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-foreground mb-2">
-                Contraseña
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <svg className="w-5 h-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 01-8 0v4h8z"
+                  <div className="relative flex-1">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                      <svg
+                        className="w-5 h-5 text-muted-foreground"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                        />
+                      </svg>
+                    </div>
+                    <input
+                      type="tel"
+                      id="phone"
+                      value={phoneNumber}
+                      onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, ""))}
+                      placeholder="11 2345 6789"
+                      className="w-full pl-12 pr-4 py-3 bg-background/50 border-2 border-border rounded-xl text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary transition-colors backdrop-blur-sm"
+                      required
                     />
-                  </svg>
+                  </div>
                 </div>
-                <input
-                  type={showPassword ? "text" : "password"}
-                  id="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="w-full pl-12 pr-12 py-3 bg-background/50 border-2 border-border rounded-xl text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary transition-colors backdrop-blur-sm"
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  {showPassword ? (
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              </div>
+
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full bg-gradient-to-r from-primary to-accent text-secondary font-bold py-4 px-6 rounded-xl hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed yellow-glow h-12 flex items-center justify-center"
+              >
+                {isLoading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                       <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.542 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                       />
                     </svg>
-                  ) : (
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    Enviando código...
+                  </span>
+                ) : (
+                  "Enviar código"
+                )}
+              </button>
+            </form>
+          )}
+
+          {step === "otp" && (
+            <form onSubmit={handleOtpSubmit} className="space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-4 text-center">
+                  Ingresa el código de 6 dígitos
+                </label>
+                <div className="flex gap-2 justify-center">
+                  {otp.map((digit, index) => (
+                    <input
+                      key={index}
+                      ref={(el) => {
+                        otpInputs.current[index] = el
+                      }}
+                      type="text"
+                      inputMode="numeric"
+                      maxLength={1}
+                      value={digit}
+                      onChange={(e) => handleOtpChange(index, e.target.value)}
+                      onKeyDown={(e) => handleOtpKeyDown(index, e)}
+                      className="w-12 h-14 text-center text-xl font-bold bg-background/50 border-2 border-border rounded-xl text-foreground focus:outline-none focus:border-primary transition-colors backdrop-blur-sm"
+                      required
+                    />
+                  ))}
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={isLoading || otp.some((digit) => !digit)}
+                className="w-full bg-gradient-to-r from-primary to-accent text-secondary font-bold py-4 px-6 rounded-xl hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed yellow-glow h-12 flex items-center justify-center"
+              >
+                {isLoading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                       <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                      />
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                       />
                     </svg>
-                  )}
-                </button>
+                    Verificando...
+                  </span>
+                ) : (
+                  "Verificar"
+                )}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setStep("phone")}
+                className="w-full text-muted-foreground hover:text-foreground transition-colors text-sm"
+              >
+                Cambiar número de teléfono
+              </button>
+            </form>
+          )}
+
+          {step === "name" && (
+            <form onSubmit={handleNameSubmit} className="space-y-6">
+              <div>
+                <label htmlFor="name" className="block text-sm font-medium text-foreground mb-2">
+                  Tu nombre
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <svg
+                      className="w-5 h-5 text-muted-foreground"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                      />
+                    </svg>
+                  </div>
+                  <input
+                    type="text"
+                    id="name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Juan Pérez"
+                    className="w-full pl-12 pr-4 py-3 bg-background/50 border-2 border-border rounded-xl text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary transition-colors backdrop-blur-sm"
+                    required
+                  />
+                </div>
               </div>
+
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full bg-gradient-to-r from-primary to-accent text-secondary font-bold py-4 px-6 rounded-xl hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed yellow-glow h-12 flex items-center justify-center"
+              >
+                {isLoading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      />
+                    </svg>
+                    Creando cuenta...
+                  </span>
+                ) : (
+                  "Continuar"
+                )}
+              </button>
+            </form>
+          )}
+
+          {/* Sign up link - only show on phone step */}
+          {step === "phone" && (
+            <div className="mt-6 text-center">
+              <p className="text-muted-foreground">
+                ¿No tienes una cuenta?{" "}
+                <Link href="/register" className="text-primary hover:text-primary/80 font-medium transition-colors">
+                  Regístrate gratis
+                </Link>
+              </p>
             </div>
-
-            {/* Forgot password link */}
-            <div className="flex justify-end">
-              <a href="#" className="text-sm text-primary hover:text-primary/80 transition-colors">
-                ¿Olvidaste tu contraseña?
-              </a>
-            </div>
-
-            {/* Submit button */}
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full bg-gradient-to-r from-primary to-accent text-secondary font-bold py-4 px-6 rounded-xl hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed yellow-glow"
-            >
-              {isLoading ? (
-                <span className="flex items-center justify-center gap-2">
-                  <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    />
-                  </svg>
-                  Iniciando sesión...
-                </span>
-              ) : (
-                "Iniciar sesión"
-              )}
-            </button>
-          </form>
-
-          {/* Sign up link */}
-          <div className="mt-6 text-center">
-            <p className="text-muted-foreground">
-              ¿No tienes una cuenta?{" "}
-              <Link href="/register" className="text-primary hover:text-primary/80 font-medium transition-colors">
-                Regístrate gratis
-              </Link>
-            </p>
-          </div>
+          )}
         </div>
       </div>
     </div>
