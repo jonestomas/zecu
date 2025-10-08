@@ -11,7 +11,10 @@
     "lint": "next lint",
     "preview": "npm run build && npm run start",
     "start": "next start",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "check-env": "node scripts/check-env.js",
+    "generate-jwt": "node scripts/generate-jwt-secret.js",
+    "dev:check": "npm run check-env && npm run dev"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
@@ -77,6 +80,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "autoprefixer": "^10.4.20",
+    "dotenv": "^16.4.5",
     "postcss": "^8.5",
     "tailwindcss": "^4.1.9",
     "typescript": "^5"
