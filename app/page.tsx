@@ -85,8 +85,7 @@ const translations = {
           "5 análisis de mensajes al mes",
           "Detección básica de phishing",
           "Respuestas automáticas",
-          "Soporte por email",
-        ],
+            ],
       },
       basic: {
         name: "Plus",
@@ -94,12 +93,11 @@ const translations = {
         period: "/mes",
         description: "Ideal para protección diaria completa",
         features: [
-          "50 análisis de mensajes al mes",
-          "Detección avanzada de estafas",
-          "Análisis de imágenes y audios",
-          "Guía paso a paso personalizada",
-          "Soporte prioritario 24/7",
-          "Alertas en tiempo real",
+          "20 análisis de mensajes al mes",
+          "IA entrenada específicamente para guiarte"
+          "Detección avanzada de estafas y fraudes",
+          "Análisis de imágenes"
+          "Análisis de audios",
         ],
       },
     },
@@ -109,7 +107,7 @@ const translations = {
         "La prevención es la mejor forma de protegerte. Y si algo falla, también estaremos aquí para asistirte.",
     },
     finalCta: {
-      title: "Prorotége ahora mismo",
+      title: "Protége ahora mismo",
       subtitle: "No esperes a ser víctima de una estafa. Empieza a usar Zecubot hoy mismo.",
     },
   },
@@ -591,7 +589,7 @@ export default function Home() {
                     <span className="text-4xl font-bold text-foreground">{t.pricing.free.price}</span>
                     <span className="text-muted-foreground text-sm">{t.pricing.free.period}</span>
                   </div>
-                  <button className="w-full h-12 bg-muted hover:bg-muted/80 text-foreground font-semibold py-3 px-6 rounded-xl transition-colors border border-border flex items-center justify-center">
+                  <button className="w-full h-12 bg-muted hover:bg-muted/80 text-foreground font-semibold text-base py-3 px-6 rounded-xl transition-colors border border-border flex items-center justify-center">
                     {t.pricing.cta}
                   </button>
                 </div>

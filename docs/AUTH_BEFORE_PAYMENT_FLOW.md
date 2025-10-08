@@ -17,14 +17,14 @@ Sistema implementado donde el usuario **DEBE** registrarse o autenticarse **ANTE
 
 El usuario navega por el landing y ve el plan Plus (AR$5.499/mes).
 
-```
+\`\`\`
 ┌─────────────────────────────────┐
 │   Landing Page (app/page.tsx)   │
 │                                  │
 │   Plan Plus: AR$5.499/mes       │
 │   [Suscribirse a Plus]          │
 └─────────────────────────────────┘
-```
+\`\`\`
 
 ### 2️⃣ Click en "Suscribirse a Plus"
 
@@ -32,7 +32,7 @@ El botón `PlusPlanPaymentButton` verifica si el usuario está autenticado.
 
 **Componente**: `components/payment-button.tsx`
 
-```typescript
+\`\`\`typescript
 const handlePayment = async () => {
   // 1. Verificar sesión
   const sessionCheck = await fetch("/api/auth/check-session")
@@ -55,7 +55,7 @@ const handlePayment = async () => {
   // Usuario autenticado → Continuar al pago
   // ...
 }
-```
+\`\`\`
 
 ### 3️⃣ Usuario NO Autenticado → Login/Registro
 
@@ -63,7 +63,7 @@ Si el usuario no está autenticado, se le redirige a `/login`.
 
 **Flujo de autenticación OTP:**
 
-```
+\`\`\`
 1. Usuario ingresa teléfono (+54911...)
    ↓
 2. POST /api/auth/send-otp
@@ -84,7 +84,7 @@ Si el usuario no está autenticado, se le redirige a `/login`.
    - Establece cookie `session_token`
    ↓
 6. Usuario autenticado ✅
-```
+\`\`\`
 
 ### 4️⃣ Checkout Automático
 
@@ -92,7 +92,7 @@ Después del login exitoso, el frontend detecta la `pendingPurchase` en `session
 
 **Página**: `app/checkout/page.tsx`
 
-```typescript
+\`\`\`typescript
 useEffect(() => {
   const processPendingPurchase = async () => {
     // 1. Verificar autenticación
@@ -116,13 +116,13 @@ useEffect(() => {
   
   processPendingPurchase()
 }, [])
-```
+\`\`\`
 
 ### 5️⃣ Crear Preferencia de Pago (Backend)
 
 **API**: `app/api/create-payment/route.ts`
 
-```typescript
+\`\`\`typescript
 export async function POST(request: NextRequest) {
   // 1. Verificar JWT token en cookie
   const sessionToken = request.cookies.get('session_token')?.value
@@ -152,11 +152,11 @@ export async function POST(request: NextRequest) {
     sandboxInitPoint: preference.sandbox_init_point
   })
 }
-```
+\`\`\`
 
 **Metadata enviada a Mercado Pago:**
 
-```json
+\`\`\`json
 {
   "metadata": {
     "user_id": "uuid-del-usuario",
@@ -165,13 +165,13 @@ export async function POST(request: NextRequest) {
   },
   "external_reference": "zecu-plus-uuid-del-usuario-1696800000"
 }
-```
+\`\`\`
 
 ### 6️⃣ Usuario Paga en Mercado Pago
 
 El usuario completa el pago en el checkout de Mercado Pago.
 
-```
+\`\`\`
 ┌─────────────────────────────────┐
 │   Mercado Pago Checkout         │
 │                                  │
@@ -180,7 +180,7 @@ El usuario completa el pago en el checkout de Mercado Pago.
 │                                  │
 │   [Pagar con tarjeta]           │
 └─────────────────────────────────┘
-```
+\`\`\`
 
 ### 7️⃣ Webhook de Mercado Pago
 
@@ -188,7 +188,7 @@ Cuando el pago es aprobado, Mercado Pago envía un webhook.
 
 **API**: `app/api/webhooks/mercadopago/route.ts`
 
-```typescript
+\`\`\`typescript
 async function handleApprovedPayment(paymentInfo: any) {
   // 1. Extraer metadata
   const metadata = paymentInfo.metadata
@@ -216,13 +216,13 @@ async function handleApprovedPayment(paymentInfo: any) {
     console.log(`✅ Plan Plus activado para ${userPhone}`)
   }
 }
-```
+\`\`\`
 
 ### 8️⃣ Página de Éxito
 
 El usuario es redirigido a `/payment/success`.
 
-```
+\`\`\`
 ┌─────────────────────────────────┐
 │   ✅ Pago Exitoso               │
 │                                  │
@@ -231,7 +231,7 @@ El usuario es redirigido a `/payment/success`.
 │                                  │
 │   [Ir al Dashboard]             │
 └─────────────────────────────────┘
-```
+\`\`\`
 
 ---
 
@@ -294,7 +294,7 @@ Si por alguna razón no llega la metadata (ej: pago directo desde MP), el webhoo
 
 ## 📊 Diagrama de Flujo Completo
 
-```
+\`\`\`
 ┌──────────────┐
 │ Landing Page │
 └──────┬───────┘
@@ -346,7 +346,7 @@ Si por alguna razón no llega la metadata (ej: pago directo desde MP), el webhoo
        │ /payment/success     │
        │ Plan activado ✅     │
        └──────────────────────┘
-```
+\`\`\`
 
 ---
 
@@ -355,7 +355,7 @@ Si por alguna razón no llega la metadata (ej: pago directo desde MP), el webhoo
 ### Test Manual
 
 1. **Usuario nuevo compra Plus:**
-   ```
+   \`\`\`
    1. Ir a landing
    2. Click "Suscribirse a Plus"
    3. Debería redirigir a /login
@@ -366,29 +366,29 @@ Si por alguna razón no llega la metadata (ej: pago directo desde MP), el webhoo
    8. Debería auto-redirigir a Mercado Pago
    9. Completar pago
    10. Webhook activa plan Plus
-   ```
+   \`\`\`
 
 2. **Usuario existente compra Plus:**
-   ```
+   \`\`\`
    1. Usuario ya tiene cuenta (plan free)
    2. Click "Suscribirse a Plus"
    3. Login con OTP
    4. Checkout automático
    5. Pago en MP
    6. Plan actualizado de free → plus
-   ```
+   \`\`\`
 
 3. **Usuario con plan Plus intenta comprar:**
-   ```
+   \`\`\`
    1. Usuario tiene plan Plus activo
    2. Click "Suscribirse a Plus"
    3. POST /create-payment → Error 400
    4. Mensaje: "Ya tienes un plan Plus activo"
-   ```
+   \`\`\`
 
 ### Logs a Monitorear
 
-```bash
+\`\`\`bash
 # Frontend (Browser Console)
 📱 Sesión no encontrada, redirigiendo a login
 💾 Compra guardada en sessionStorage
@@ -399,7 +399,7 @@ Si por alguna razón no llega la metadata (ej: pago directo desde MP), el webhoo
 💳 Preferencia creada: pref_id para usuario uuid
 📦 Metadata recibida: { user_id, user_phone, plan_id }
 ✅ Plan Plus activado para usuario uuid (+54911...)
-```
+\`\`\`
 
 ---
 
@@ -418,7 +418,7 @@ Si por alguna razón no llega la metadata (ej: pago directo desde MP), el webhoo
 
 ## 📝 Variables de Entorno Necesarias
 
-```bash
+\`\`\`bash
 # JWT
 JWT_SECRET=tu-secreto-super-seguro
 
@@ -432,7 +432,7 @@ NEXT_PUBLIC_BASE_URL=https://tu-dominio.com
 
 # n8n (para OTP)
 N8N_WEBHOOK_SEND_OTP_URL=https://n8n.com/webhook/send-otp
-```
+\`\`\`
 
 ---
 
@@ -457,5 +457,3 @@ N8N_WEBHOOK_SEND_OTP_URL=https://n8n.com/webhook/send-otp
 2. **Renovación automática**: Integración con suscripciones recurrentes de MP
 3. **Notificaciones**: Email/WhatsApp cuando el plan está por expirar
 4. **Analytics**: Tracking de conversión del flujo completo
-
-

@@ -192,4 +192,3 @@ export async function invalidateAllOTPCodes(phone: string): Promise<void> {
     .eq('phone', phone)
     .eq('verified', false);
 }
-

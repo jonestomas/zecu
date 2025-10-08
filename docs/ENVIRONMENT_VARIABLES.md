@@ -4,7 +4,7 @@
 
 Copia este contenido en tu archivo `.env.local`:
 
-```bash
+\`\`\`bash
 # ===========================================
 # Supabase Configuration
 # ===========================================
@@ -50,7 +50,7 @@ NEXT_PUBLIC_BASE_URL=http://localhost:3000
 # TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 # TWILIO_AUTH_TOKEN=your-auth-token
 # TWILIO_WHATSAPP_FROM=whatsapp:+14155238886
-```
+\`\`\`
 
 ---
 
@@ -62,9 +62,9 @@ NEXT_PUBLIC_BASE_URL=http://localhost:3000
 **Dónde obtenerla:** Supabase Dashboard → Settings → API → Project URL
 
 **Ejemplo:**
-```
+\`\`\`
 https://abcdefghijklmnop.supabase.co
-```
+\`\`\`
 
 ---
 
@@ -79,9 +79,9 @@ https://abcdefghijklmnop.supabase.co
 - Ignora Row Level Security (RLS)
 
 **Ejemplo:**
-```
+\`\`\`
 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFiY2RlZmdoaWprbG1ub3AiLCJyb2xlIjoic2VydmljZV9yb2xlIiwiaWF0IjoxNjk0NTYwMDAwLCJleHAiOjE4NTIyNDAwMDB9.xxx-signature-xxx
-```
+\`\`\`
 
 ---
 
@@ -91,14 +91,14 @@ eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFiY2RlZmd
 **Propósito:** Firmar tokens de sesión (JWT)
 
 **Generar:**
-```bash
+\`\`\`bash
 node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
-```
+\`\`\`
 
 **Output ejemplo:**
-```
+\`\`\`
 5f3a2b1c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a
-```
+\`\`\`
 
 ---
 
@@ -108,9 +108,9 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 **Propósito:** Enviar códigos OTP por WhatsApp vía n8n
 
 **Formato:**
-```
+\`\`\`
 https://tu-n8n-instance.com/webhook/send-otp
-```
+\`\`\`
 
 **Desarrollo sin n8n:**
 - Déjalo vacío o comenta la línea
@@ -147,7 +147,7 @@ https://tu-n8n-instance.com/webhook/send-otp
 **Propósito:** URL base para webhooks y redirects de Mercado Pago
 
 **Ejemplos:**
-```bash
+\`\`\`bash
 # Desarrollo local
 NEXT_PUBLIC_BASE_URL=http://localhost:3000
 
@@ -156,7 +156,7 @@ NEXT_PUBLIC_BASE_URL=https://zecubot.vercel.app
 
 # Dominio custom
 NEXT_PUBLIC_BASE_URL=https://www.zecubot.com
-```
+\`\`\`
 
 ---
 
@@ -164,10 +164,10 @@ NEXT_PUBLIC_BASE_URL=https://www.zecubot.com
 
 ### 1. Copiar archivo de ejemplo
 
-```bash
+\`\`\`bash
 cp docs/ENVIRONMENT_VARIABLES.md .env.local
 # Edita .env.local con tus valores reales
-```
+\`\`\`
 
 ### 2. Configurar Supabase
 
@@ -178,10 +178,10 @@ cp docs/ENVIRONMENT_VARIABLES.md .env.local
 
 ### 3. Configurar JWT Secret
 
-```bash
+\`\`\`bash
 node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 # Copia el output → JWT_SECRET
-```
+\`\`\`
 
 ### 4. Configurar Mercado Pago
 
@@ -225,11 +225,11 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 2. Settings → Environment Variables
 3. Agrega cada variable:
 
-```
+\`\`\`
 Name: NEXT_PUBLIC_SUPABASE_URL
 Value: https://your-project.supabase.co
 Environment: Production, Preview, Development
-```
+\`\`\`
 
 Repite para:
 - `SUPABASE_SERVICE_ROLE_KEY` (solo Production y Preview)
@@ -240,7 +240,7 @@ Repite para:
 
 ### Verificar Deploy
 
-```bash
+\`\`\`bash
 # 1. Trigger redeploy
 git push origin main
 
@@ -252,7 +252,7 @@ curl https://tu-app.vercel.app/api/auth/send-otp \
   -X POST \
   -H "Content-Type: application/json" \
   -d '{"phone": "+5491112345678"}'
-```
+\`\`\`
 
 ---
 
@@ -260,7 +260,7 @@ curl https://tu-app.vercel.app/api/auth/send-otp \
 
 ### Verificar Variables Localmente
 
-```bash
+\`\`\`bash
 # Verificar que todas las variables están cargadas
 node -e "
 require('dotenv').config({ path: '.env.local' });
@@ -276,7 +276,7 @@ vars.forEach(v => {
   console.log(\`\${v}: \${val ? '✅ Set' : '❌ Missing'}\`);
 });
 "
-```
+\`\`\`
 
 ---
 
@@ -289,4 +289,3 @@ vars.forEach(v => {
 ---
 
 **Última actualización:** Octubre 2025
-

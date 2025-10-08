@@ -10,10 +10,10 @@ El flujo de compra ahora requiere que el usuario se registre/autentique **ANTES*
 
 ### ❌ Flujo Anterior (Ya NO se usa)
 
-```
+\`\`\`
 Landing → "Suscribirse Plus" → Mercado Pago → Pago → 
 Webhook crea usuario → Envía OTP → Login → Dashboard
-```
+\`\`\`
 
 **Problemas:**
 - Usuarios fantasma si el pago falla
@@ -22,11 +22,11 @@ Webhook crea usuario → Envía OTP → Login → Dashboard
 
 ### ✅ Flujo Nuevo (Implementado)
 
-```
+\`\`\`
 Landing → "Suscribirse Plus" → Verificar Sesión →
 [NO autenticado] → Login/Registro OTP → Checkout → 
 Mercado Pago → Pago → Webhook actualiza plan → Dashboard
-```
+\`\`\`
 
 **Ventajas:**
 - ✅ Usuario creado antes del pago
@@ -41,7 +41,7 @@ Mercado Pago → Pago → Webhook actualiza plan → Dashboard
 
 ### Flujo 1: Usuario NUEVO compra Plan Plus
 
-```
+\`\`\`
 1. Usuario en landing page
    ↓
 2. Clic en "Suscribirse a Plan Plus" (AR$5.499/mes)
@@ -89,11 +89,11 @@ Mercado Pago → Pago → Webhook actualiza plan → Dashboard
 18. Mercado Pago redirige a /payment/success
     ↓
 19. Usuario va a Dashboard → Ve Plan Plus activo ✅
-```
+\`\`\`
 
 ### Flujo 2: Usuario EXISTENTE compra Plan Plus
 
-```
+\`\`\`
 1. Usuario en landing page (ya autenticado)
    ↓
 2. Clic en "Suscribirse a Plan Plus"
@@ -111,11 +111,11 @@ Mercado Pago → Pago → Webhook actualiza plan → Dashboard
 8. Redirige a /payment/success
    ↓
 9. Dashboard → Plan Plus activo ✅
-```
+\`\`\`
 
 ### Flujo 3: Usuario se registra sin comprar (Plan Free)
 
-```
+\`\`\`
 1. Usuario → /login o /register
    ↓
 2. Ingresa teléfono → POST /api/auth/send-otp
@@ -131,7 +131,7 @@ Mercado Pago → Pago → Webhook actualiza plan → Dashboard
 7. NO hay pendingPurchase → Redirige a Dashboard
    ↓
 8. Dashboard → Plan Free activo (gratis) ✅
-```
+\`\`\`
 
 ---
 
@@ -140,13 +140,13 @@ Mercado Pago → Pago → Webhook actualiza plan → Dashboard
 ### 1. `components/payment-button.tsx`
 
 **Antes:**
-```typescript
+\`\`\`typescript
 // Creaba preferencia de pago directamente
 await fetch("/api/create-payment", { ... })
-```
+\`\`\`
 
 **Ahora:**
-```typescript
+\`\`\`typescript
 // Verifica sesión primero
 const sessionCheck = await fetch("/api/auth/check-session")
 
@@ -158,13 +158,13 @@ if (!authenticated) {
   // Procede al pago
   await fetch("/api/create-payment", { ... })
 }
-```
+\`\`\`
 
 ### 2. `app/api/auth/check-session/route.ts` (NUEVO)
 
 **Propósito:** Verificar si el usuario tiene sesión activa
 
-```typescript
+\`\`\`typescript
 export async function GET(request: NextRequest) {
   const sessionToken = request.cookies.get('session_token')?.value
   const session = await verifySessionToken(sessionToken)
@@ -175,13 +175,13 @@ export async function GET(request: NextRequest) {
     phone: session?.phone
   })
 }
-```
+\`\`\`
 
 ### 3. `app/checkout/page.tsx` (NUEVO)
 
 **Propósito:** Página intermedia que procesa la compra pendiente y redirige a Mercado Pago
 
-```typescript
+\`\`\`typescript
 useEffect(() => {
   const pendingPurchase = sessionStorage.getItem('pendingPurchase')
   
@@ -201,13 +201,13 @@ useEffect(() => {
     window.location.href = initPoint
   }
 }, [])
-```
+\`\`\`
 
 ### 4. `app/login/page.tsx` y `app/verify/page.tsx`
 
 **Modificación:** Después de verificación exitosa o actualización de perfil:
 
-```typescript
+\`\`\`typescript
 // Verificar si hay compra pendiente
 const pendingPurchase = sessionStorage.getItem('pendingPurchase')
 
@@ -216,13 +216,13 @@ if (pendingPurchase) {
 } else {
   router.push('/dashboard')  // Ir al dashboard normal
 }
-```
+\`\`\`
 
 ### 5. `app/api/webhooks/mercadopago/route.ts`
 
 **Modificación:** Ya no crea usuarios automáticamente, solo actualiza plan
 
-```typescript
+\`\`\`typescript
 if (planId === 'plus') {
   const existingUser = await getUserByPhone(fullPhone)
   
@@ -235,7 +235,7 @@ if (planId === 'plus') {
     await sendOTPViaWhatsApp(fullPhone, otpCode)
   }
 }
-```
+\`\`\`
 
 ---
 
@@ -244,14 +244,14 @@ if (planId === 'plus') {
 ### `pendingPurchase`
 
 **Estructura:**
-```json
+\`\`\`json
 {
   "planId": "plus",
   "planName": "Plan Plus",
   "price": "AR$5.499",
   "timestamp": 1696800000000
 }
-```
+\`\`\`
 
 **Cuándo se crea:**
 - Al hacer clic en botón de pago sin estar autenticado
@@ -272,7 +272,7 @@ if (planId === 'plus') {
 
 ### Test del Flujo Completo
 
-```bash
+\`\`\`bash
 # 1. Iniciar servidor
 npm run dev
 
@@ -304,15 +304,15 @@ sessionStorage.clear()
 
 # 14. Verificar plan actualizado en Supabase:
 SELECT * FROM users WHERE phone = '+5491112345678';
-```
+\`\`\`
 
 ### Verificar sessionStorage
 
-```javascript
+\`\`\`javascript
 // En DevTools Console
 console.log(JSON.parse(sessionStorage.getItem('pendingPurchase')))
 // Debería mostrar: { planId: "plus", planName: "Plan Plus", ... }
-```
+\`\`\`
 
 ---
 
@@ -342,7 +342,7 @@ console.log(JSON.parse(sessionStorage.getItem('pendingPurchase')))
 
 En lugar de `sessionStorage`, guardar en tabla `pending_purchases`:
 
-```sql
+\`\`\`sql
 CREATE TABLE pending_purchases (
   id UUID PRIMARY KEY,
   user_id UUID REFERENCES users(id),
@@ -350,16 +350,16 @@ CREATE TABLE pending_purchases (
   created_at TIMESTAMP,
   expires_at TIMESTAMP
 );
-```
+\`\`\`
 
 **Ventaja:** Sobrevive al cierre del navegador
 
 ### Opción 2: Link mágico para retomar compra
 
 Enviar email/WhatsApp con link:
-```
+\`\`\`
 https://zecubot.com/checkout?token=abc123
-```
+\`\`\`
 
 ### Opción 3: Analytics de abandono
 
@@ -383,4 +383,3 @@ Trackear cuántos usuarios abandonan en cada paso:
 
 **Última actualización:** Octubre 2025  
 **Versión del flujo:** 2.0.0 (Registro antes de pago)
-

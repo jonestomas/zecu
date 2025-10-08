@@ -30,7 +30,7 @@ Sistema completo de autenticación sin contraseñas (passwordless) usando códig
 
 ## 🏗️ Arquitectura
 
-```
+\`\`\`
 Frontend (Next.js)
     ↓
 API Routes (/api/auth/*)
@@ -38,7 +38,7 @@ API Routes (/api/auth/*)
 Supabase (PostgreSQL)
     ↓
 n8n Webhook → Twilio → WhatsApp
-```
+\`\`\`
 
 ### Componentes
 
@@ -54,7 +54,7 @@ n8n Webhook → Twilio → WhatsApp
 
 ### Tabla: `users`
 
-```sql
+\`\`\`sql
 CREATE TABLE public.users (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   phone VARCHAR(20) UNIQUE NOT NULL,
@@ -65,7 +65,7 @@ CREATE TABLE public.users (
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW()
 );
-```
+\`\`\`
 
 **Campos:**
 - `phone`: Número con código de país (ej: `+5491112345678`)
@@ -74,7 +74,7 @@ CREATE TABLE public.users (
 
 ### Tabla: `otp_codes`
 
-```sql
+\`\`\`sql
 CREATE TABLE public.otp_codes (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   phone VARCHAR(20) NOT NULL,
@@ -84,7 +84,7 @@ CREATE TABLE public.otp_codes (
   attempts INT DEFAULT 0,
   created_at TIMESTAMP DEFAULT NOW()
 );
-```
+\`\`\`
 
 **Campos:**
 - `code`: Código de 6 dígitos
@@ -108,22 +108,22 @@ Ejecuta en Supabase SQL Editor:
 **Descripción:** Genera código OTP y lo envía por WhatsApp.
 
 **Request:**
-```json
+\`\`\`json
 {
   "phone": "+5491112345678",
   "name": "Juan Pérez" // Opcional
 }
-```
+\`\`\`
 
 **Response:**
-```json
+\`\`\`json
 {
   "success": true,
   "message": "Código enviado exitosamente",
   "isNewUser": false,
   "expiresIn": 300
 }
-```
+\`\`\`
 
 **Flujo Interno:**
 1. Valida formato de teléfono
@@ -138,16 +138,16 @@ Ejecuta en Supabase SQL Editor:
 **Descripción:** Verifica código OTP y crea/actualiza sesión.
 
 **Request:**
-```json
+\`\`\`json
 {
   "phone": "+5491112345678",
   "code": "123456",
   "name": "Juan Pérez" // Opcional para nuevos usuarios
 }
-```
+\`\`\`
 
 **Response:**
-```json
+\`\`\`json
 {
   "success": true,
   "message": "Verificación exitosa",
@@ -160,7 +160,7 @@ Ejecuta en Supabase SQL Editor:
     "plan_expires_at": null
   }
 }
-```
+\`\`\`
 
 **Flujo Interno:**
 1. Valida código en base de datos
@@ -176,25 +176,25 @@ Ejecuta en Supabase SQL Editor:
 **Descripción:** Actualiza nombre del usuario autenticado.
 
 **Request:**
-```json
+\`\`\`json
 {
   "name": "Juan Pérez"
 }
-```
+\`\`\`
 
 **Headers:**
-```
+\`\`\`
 Cookie: session_token=<JWT_TOKEN>
-```
+\`\`\`
 
 **Response:**
-```json
+\`\`\`json
 {
   "success": true,
   "message": "Perfil actualizado exitosamente",
   "user": { /* datos del usuario */ }
 }
-```
+\`\`\`
 
 ---
 
@@ -202,7 +202,7 @@ Cookie: session_token=<JWT_TOKEN>
 
 ### Flujo 1: Usuario Nuevo - Plan Free
 
-```
+\`\`\`
 1. Usuario → /login
 2. Ingresa teléfono → [Enviar código]
 3. POST /api/auth/send-otp
@@ -212,11 +212,11 @@ Cookie: session_token=<JWT_TOKEN>
 7. ¿Usuario nuevo? → Pedir nombre
 8. POST /api/auth/update-profile
 9. → Dashboard (Plan Free activo)
-```
+\`\`\`
 
 ### Flujo 2: Usuario Existente - Login
 
-```
+\`\`\`
 1. Usuario → /login
 2. Ingresa teléfono → [Enviar código]
 3. POST /api/auth/send-otp (isNewUser: false)
@@ -224,11 +224,11 @@ Cookie: session_token=<JWT_TOKEN>
 5. Usuario ingresa código → [Verificar]
 6. POST /api/auth/verify-otp (isNewUser: false)
 7. → Dashboard directo
-```
+\`\`\`
 
 ### Flujo 3: Compra Plan Plus SIN cuenta
 
-```
+\`\`\`
 1. Usuario → Landing Page
 2. Clic "Suscribirse a Plus"
 3. → Mercado Pago (pago de AR$5.499)
@@ -242,18 +242,18 @@ Cookie: session_token=<JWT_TOKEN>
 8. Ingresa código recibido
 9. POST /api/auth/verify-otp
 10. → Dashboard (Plan Plus activo por 30 días)
-```
+\`\`\`
 
 ### Flujo 4: Upgrade a Plus CON cuenta
 
-```
+\`\`\`
 1. Usuario con sesión activa
 2. Clic "Suscribirse a Plus"
 3. → Mercado Pago
 4. Pago aprobado
 5. Webhook actualiza: user.plan = 'plus'
 6. → Dashboard (Plan Plus activo)
-```
+\`\`\`
 
 ---
 
@@ -263,7 +263,7 @@ Cookie: session_token=<JWT_TOKEN>
 
 Agrega a `.env.local`:
 
-```bash
+\`\`\`bash
 # Supabase
 NEXT_PUBLIC_SUPABASE_URL=https://xxx.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
@@ -277,13 +277,13 @@ N8N_WEBHOOK_SEND_OTP_URL=https://tu-n8n-instance.com/webhook/send-otp
 # Mercado Pago
 MERCADOPAGO_ACCESS_TOKEN=APP_USR-xxx
 NEXT_PUBLIC_BASE_URL=https://tu-dominio.com
-```
+\`\`\`
 
 ### Instalación de Dependencias
 
-```bash
+\`\`\`bash
 npm install jose @supabase/supabase-js
-```
+\`\`\`
 
 ---
 
@@ -296,18 +296,18 @@ npm install jose @supabase/supabase-js
 **Método:** `POST`
 
 **Request Body:**
-```json
+\`\`\`json
 {
   "phone": "+5491112345678",
   "code": "123456",
   "name": "Juan",
   "timestamp": "2025-10-07T..."
 }
-```
+\`\`\`
 
 ### Workflow n8n Sugerido
 
-```
+\`\`\`
 1. [Webhook] Recibe solicitud OTP
    ↓
 2. [Function] Formatear mensaje
@@ -317,7 +317,7 @@ npm install jose @supabase/supabase-js
    - Body: "Hola {{$json.name}}! Tu código Zecubot es: {{$json.code}}"
    ↓
 4. [Response] Confirmar envío
-```
+\`\`\`
 
 ### Configuración de Twilio
 
@@ -331,7 +331,7 @@ npm install jose @supabase/supabase-js
 
 ### Plantilla de Mensaje
 
-```
+\`\`\`
 Hola {{name}}! 👋
 
 Tu código de verificación para Zecubot es:
@@ -341,7 +341,7 @@ Tu código de verificación para Zecubot es:
 Este código expira en 5 minutos.
 
 Si no solicitaste este código, ignora este mensaje.
-```
+\`\`\`
 
 ---
 
@@ -359,7 +359,7 @@ Si no solicitaste este código, ignora este mensaje.
 
 ### Test de Flujo Completo
 
-```bash
+\`\`\`bash
 # 1. Iniciar servidor
 npm run dev
 
@@ -376,11 +376,11 @@ npm run dev
 # 6. Si es nuevo usuario, ingresar nombre
 
 # 7. Verificar que redirige a /dashboard
-```
+\`\`\`
 
 ### Verificar Base de Datos
 
-```sql
+\`\`\`sql
 -- Ver usuarios creados
 SELECT * FROM public.users ORDER BY created_at DESC LIMIT 10;
 
@@ -391,7 +391,7 @@ SELECT * FROM public.otp_codes ORDER BY created_at DESC LIMIT 10;
 SELECT * FROM public.otp_codes 
 WHERE expires_at > NOW() 
   AND verified = FALSE;
-```
+\`\`\`
 
 ---
 
@@ -466,4 +466,3 @@ WHERE expires_at > NOW()
 
 **Última actualización:** Octubre 2025  
 **Versión:** 1.0.0
-

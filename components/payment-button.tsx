@@ -27,17 +27,21 @@ export function PaymentButton({ planId, planName, price, className = "", childre
 
       if (!authenticated) {
         // Usuario NO autenticado → Guardar intención de compra y redirigir a login
-        sessionStorage.setItem("pendingPurchase", JSON.stringify({
-          planId,
-          planName,
-          price,
-          timestamp: Date.now()
-        }))
-        
+        sessionStorage.setItem(
+          "pendingPurchase",
+          JSON.stringify({
+            planId,
+            planName,
+            price,
+            timestamp: Date.now(),
+          }),
+        )
+
         // Mensaje más amigable
-        const mensaje = "Para suscribirte al plan Plus, primero necesitas crear una cuenta o iniciar sesión. ¡Es rápido y solo toma 1 minuto! 🚀"
-        
-        if (typeof window !== 'undefined') {
+        const mensaje =
+          "Para suscribirte al plan Plus, primero necesitas crear una cuenta o iniciar sesión. ¡Es rápido y solo toma 1 minuto! 🚀"
+
+        if (typeof window !== "undefined") {
           // En producción usa un modal bonito, en dev un alert simple
           if (confirm(mensaje + "\n\n¿Quieres continuar?")) {
             window.location.href = "/login"
@@ -106,7 +110,7 @@ export function PlusPlanPaymentButton() {
       planId="plus"
       planName="Plus"
       price="AR$5.499"
-      className="cta-button text-white font-semibold py-3 px-6 rounded-xl shadow-lg h-12"
+      className="cta-button text-white font-semibold text-base py-3 px-6 rounded-xl shadow-lg h-12"
     >
       Comenzar con Mercado Pago
     </PaymentButton>

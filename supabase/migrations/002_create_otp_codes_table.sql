@@ -59,4 +59,3 @@ COMMENT ON TABLE public.otp_codes IS 'Códigos OTP de un solo uso para autentica
 COMMENT ON COLUMN public.otp_codes.code IS 'Código de 6 dígitos generado aleatoriamente';
 COMMENT ON COLUMN public.otp_codes.expires_at IS 'Timestamp de expiración del código (5 minutos típicamente)';
 COMMENT ON COLUMN public.otp_codes.attempts IS 'Número de intentos de verificación fallidos';
-

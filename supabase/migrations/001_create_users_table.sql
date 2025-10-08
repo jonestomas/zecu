@@ -56,4 +56,3 @@ COMMENT ON TABLE public.users IS 'Tabla de usuarios de Zecubot con planes de sus
 COMMENT ON COLUMN public.users.phone IS 'Número de teléfono con código de país (ej: +5491112345678)';
 COMMENT ON COLUMN public.users.plan IS 'Plan activo del usuario: free o plus';
 COMMENT ON COLUMN public.users.plan_expires_at IS 'Fecha de expiración del plan (null = sin expiración)';
-
