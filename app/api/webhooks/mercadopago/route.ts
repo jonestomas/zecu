@@ -111,7 +111,73 @@ async function handleApprovedPayment(paymentInfo: any) {
   console.log("✅ Pago aprobado:", paymentInfo.id)
 
   try {
-    const planId = extractPlanFromReference(paymentInfo.external_reference)
+    // Extraer datos del pago y metadata
+    const metadata = paymentInfo.metadata || {}
+    const userId = metadata.user_id
+    const userPhone = metadata.user_phone
+    const planId = metadata.plan_id || extractPlanFromReference(paymentInfo.external_reference)
+    
+    console.log(`📦 Metadata recibida:`, {
+      user_id: userId,
+      user_phone: userPhone,
+      plan_id: planId,
+      payment_id: paymentInfo.id
+    })
+
+    // Validar que tenemos el ID del usuario
+    if (!userId) {
+      console.error('❌ No se encontró user_id en metadata. Usando flujo legacy.')
+      await handleLegacyPaymentFlow(paymentInfo, planId)
+      return
+    }
+
+    // Flujo principal: Usuario autenticado que completó el registro antes de pagar
+    if (userPhone) {
+      const user = await getUserByPhone(userPhone)
+
+      if (user) {
+        // Verificar que el user_id coincida
+        if (user.id === userId) {
+          // Actualizar plan del usuario
+          await updateUserPlan(userPhone, 'plus')
+          console.log(`✅ Plan Plus activado para usuario ${user.id} (${userPhone})`)
+
+          // Guardar registro de la compra
+          const purchase = {
+            id: paymentInfo.id,
+            userId: user.id,
+            planId,
+            planName: planId === "plus" ? "Plan Plus" : "Plan Desconocido",
+            amount: paymentInfo.transaction_amount,
+            currency: paymentInfo.currency_id,
+            status: paymentInfo.status,
+            date: new Date().toISOString(),
+            paymentId: paymentInfo.id,
+            email: user.email,
+            phone: userPhone
+          }
+          await savePurchaseToDatabase(purchase)
+        } else {
+          console.error(`❌ user_id no coincide. Metadata: ${userId}, DB: ${user.id}`)
+        }
+      } else {
+        console.error(`❌ Usuario no encontrado: ${userPhone}`)
+      }
+    } else {
+      console.error(`❌ No se encontró user_phone en metadata`)
+    }
+
+  } catch (error) {
+    console.error('❌ Error procesando pago aprobado:', error)
+    // No lanzar error para no fallar el webhook
+  }
+}
+
+// Flujo legacy para pagos sin autenticación previa (fallback)
+async function handleLegacyPaymentFlow(paymentInfo: any, planId: string) {
+  console.log('🔄 Ejecutando flujo legacy (sin autenticación previa)')
+  
+  try {
     const userEmail = paymentInfo.payer?.email
     const userPhone = paymentInfo.payer?.phone?.number
     const areaCode = paymentInfo.payer?.phone?.area_code
@@ -136,7 +202,7 @@ async function handleApprovedPayment(paymentInfo: any) {
           await updateUserPlan(fullPhone, 'plus')
           console.log(`✅ Plan Plus activado para: ${fullPhone}`)
         } else {
-          // Usuario no existe pero pagó (flujo legacy o directo a MP)
+          // Usuario no existe pero pagó (flujo legacy)
           // Crear usuario con plan Plus y enviar OTP
           await createUser({
             phone: fullPhone,
@@ -173,8 +239,7 @@ async function handleApprovedPayment(paymentInfo: any) {
     await savePurchaseToDatabase(purchase)
 
   } catch (error) {
-    console.error('❌ Error procesando pago aprobado:', error)
-    // No lanzar error para no fallar el webhook
+    console.error('❌ Error en flujo legacy:', error)
   }
 }
 
@@ -205,7 +270,7 @@ async function handleCancelledPayment(paymentInfo: any) {
 
 // Función auxiliar para extraer el plan de la referencia externa
 function extractPlanFromReference(externalReference: string): string {
-  // El formato es: "zecu-{planId}-{timestamp}"
+  // El formato es: "zecu-{planId}-{userId}-{timestamp}" o "zecu-{planId}-{timestamp}"
   if (externalReference) {
     const parts = externalReference.split("-")
     return parts[1] || "unknown"

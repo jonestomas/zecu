@@ -42,8 +42,19 @@ export const plans: Record<string, Plan> = {
   }
 };
 
+// Datos opcionales del usuario para la preferencia de pago
+export interface UserPaymentData {
+  userId: string;
+  phone: string;
+  name?: string;
+}
+
 // Función para crear una preferencia de pago
-export async function createPaymentPreference(planId: string, userEmail?: string) {
+export async function createPaymentPreference(
+  planId: string, 
+  userEmail?: string,
+  userData?: UserPaymentData
+) {
   const plan = plans[planId];
   
   if (!plan) {
@@ -52,6 +63,11 @@ export async function createPaymentPreference(planId: string, userEmail?: string
 
   // Asegurar que tenemos una URL base válida
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+  
+  // Crear referencia externa con el ID del usuario si está disponible
+  const externalReference = userData 
+    ? `zecu-${plan.id}-${userData.userId}-${Date.now()}`
+    : `zecu-${plan.id}-${Date.now()}`;
   
   const preference = {
     items: [
@@ -65,20 +81,29 @@ export async function createPaymentPreference(planId: string, userEmail?: string
       }
     ],
     payer: {
-      email: userEmail || 'test@test.com'
+      email: userEmail || 'test@test.com',
+      ...(userData?.name && { name: userData.name }),
+      ...(userData?.phone && { phone: { number: userData.phone } })
     },
     back_urls: {
       success: `${baseUrl}/payment/success`,
       failure: `${baseUrl}/payment/failure`,
       pending: `${baseUrl}/payment/pending`
     },
-    external_reference: `zecu-${plan.id}-${Date.now()}`,
+    external_reference: externalReference,
     notification_url: `${baseUrl}/api/webhooks/mercadopago`,
-    statement_descriptor: 'ZECU'
+    statement_descriptor: 'ZECU',
+    // Metadata adicional para el webhook
+    metadata: {
+      user_id: userData?.userId,
+      user_phone: userData?.phone,
+      plan_id: planId
+    }
   };
 
   try {
     const response = await mercadopago.preference.create({ body: preference });
+    console.log(`💳 Preferencia creada: ${response.id} para usuario ${userData?.userId || 'anónimo'}`);
     return response;
   } catch (error) {
     console.error('Error creating payment preference:', error);

@@ -34,8 +34,17 @@ export function PaymentButton({ planId, planName, price, className = "", childre
           timestamp: Date.now()
         }))
         
-        alert("Primero necesitas crear una cuenta o iniciar sesión")
-        window.location.href = "/login"
+        // Mensaje más amigable
+        const mensaje = "Para suscribirte al plan Plus, primero necesitas crear una cuenta o iniciar sesión. ¡Es rápido y solo toma 1 minuto! 🚀"
+        
+        if (typeof window !== 'undefined') {
+          // En producción usa un modal bonito, en dev un alert simple
+          if (confirm(mensaje + "\n\n¿Quieres continuar?")) {
+            window.location.href = "/login"
+          } else {
+            setIsLoading(false)
+          }
+        }
         return
       }
 
@@ -51,7 +60,8 @@ export function PaymentButton({ planId, planName, price, className = "", childre
       })
 
       if (!response.ok) {
-        throw new Error("Error al crear la preferencia de pago")
+        const errorData = await response.json()
+        throw new Error(errorData.error || "Error al crear la preferencia de pago")
       }
 
       const { initPoint, sandboxInitPoint } = await response.json()
@@ -66,7 +76,7 @@ export function PaymentButton({ planId, planName, price, className = "", childre
       }
     } catch (error) {
       console.error("Error al procesar el pago:", error)
-      alert("Error al procesar el pago. Por favor, intenta nuevamente.")
+      alert(error instanceof Error ? error.message : "Error al procesar el pago. Por favor, intenta nuevamente.")
     } finally {
       setIsLoading(false)
     }
