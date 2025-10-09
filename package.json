@@ -12,6 +12,9 @@
     "preview": "npm run build && npm run start",
     "start": "next start",
     "type-check": "tsc --noEmit",
+    "check-env": "node scripts/check-env.js",
+    "generate-jwt": "node scripts/generate-jwt-secret.js",
+    "dev:check": "npm run check-env && npm run dev",
     "test:flows": "node scripts/testing/test-flows.js"
   },
   "dependencies": {
