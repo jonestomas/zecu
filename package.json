@@ -11,7 +11,8 @@
     "lint": "next lint",
     "preview": "npm run build && npm run start",
     "start": "next start",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "test:flows": "node scripts/testing/test-flows.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

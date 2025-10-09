@@ -50,6 +50,23 @@ npm run build
 npm run preview
 \`\`\`
 
+## 🧪 Testing
+
+\`\`\`bash
+# Testing interactivo de flujos
+npm run test:flows
+
+# Verificar variables de entorno
+npm run check-env
+
+# Generar JWT secret
+npm run generate-jwt
+\`\`\`
+
+**Documentación de testing:**
+- 📖 [Guía completa de testing](docs/TESTING_FLOWS_GUIDE.md)
+- 🚀 [Quick start de testing](docs/TESTING_QUICK_START.md)
+
 ## 📦 Características técnicas
 
 - **Framework**: Next.js 14.2.16
