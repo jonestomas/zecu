@@ -1,21 +1,83 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
-import { ArrowLeft, LogOut, TrendingUp, Shield, AlertTriangle } from "lucide-react"
+import { ArrowLeft, LogOut, TrendingUp, Shield, AlertTriangle, Loader2 } from "lucide-react"
+
+interface UserData {
+  name?: string
+  plan: "free" | "plus"
+  plan_expires_at?: string
+  analysesRemaining: number
+  analysesTotal: number
+}
 
 export default function DashboardPage() {
+  const router = useRouter()
   const [language, setLanguage] = useState<"es" | "en">("es")
   const [showUnsubscribeModal, setShowUnsubscribeModal] = useState(false)
+  const [userData, setUserData] = useState<UserData | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
-  // Mock user data - in a real app, this would come from authentication/database
-  const userData = {
-    plan: "Plus", // or 'Free'
-    analysesRemaining: 47,
-    analysesTotal: 50,
-    nextRenewal: "15 de Febrero, 2025",
+  useEffect(() => {
+    // Obtener datos del usuario desde la sesión
+    const fetchUserData = async () => {
+      try {
+        const response = await fetch("/api/auth/check-session")
+        const data = await response.json()
+
+        if (!data.authenticated) {
+          // Si no está autenticado, redirigir a login
+          router.push("/login")
+          return
+        }
+
+        // Configurar límites según el plan
+        const analysesTotal = data.plan === "plus" ? 50 : 5
+        const analysesRemaining = data.plan === "plus" ? 47 : 3 // Mock, debería venir de la DB
+
+        setUserData({
+          name: data.name,
+          plan: data.plan,
+          plan_expires_at: data.plan_expires_at,
+          analysesRemaining,
+          analysesTotal,
+        })
+      } catch (error) {
+        console.error("Error obteniendo datos del usuario:", error)
+        router.push("/login")
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchUserData()
+  }, [router])
+
+  const handleLogout = () => {
+    // Eliminar cookie de sesión
+    document.cookie = "session_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"
+    router.push("/")
   }
+
+  if (isLoading || !userData) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    )
+  }
+
+  const planName = userData.plan === "plus" ? "Plus" : "Free"
+  const nextRenewal = userData.plan_expires_at 
+    ? new Date(userData.plan_expires_at).toLocaleDateString("es-AR", { 
+        day: "numeric", 
+        month: "long", 
+        year: "numeric" 
+      })
+    : "Plan Free (sin vencimiento)"
 
   const translations = {
     es: {
@@ -93,7 +155,10 @@ export default function DashboardPage() {
               </button>
 
               {/* Logout Button */}
-              <button className="flex items-center gap-2 px-4 py-2 rounded-lg border-2 border-border hover:border-destructive hover:text-destructive transition-colors text-sm font-medium">
+              <button 
+                onClick={handleLogout}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg border-2 border-border hover:border-destructive hover:text-destructive transition-colors text-sm font-medium"
+              >
                 <LogOut className="w-4 h-4" />
                 {t.logout}
               </button>
@@ -124,7 +189,7 @@ export default function DashboardPage() {
               <div className="flex items-start justify-between mb-6">
                 <div>
                   <p className="text-muted-foreground text-sm mb-2">{t.currentPlan}</p>
-                  <h2 className="text-4xl font-bold text-foreground">{userData.plan}</h2>
+                  <h2 className="text-4xl font-bold text-foreground">{planName}</h2>
                 </div>
                 <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
                   <Shield className="w-6 h-6 text-primary" />
@@ -132,7 +197,7 @@ export default function DashboardPage() {
               </div>
               <div className="space-y-2 mb-6">
                 <p className="text-sm text-muted-foreground">
-                  {t.nextRenewal}: <span className="text-foreground font-medium">{userData.nextRenewal}</span>
+                  {t.nextRenewal}: <span className="text-foreground font-medium">{nextRenewal}</span>
                 </p>
               </div>
               {/* Plan Benefits */}
@@ -192,9 +257,9 @@ export default function DashboardPage() {
               {/* Info Message */}
               <div className="bg-primary/10 border-2 border-primary/30 rounded-xl p-4">
                 <p className="text-sm text-foreground">
-                  {userData.plan === "Free"
-                    ? "¡Actualiza a Plus para análisis ilimitados!"
-                    : "¡Tienes análisis ilimitados con tu plan Plus!"}
+                  {userData.plan === "free"
+                    ? "¡Actualiza a Plus para más análisis al mes!"
+                    : "¡Tienes 50 análisis al mes con tu plan Plus!"}
                 </p>
               </div>
             </div>

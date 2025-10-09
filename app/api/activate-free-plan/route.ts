@@ -1,14 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase-client';
-import { z } from 'zod';
 import { jwtVerify } from 'jose';
-
-// Schema de validación
-const updateProfileSchema = z.object({
-  name: z.string().min(1, 'El nombre es requerido').max(255),
-  country: z.string().optional(),
-  city: z.string().optional()
-});
 
 // Verificar token de sesión
 async function verifySessionToken(token: string): Promise<{ userId: string; phone: string } | null> {
@@ -54,20 +46,38 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Parsear y validar el body
-    const body = await request.json();
-    const validatedData = updateProfileSchema.parse(body);
+    // Obtener usuario actual
+    const { data: currentUser, error: fetchError } = await supabaseAdmin
+      .from('users')
+      .select('*')
+      .eq('id', session.userId)
+      .single();
 
-    // Preparar datos a actualizar (solo los que vienen en el body)
-    const updateData: Record<string, string> = {};
-    if (validatedData.name) updateData.name = validatedData.name;
-    if (validatedData.country) updateData.country = validatedData.country;
-    if (validatedData.city) updateData.city = validatedData.city;
+    if (fetchError || !currentUser) {
+      throw new Error('Usuario no encontrado');
+    }
 
-    // Actualizar el perfil del usuario
+    // Verificar que no tenga ya un plan Plus activo
+    if (currentUser.plan === 'plus' && currentUser.plan_expires_at) {
+      const expiresAt = new Date(currentUser.plan_expires_at);
+      if (expiresAt > new Date()) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: 'Ya tienes un plan Plus activo. No puedes activar el plan Free.'
+          },
+          { status: 400 }
+        );
+      }
+    }
+
+    // Activar plan Free
     const { data: user, error } = await supabaseAdmin
       .from('users')
-      .update(updateData)
+      .update({ 
+        plan: 'free',
+        plan_expires_at: null // El plan free no expira
+      })
       .eq('id', session.userId)
       .select()
       .single();
@@ -76,11 +86,11 @@ export async function POST(request: NextRequest) {
       throw error;
     }
 
-    console.log(`✅ Perfil actualizado para usuario: ${session.phone}`, updateData);
+    console.log(`✅ Plan Free activado para usuario: ${session.phone} (${session.userId})`);
 
     return NextResponse.json({
       success: true,
-      message: 'Perfil actualizado exitosamente',
+      message: 'Plan Free activado exitosamente',
       user: {
         id: user.id,
         phone: user.phone,
@@ -93,18 +103,7 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Error en update-profile:', error);
-
-    if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: 'Datos inválidos',
-          details: error.errors
-        },
-        { status: 400 }
-      );
-    }
+    console.error('Error en activate-free-plan:', error);
 
     if (error instanceof Error) {
       return NextResponse.json(
@@ -125,3 +124,4 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+

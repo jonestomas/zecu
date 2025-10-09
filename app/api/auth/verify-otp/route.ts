@@ -59,19 +59,30 @@ export async function POST(request: NextRequest) {
     // Verificar si el usuario existe
     let user = await getUserByPhone(phone);
     let isNewUser = false;
+    let hasSubscription = false;
 
     if (!user) {
-      // Crear nuevo usuario
+      // Crear nuevo usuario (sin plan seleccionado aún)
+      // Por defecto se crea sin plan activo (plan = null conceptualmente)
+      // pero la DB requiere un valor, usamos 'free' pero no está "activado"
       user = await createUser({
         phone,
         name: name || undefined,
         plan: 'free'
       });
       isNewUser = true;
+      hasSubscription = false; // Usuario nuevo no tiene plan activado aún
 
-      console.log(`✅ Nuevo usuario creado: ${phone}`);
+      console.log(`✅ Nuevo usuario creado: ${phone} - Sin plan activado`);
     } else {
       console.log(`✅ Usuario existente verificado: ${phone}`);
+      
+      // Verificar si ya tiene un plan activo
+      // Consideramos que tiene suscripción si ya pasó por el flujo de selección
+      // Para simplificar: si tiene nombre guardado, ya completó el onboarding
+      hasSubscription = Boolean(user.name);
+      
+      console.log(`📊 hasSubscription: ${hasSubscription} (nombre: ${user.name})`);
     }
 
     // Invalidar todos los códigos OTP anteriores de este teléfono
@@ -85,10 +96,13 @@ export async function POST(request: NextRequest) {
       success: true,
       message: 'Verificación exitosa',
       isNewUser,
+      hasSubscription,
       user: {
         id: user.id,
         phone: user.phone,
         name: user.name,
+        country: user.country,
+        city: user.city,
         plan: user.plan,
         plan_expires_at: user.plan_expires_at
       }

@@ -1,12 +1,14 @@
 "use client"
 
 import { useEffect, useState, Suspense } from "react"
-import { useSearchParams } from "next/navigation"
+import { useSearchParams, useRouter } from "next/navigation"
 import Link from "next/link"
 
 function PaymentSuccessContent() {
   const searchParams = useSearchParams()
+  const router = useRouter()
   const [paymentInfo, setPaymentInfo] = useState<any>(null)
+  const [redirecting, setRedirecting] = useState(false)
 
   useEffect(() => {
     // Obtener información del pago desde los parámetros de URL
@@ -19,7 +21,15 @@ function PaymentSuccessContent() {
       status,
       externalReference,
     })
-  }, [searchParams])
+
+    // Redirigir automáticamente a /welcome después de 3 segundos
+    const timer = setTimeout(() => {
+      setRedirecting(true)
+      router.push("/welcome")
+    }, 3000)
+
+    return () => clearTimeout(timer)
+  }, [searchParams, router])
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4">
@@ -33,7 +43,10 @@ function PaymentSuccessContent() {
         <h1 className="text-2xl font-bold text-foreground mb-4">¡Pago Exitoso!</h1>
 
         <p className="text-muted-foreground mb-6">
-          Tu suscripción a Zecu ha sido activada correctamente. Recibirás un email de confirmación en breve.
+          Tu suscripción al Plan Plus ha sido activada correctamente. 
+          {redirecting 
+            ? " Redirigiendo..." 
+            : " Serás redirigido a la página de bienvenida en 3 segundos..."}
         </p>
 
         {paymentInfo?.paymentId && (
@@ -46,17 +59,17 @@ function PaymentSuccessContent() {
 
         <div className="space-y-3">
           <Link
-            href="/"
-            className="w-full bg-gradient-to-r from-emerald-500 to-cyan-500 text-white font-semibold py-3 px-6 rounded-xl hover:shadow-lg transition-all inline-block"
+            href="/welcome"
+            className="w-full bg-gradient-to-r from-primary to-accent text-secondary font-bold py-3 px-6 rounded-xl hover:shadow-lg transition-all inline-block"
           >
-            Volver al inicio
+            Ir a la página de bienvenida
           </Link>
 
           <Link
-            href="https://wa.me/1234567890"
-            className="w-full bg-green-500 text-white font-semibold py-3 px-6 rounded-xl hover:bg-green-600 transition-colors inline-block"
+            href="/dashboard"
+            className="w-full border-2 border-border text-foreground font-semibold py-3 px-6 rounded-xl hover:border-primary transition-colors inline-block"
           >
-            Comenzar en WhatsApp
+            Ir al Dashboard
           </Link>
         </div>
       </div>

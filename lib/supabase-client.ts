@@ -31,6 +31,8 @@ export interface User {
   phone: string
   name?: string
   email?: string
+  country?: string
+  city?: string
   plan: "free" | "plus"
   plan_expires_at?: string
   created_at: string

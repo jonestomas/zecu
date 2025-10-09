@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { jwtVerify } from 'jose';
+import { getUserByPhone } from '@/lib/supabase-client';
 
 // Verificar token de sesión
 async function verifySessionToken(token: string): Promise<{ userId: string; phone: string } | null> {
@@ -36,10 +37,33 @@ export async function GET(request: NextRequest) {
       });
     }
 
+    // Obtener datos completos del usuario desde la base de datos
+    const user = await getUserByPhone(session.phone);
+
+    if (!user) {
+      return NextResponse.json({
+        authenticated: false
+      });
+    }
+
+    // Verificar si el plan Plus está expirado
+    let isPlanExpired = false;
+    if (user.plan === 'plus' && user.plan_expires_at) {
+      const expiresAt = new Date(user.plan_expires_at);
+      isPlanExpired = expiresAt <= new Date();
+    }
+
     return NextResponse.json({
       authenticated: true,
-      userId: session.userId,
-      phone: session.phone
+      userId: user.id,
+      phone: user.phone,
+      name: user.name,
+      email: user.email,
+      country: user.country,
+      city: user.city,
+      plan: isPlanExpired ? 'free' : user.plan, // Si el plan expiró, retornar 'free'
+      plan_expires_at: user.plan_expires_at,
+      isPlanExpired
     });
 
   } catch (error) {

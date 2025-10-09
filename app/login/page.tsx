@@ -204,8 +204,11 @@ export default function LoginPage() {
         }
 
         console.log("✅ Plan Free activado:", data)
-        router.push("/dashboard")
+        
+        // Redirigir a la página de bienvenida
+        router.push("/welcome")
       } else {
+        // Plan Plus: guardar intención de compra y redirigir a checkout
         sessionStorage.setItem(
           "pendingPurchase",
           JSON.stringify({
