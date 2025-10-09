@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { PlusPlanPaymentButton } from "@/components/payment-button"
+import { PlusPlanPaymentButton, FreePlanButton } from "@/components/payment-button"
 import Image from "next/image"
 
 const translations = {
@@ -589,9 +589,7 @@ export default function Home() {
                     <span className="text-4xl font-bold text-foreground">{t.pricing.free.price}</span>
                     <span className="text-muted-foreground text-sm">{t.pricing.free.period}</span>
                   </div>
-                  <button className="w-full h-12 bg-muted hover:bg-muted/80 text-foreground font-semibold text-base py-3 px-6 rounded-xl transition-colors border border-border flex items-center justify-center">
-                    {t.pricing.cta}
-                  </button>
+                  <FreePlanButton />
                 </div>
               </div>
 
