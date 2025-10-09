@@ -94,9 +94,9 @@ const translations = {
         description: "Ideal para protección diaria completa",
         features: [
           "20 análisis de mensajes al mes",
-          "IA entrenada específicamente para guiarte"
+          "IA entrenada específicamente para guiarte",
           "Detección avanzada de estafas y fraudes",
-          "Análisis de imágenes"
+          "Análisis de imágenes",
           "Análisis de audios",
         ],
       },
