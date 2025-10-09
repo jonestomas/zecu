@@ -9,11 +9,13 @@ import { useRouter } from "next/navigation"
 
 export default function LoginPage() {
   const router = useRouter()
-  const [step, setStep] = useState<"phone" | "otp" | "name">("phone")
+  const [step, setStep] = useState<"phone" | "otp" | "name" | "selectPlan">("phone")
   const [countryCode, setCountryCode] = useState("+54")
   const [phoneNumber, setPhoneNumber] = useState("")
   const [otp, setOtp] = useState(["", "", "", "", "", ""])
   const [name, setName] = useState("")
+  const [country, setCountry] = useState("Argentina")
+  const [city, setCity] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const otpInputs = useRef<(HTMLInputElement | null)[]>([])
 
@@ -29,40 +31,45 @@ export default function LoginPage() {
     { code: "+598", country: "Uruguay", flag: "🇺🇾" },
   ]
 
+  const countries = ["Argentina", "USA", "México", "España", "Brasil", "Chile", "Colombia", "Perú", "Uruguay", "Otro"]
+
   const handlePhoneSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
 
     try {
       const fullPhone = `${countryCode}${phoneNumber}`
-      
-      // Llamar a la API real para enviar OTP
-      const response = await fetch('/api/auth/send-otp', {
-        method: 'POST',
+
+      const response = await fetch("/api/auth/send-otp", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           phone: fullPhone,
         }),
       })
 
+      const contentType = response.headers.get("content-type")
+      if (!contentType || !contentType.includes("application/json")) {
+        throw new Error("Error del servidor. Por favor, verifica que Supabase esté configurado correctamente.")
+      }
+
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.error || 'Error al enviar código')
+        throw new Error(data.error || "Error al enviar código")
       }
 
-      console.log('✅ OTP enviado:', data)
-      
-      // Guardar en sessionStorage para la página de verificación
-      sessionStorage.setItem('registerPhone', fullPhone)
-      
+      console.log("✅ OTP enviado:", data)
+
+      sessionStorage.setItem("registerPhone", fullPhone)
+
       setIsLoading(false)
       setStep("otp")
     } catch (error) {
-      console.error('Error enviando OTP:', error)
-      alert(error instanceof Error ? error.message : 'Error al enviar código de verificación')
+      console.error("Error enviando OTP:", error)
+      alert(error instanceof Error ? error.message : "Error al enviar código de verificación")
       setIsLoading(false)
     }
   }
@@ -76,7 +83,6 @@ export default function LoginPage() {
     newOtp[index] = value
     setOtp(newOtp)
 
-    // Auto-focus next input
     if (value && index < 5) {
       otpInputs.current[index + 1]?.focus()
     }
@@ -88,13 +94,12 @@ export default function LoginPage() {
 
     try {
       const fullPhone = `${countryCode}${phoneNumber}`
-      const otpCode = otp.join('')
+      const otpCode = otp.join("")
 
-      // Llamar a la API real para verificar OTP
-      const response = await fetch('/api/auth/verify-otp', {
-        method: 'POST',
+      const response = await fetch("/api/auth/verify-otp", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           phone: fullPhone,
@@ -105,30 +110,31 @@ export default function LoginPage() {
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.error || 'Código inválido')
+        throw new Error(data.error || "Código inválido")
       }
 
-      console.log('✅ OTP verificado:', data)
+      console.log("✅ OTP verificado:", data)
 
       setIsLoading(false)
 
+      const pendingPurchase = sessionStorage.getItem("pendingPurchase")
+
       if (data.isNewUser) {
-        // Usuario nuevo - pedir nombre
         setStep("name")
       } else {
-        // Usuario existente - verificar si hay compra pendiente
-        const pendingPurchase = sessionStorage.getItem('pendingPurchase')
         if (pendingPurchase) {
-          // Hay una compra pendiente - redirigir al checkout
-          router.push('/checkout')
+          router.push("/checkout")
         } else {
-          // No hay compra pendiente - ir al dashboard
-          router.push("/dashboard")
+          if (!data.hasSubscription) {
+            setStep("selectPlan")
+          } else {
+            router.push("/dashboard")
+          }
         }
       }
     } catch (error) {
-      console.error('Error verificando OTP:', error)
-      alert(error instanceof Error ? error.message : 'Código inválido o expirado')
+      console.error("Error verificando OTP:", error)
+      alert(error instanceof Error ? error.message : "Código inválido o expirado")
       setIsLoading(false)
     }
   }
@@ -138,39 +144,37 @@ export default function LoginPage() {
     setIsLoading(true)
 
     try {
-      // Actualizar el perfil con el nombre
-      const response = await fetch('/api/auth/update-profile', {
-        method: 'POST',
+      const response = await fetch("/api/auth/update-profile", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           name,
+          country,
+          city,
         }),
       })
 
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.error || 'Error al actualizar perfil')
+        throw new Error(data.error || "Error al actualizar perfil")
       }
 
-      console.log('✅ Perfil actualizado:', data)
+      console.log("✅ Perfil actualizado:", data)
 
       setIsLoading(false)
-      
-      // Verificar si hay compra pendiente
-      const pendingPurchase = sessionStorage.getItem('pendingPurchase')
+
+      const pendingPurchase = sessionStorage.getItem("pendingPurchase")
       if (pendingPurchase) {
-        // Hay una compra pendiente - redirigir al checkout
-        router.push('/checkout')
+        router.push("/checkout")
       } else {
-        // No hay compra pendiente - ir al dashboard
-        router.push("/dashboard")
+        setStep("selectPlan")
       }
     } catch (error) {
-      console.error('Error actualizando perfil:', error)
-      alert(error instanceof Error ? error.message : 'Error al guardar tu nombre')
+      console.error("Error actualizando perfil:", error)
+      alert(error instanceof Error ? error.message : "Error al guardar tu información")
       setIsLoading(false)
     }
   }
@@ -181,13 +185,50 @@ export default function LoginPage() {
     }
   }
 
+  const handlePlanSelection = async (planId: "free" | "plus") => {
+    setIsLoading(true)
+
+    try {
+      if (planId === "free") {
+        const response = await fetch("/api/activate-free-plan", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+
+        const data = await response.json()
+
+        if (!response.ok) {
+          throw new Error(data.error || "Error al activar plan Free")
+        }
+
+        console.log("✅ Plan Free activado:", data)
+        router.push("/dashboard")
+      } else {
+        sessionStorage.setItem(
+          "pendingPurchase",
+          JSON.stringify({
+            planId: "plus",
+            planName: "Plus",
+            price: "AR$5.499",
+            timestamp: Date.now(),
+          }),
+        )
+        router.push("/checkout")
+      }
+    } catch (error) {
+      console.error("Error al seleccionar plan:", error)
+      alert(error instanceof Error ? error.message : "Error al procesar tu selección")
+      setIsLoading(false)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4 py-12">
-      {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-background via-muted to-background opacity-50" />
 
       <div className="relative z-10 w-full max-w-md">
-        {/* Logo and back button */}
         <div className="text-center mb-8">
           <Link
             href="/"
@@ -213,15 +254,16 @@ export default function LoginPage() {
             {step === "phone" && "Iniciar sesión"}
             {step === "otp" && "Verificar código"}
             {step === "name" && "Completa tu perfil"}
+            {step === "selectPlan" && "Elige tu plan"}
           </h1>
           <p className="text-muted-foreground">
             {step === "phone" && "Te enviaremos un código de verificación"}
             {step === "otp" && `Código enviado a ${countryCode} ${phoneNumber}`}
-            {step === "name" && "Necesitamos saber tu nombre"}
+            {step === "name" && "Necesitamos algunos datos adicionales"}
+            {step === "selectPlan" && "Selecciona el plan que mejor se adapte a ti"}
           </p>
         </div>
 
-        {/* Form container */}
         <div className="glass-card rounded-3xl p-8">
           {step === "phone" && (
             <form onSubmit={handlePhoneSubmit} className="space-y-6">
@@ -276,7 +318,7 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-gradient-to-r from-primary to-accent text-secondary font-bold py-4 px-6 rounded-xl hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed yellow-glow h-12 flex items-center justify-center"
+                className="w-full bg-gradient-to-r from-primary to-accent text-secondary font-bold py-4 px-6 rounded-xl hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed yellow-glow h-12 flex items-center justify-center text-base"
               >
                 {isLoading ? (
                   <span className="flex items-center justify-center gap-2">
@@ -389,6 +431,80 @@ export default function LoginPage() {
                 </div>
               </div>
 
+              <div>
+                <label htmlFor="country" className="block text-sm font-medium text-foreground mb-2">
+                  País
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <svg
+                      className="w-5 h-5 text-muted-foreground"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 104 0 2 2 0 012-2h1.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                  </div>
+                  <select
+                    id="country"
+                    value={country}
+                    onChange={(e) => setCountry(e.target.value)}
+                    className="w-full pl-12 pr-4 py-3 bg-background/50 border-2 border-border rounded-xl text-foreground focus:outline-none focus:border-primary transition-colors backdrop-blur-sm appearance-none cursor-pointer"
+                    required
+                  >
+                    {countries.map((c) => (
+                      <option key={c} value={c}>
+                        {c}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="city" className="block text-sm font-medium text-foreground mb-2">
+                  Ciudad / Localidad
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <svg
+                      className="w-5 h-5 text-muted-foreground"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                      />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                      />
+                    </svg>
+                  </div>
+                  <input
+                    type="text"
+                    id="city"
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                    placeholder="Buenos Aires"
+                    className="w-full pl-12 pr-4 py-3 bg-background/50 border-2 border-border rounded-xl text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary transition-colors backdrop-blur-sm"
+                    required
+                  />
+                </div>
+              </div>
+
               <button
                 type="submit"
                 disabled={isLoading}
@@ -413,15 +529,128 @@ export default function LoginPage() {
             </form>
           )}
 
-          {/* Sign up link - only show on phone step */}
-          {step === "phone" && (
-            <div className="mt-6 text-center">
-              <p className="text-muted-foreground">
-                ¿No tienes una cuenta?{" "}
-                <Link href="/register" className="text-primary hover:text-primary/80 font-medium transition-colors">
-                  Regístrate gratis
-                </Link>
-              </p>
+          {step === "selectPlan" && (
+            <div className="space-y-4">
+              <div className="bg-background/50 border-2 border-border rounded-2xl p-6 backdrop-blur-sm hover:border-primary/50 transition-colors">
+                <h3 className="text-xl font-bold text-foreground mb-2">Free</h3>
+                <p className="text-sm text-muted-foreground mb-4">Perfecto para comenzar a protegerte</p>
+
+                <div className="space-y-2 mb-4">
+                  <div className="flex items-start gap-2 text-sm">
+                    <svg
+                      className="w-5 h-5 text-primary flex-shrink-0 mt-0.5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span>5 análisis de mensajes al mes</span>
+                  </div>
+                  <div className="flex items-start gap-2 text-sm">
+                    <svg
+                      className="w-5 h-5 text-primary flex-shrink-0 mt-0.5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span>Detección básica de phishing</span>
+                  </div>
+                  <div className="flex items-start gap-2 text-sm">
+                    <svg
+                      className="w-5 h-5 text-primary flex-shrink-0 mt-0.5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span>Respuestas automáticas</span>
+                  </div>
+                </div>
+
+                <div className="text-3xl font-bold text-foreground mb-4">
+                  AR$0<span className="text-base font-normal text-muted-foreground">/mes</span>
+                </div>
+
+                <button
+                  onClick={() => handlePlanSelection("free")}
+                  disabled={isLoading}
+                  className="w-full bg-muted hover:bg-muted/80 text-foreground font-semibold text-base py-3 px-6 rounded-xl transition-colors border border-border h-12 flex items-center justify-center disabled:opacity-50"
+                >
+                  {isLoading ? "Activando..." : "Comenzar gratis"}
+                </button>
+              </div>
+
+              <div className="bg-gradient-to-br from-primary/10 to-accent/10 border-2 border-primary rounded-2xl p-6 backdrop-blur-sm relative">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-secondary px-4 py-1 rounded-full text-sm font-semibold">
+                  Más Popular
+                </div>
+
+                <h3 className="text-xl font-bold text-foreground mb-2">Plus</h3>
+                <p className="text-sm text-muted-foreground mb-4">Ideal para protección diaria completa</p>
+
+                <div className="space-y-2 mb-4">
+                  <div className="flex items-start gap-2 text-sm">
+                    <svg
+                      className="w-5 h-5 text-primary flex-shrink-0 mt-0.5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span>50 análisis de mensajes al mes</span>
+                  </div>
+                  <div className="flex items-start gap-2 text-sm">
+                    <svg
+                      className="w-5 h-5 text-primary flex-shrink-0 mt-0.5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span>Detección avanzada de estafas</span>
+                  </div>
+                  <div className="flex items-start gap-2 text-sm">
+                    <svg
+                      className="w-5 h-5 text-primary flex-shrink-0 mt-0.5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span>Análisis de imágenes y audios</span>
+                  </div>
+                  <div className="flex items-start gap-2 text-sm">
+                    <svg
+                      className="w-5 h-5 text-primary flex-shrink-0 mt-0.5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span>Soporte prioritario 24/7</span>
+                  </div>
+                </div>
+
+                <div className="text-3xl font-bold text-foreground mb-4">
+                  AR$5.499<span className="text-base font-normal text-muted-foreground">/mes</span>
+                </div>
+
+                <button
+                  onClick={() => handlePlanSelection("plus")}
+                  disabled={isLoading}
+                  className="w-full bg-gradient-to-r from-primary to-accent text-secondary font-bold text-base py-3 px-6 rounded-xl hover:shadow-lg transition-all yellow-glow h-12 flex items-center justify-center disabled:opacity-50"
+                >
+                  {isLoading ? "Procesando..." : "Comenzar con Mercado Pago"}
+                </button>
+              </div>
             </div>
           )}
         </div>
