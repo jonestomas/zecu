@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getUserByPhone, createOTPCode } from '@/lib/supabase-client';
+import { normalizePhoneNumber } from '@/lib/phone-utils';
 import { z } from 'zod';
 
 // Schema de validación
@@ -59,18 +60,21 @@ export async function POST(request: NextRequest) {
 
     const { phone, name } = validatedData;
 
+    // Normalizar el número de teléfono
+    const normalizedPhone = normalizePhoneNumber(phone);
+
     // Verificar si el usuario ya existe
-    const existingUser = await getUserByPhone(phone);
+    const existingUser = await getUserByPhone(normalizedPhone);
     const isNewUser = !existingUser;
 
     // Generar código OTP
     const otpCode = generateOTPCode();
 
     // Guardar OTP en base de datos
-    await createOTPCode(phone, otpCode, 5); // Expira en 5 minutos
+    await createOTPCode(normalizedPhone, otpCode, 5); // Expira en 5 minutos
 
     // Enviar OTP por WhatsApp
-    await sendOTPViaWhatsApp(phone, otpCode, name);
+    await sendOTPViaWhatsApp(normalizedPhone, otpCode, name);
 
     // Responder al frontend
     return NextResponse.json({

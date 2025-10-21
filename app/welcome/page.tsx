@@ -12,7 +12,7 @@ export default function WelcomePage() {
   const [isLoading, setIsLoading] = useState(true)
 
   // Número de WhatsApp del bot (configurable)
-  const WHATSAPP_BOT_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_BOT_NUMBER || "5491112345678"
+  const WHATSAPP_BOT_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_BOT_NUMBER || "12692562013"
   const whatsappLink = `https://wa.me/${WHATSAPP_BOT_NUMBER}?text=Hola%20Zecu%2C%20quiero%20comenzar%20a%20protegerme%20de%20estafas`
 
   useEffect(() => {
@@ -136,7 +136,7 @@ export default function WelcomePage() {
           <p className="text-center text-sm text-muted-foreground mt-4">
             Número de WhatsApp:{" "}
             <span className="font-mono font-semibold text-foreground">
-              +{WHATSAPP_BOT_NUMBER.replace(/(\d{2})(\d{3})(\d{4})(\d{4})/, "$1 $2 $3 $4")}
+              +{WHATSAPP_BOT_NUMBER.replace(/(\d{1})(\d{3})(\d{3})(\d{4})/, "$1 $2 $3 $4")}
             </span>
           </p>
         </div>
@@ -212,4 +212,5 @@ export default function WelcomePage() {
     </div>
   )
 }
+
 

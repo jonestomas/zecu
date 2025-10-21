@@ -458,3 +458,4 @@ N8N_WEBHOOK_SEND_OTP_URL=https://n8n.com/webhook/send-otp
 3. **Notificaciones**: Email/WhatsApp cuando el plan está por expirar
 4. **Analytics**: Tracking de conversión del flujo completo
 
+

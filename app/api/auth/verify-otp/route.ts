@@ -5,6 +5,7 @@ import {
   verifyOTPCode,
   invalidateAllOTPCodes
 } from '@/lib/supabase-client';
+import { normalizePhoneNumber } from '@/lib/phone-utils';
 import { z } from 'zod';
 import { SignJWT } from 'jose';
 
@@ -43,8 +44,11 @@ export async function POST(request: NextRequest) {
 
     const { phone, code, name } = validatedData;
 
+    // Normalizar el número de teléfono
+    const normalizedPhone = normalizePhoneNumber(phone);
+
     // Verificar código OTP
-    const { valid, otpRecord } = await verifyOTPCode(phone, code);
+    const { valid, otpRecord } = await verifyOTPCode(normalizedPhone, code);
 
     if (!valid) {
       return NextResponse.json(
@@ -57,7 +61,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Verificar si el usuario existe
-    let user = await getUserByPhone(phone);
+    let user = await getUserByPhone(normalizedPhone);
     let isNewUser = false;
     let hasSubscription = false;
 
@@ -66,16 +70,16 @@ export async function POST(request: NextRequest) {
       // Por defecto se crea sin plan activo (plan = null conceptualmente)
       // pero la DB requiere un valor, usamos 'free' pero no está "activado"
       user = await createUser({
-        phone,
+        phone: normalizedPhone,
         name: name || undefined,
         plan: 'free'
       });
       isNewUser = true;
       hasSubscription = false; // Usuario nuevo no tiene plan activado aún
 
-      console.log(`✅ Nuevo usuario creado: ${phone} - Sin plan activado`);
+      console.log(`✅ Nuevo usuario creado: ${normalizedPhone} - Sin plan activado`);
     } else {
-      console.log(`✅ Usuario existente verificado: ${phone}`);
+      console.log(`✅ Usuario existente verificado: ${normalizedPhone}`);
       
       // Verificar si ya tiene un plan activo
       // Consideramos que tiene suscripción si ya pasó por el flujo de selección
@@ -86,7 +90,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Invalidar todos los códigos OTP anteriores de este teléfono
-    await invalidateAllOTPCodes(phone);
+    await invalidateAllOTPCodes(normalizedPhone);
 
     // Crear token de sesión
     const sessionToken = await createSessionToken(user.id, user.phone);

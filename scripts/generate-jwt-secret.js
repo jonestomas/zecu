@@ -21,3 +21,4 @@ console.log(`JWT_SECRET=${secret}`);
 console.log('\n✅ ¡Listo! Mantén este secreto seguro y nunca lo compartas.\n');
 
 
+
