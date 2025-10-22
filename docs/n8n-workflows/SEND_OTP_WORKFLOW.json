@@ -1,0 +1,202 @@
+{
+  "name": "Zecubot - Enviar OTP por WhatsApp",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "zecubot-send-otp",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-receive-otp",
+      "name": "Webhook Recibir OTP",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "zecubot-send-otp"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.phone }}",
+              "operation": "isNotEmpty"
+            },
+            {
+              "value1": "={{ $json.code }}",
+              "operation": "isNotEmpty"
+            }
+          ]
+        }
+      },
+      "id": "validate-data",
+      "name": "Validar Datos",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "phone",
+              "value": "={{ $json.phone }}"
+            },
+            {
+              "name": "code",
+              "value": "={{ $json.code }}"
+            },
+            {
+              "name": "name",
+              "value": "={{ $json.name || 'Usuario' }}"
+            },
+            {
+              "name": "message",
+              "value": "Hola {{ $json.name || 'Usuario' }}! 👋\n\nTu código de verificación Zecubot es:\n\n*{{ $json.code }}*\n\nEste código expira en 5 minutos.\n\n🔒 Nunca compartas este código con nadie."
+            }
+          ]
+        }
+      },
+      "id": "prepare-message",
+      "name": "Preparar Mensaje",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [650, 200]
+    },
+    {
+      "parameters": {
+        "fromNumber": "={{ $credentials.twilioAccountSid }}",
+        "toNumber": "={{ 'whatsapp:' + $json.phone }}",
+        "message": "={{ $json.message }}",
+        "options": {}
+      },
+      "id": "send-whatsapp-twilio",
+      "name": "Enviar WhatsApp (Twilio)",
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [850, 200],
+      "credentials": {
+        "twilioApi": {
+          "id": "TWILIO_CREDENTIALS_ID",
+          "name": "Twilio Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { success: true, message: 'OTP enviado correctamente a ' + $json.phone, timestamp: new Date().toISOString() } }}"
+      },
+      "id": "response-success",
+      "name": "Respuesta Éxito",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1050, 200]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { success: false, error: 'Datos incompletos. Se requiere phone y code', timestamp: new Date().toISOString() } }}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "id": "response-error-validation",
+      "name": "Respuesta Error (Validación)",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [650, 400]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { success: false, error: 'Error al enviar WhatsApp: ' + $json.error, timestamp: new Date().toISOString() } }}",
+        "options": {
+          "responseCode": 500
+        }
+      },
+      "id": "response-error-twilio",
+      "name": "Respuesta Error (Twilio)",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1050, 400]
+    }
+  ],
+  "connections": {
+    "Webhook Recibir OTP": {
+      "main": [
+        [
+          {
+            "node": "Validar Datos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validar Datos": {
+      "main": [
+        [
+          {
+            "node": "Preparar Mensaje",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respuesta Error (Validación)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar Mensaje": {
+      "main": [
+        [
+          {
+            "node": "Enviar WhatsApp (Twilio)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar WhatsApp (Twilio)": {
+      "main": [
+        [
+          {
+            "node": "Respuesta Éxito",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "versionId": "1",
+  "id": "zecubot-send-otp-workflow",
+  "meta": {
+    "instanceId": "zecubot-production"
+  },
+  "tags": [
+    {
+      "name": "Zecubot",
+      "id": "zecubot"
+    },
+    {
+      "name": "OTP",
+      "id": "otp"
+    },
+    {
+      "name": "WhatsApp",
+      "id": "whatsapp"
+    }
+  ]
+}
+
