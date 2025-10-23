@@ -53,6 +53,17 @@ export async function GET(request: NextRequest) {
       isPlanExpired = expiresAt <= new Date();
     }
 
+    // Calcular límites según el plan
+    const currentPlan = isPlanExpired ? 'free' : user.plan;
+    const limites: Record<string, number> = {
+      free: 5,
+      plus: 20,
+      premium: 50
+    };
+    const limite = limites[currentPlan] || 5;
+    const consultasUsadas = (user as any).consultas_mes || 0;
+    const consultasRestantes = Math.max(0, limite - consultasUsadas);
+
     return NextResponse.json({
       authenticated: true,
       userId: user.id,
@@ -61,9 +72,13 @@ export async function GET(request: NextRequest) {
       email: user.email,
       country: user.country,
       city: user.city,
-      plan: isPlanExpired ? 'free' : user.plan, // Si el plan expiró, retornar 'free'
+      plan: currentPlan,
       plan_expires_at: user.plan_expires_at,
-      isPlanExpired
+      isPlanExpired,
+      consultas_mes: consultasUsadas,
+      mes_periodo: (user as any).mes_periodo,
+      consultas_limite: limite,
+      consultas_restantes: consultasRestantes
     });
 
   } catch (error) {

@@ -8,10 +8,12 @@ import { ArrowLeft, LogOut, TrendingUp, Shield, AlertTriangle, Loader2 } from "l
 
 interface UserData {
   name?: string
-  plan: "free" | "plus"
+  plan: "free" | "plus" | "premium"
   plan_expires_at?: string
-  analysesRemaining: number
-  analysesTotal: number
+  consultas_mes: number
+  consultas_limite: number
+  consultas_restantes: number
+  mes_periodo: string
 }
 
 export default function DashboardPage() {
@@ -34,16 +36,14 @@ export default function DashboardPage() {
           return
         }
 
-        // Configurar límites según el plan
-        const analysesTotal = data.plan === "plus" ? 50 : 5
-        const analysesRemaining = data.plan === "plus" ? 47 : 3 // Mock, debería venir de la DB
-
         setUserData({
           name: data.name,
           plan: data.plan,
           plan_expires_at: data.plan_expires_at,
-          analysesRemaining,
-          analysesTotal,
+          consultas_mes: data.consultas_mes,
+          consultas_limite: data.consultas_limite,
+          consultas_restantes: data.consultas_restantes,
+          mes_periodo: data.mes_periodo,
         })
       } catch (error) {
         console.error("Error obteniendo datos del usuario:", error)
@@ -70,7 +70,7 @@ export default function DashboardPage() {
     )
   }
 
-  const planName = userData.plan === "plus" ? "Plus" : "Free"
+  const planName = userData.plan === "plus" ? "Plus" : userData.plan === "premium" ? "Premium" : "Free"
   const nextRenewal = userData.plan_expires_at 
     ? new Date(userData.plan_expires_at).toLocaleDateString("es-AR", { 
         day: "numeric", 
@@ -79,12 +79,22 @@ export default function DashboardPage() {
       })
     : "Plan Free (sin vencimiento)"
 
+  // Calcular porcentaje de consultas usadas
+  const porcentajeUsado = userData.consultas_limite > 0 
+    ? Math.round((userData.consultas_mes / userData.consultas_limite) * 100)
+    : 0
+  
+  // Calcular porcentaje restante
+  const porcentajeRestante = 100 - porcentajeUsado
+
   const translations = {
     es: {
       title: "Mi Dashboard",
       currentPlan: "Plan Actual",
-      analysesRemaining: "Análisis Restantes",
+      analysesRemaining: "Consultas Restantes",
+      analysesUsed: "Consultas Usadas",
       of: "de",
+      thisMonth: "este mes",
       nextRenewal: "Próxima renovación",
       unsubscribe: "Quiero darme de baja",
       upgradePlan: "Mejorar plan",
@@ -95,16 +105,18 @@ export default function DashboardPage() {
       cancel: "Cancelar",
       confirmUnsubscribe: "Sí, darme de baja",
       planBenefits: "Beneficios de tu plan",
-      benefit1: "Análisis ilimitados de mensajes",
-      benefit2: "Detección en tiempo real",
+      benefit1: "Detección de estafas",
+      benefit2: "Análisis en tiempo real",
       benefit3: "Soporte prioritario",
       benefit4: "Actualizaciones automáticas",
     },
     en: {
       title: "My Dashboard",
       currentPlan: "Current Plan",
-      analysesRemaining: "Analyses Remaining",
+      analysesRemaining: "Queries Remaining",
+      analysesUsed: "Queries Used",
       of: "of",
+      thisMonth: "this month",
       nextRenewal: "Next renewal",
       unsubscribe: "I want to unsubscribe",
       upgradePlan: "Upgrade plan",
@@ -115,8 +127,8 @@ export default function DashboardPage() {
       cancel: "Cancel",
       confirmUnsubscribe: "Yes, unsubscribe",
       planBenefits: "Your plan benefits",
-      benefit1: "Unlimited message analysis",
-      benefit2: "Real-time detection",
+      benefit1: "Scam detection",
+      benefit2: "Real-time analysis",
       benefit3: "Priority support",
       benefit4: "Automatic updates",
     },
@@ -224,15 +236,15 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* Analyses Remaining Card */}
+            {/* Queries Remaining Card */}
             <div className="glass-card p-8 rounded-2xl">
               <div className="flex items-start justify-between mb-6">
                 <div>
                   <p className="text-muted-foreground text-sm mb-2">{t.analysesRemaining}</p>
                   <h2 className="text-4xl font-bold text-foreground">
-                    {userData.analysesRemaining}
+                    {userData.consultas_restantes}
                     <span className="text-2xl text-muted-foreground ml-2">
-                      {t.of} {userData.analysesTotal}
+                      {t.of} {userData.consultas_limite}
                     </span>
                   </h2>
                 </div>
@@ -241,25 +253,44 @@ export default function DashboardPage() {
                 </div>
               </div>
 
+              {/* Consultas Usadas */}
+              <div className="mb-4">
+                <p className="text-sm text-muted-foreground mb-2">
+                  {t.analysesUsed}: <span className="text-foreground font-semibold">{userData.consultas_mes} {t.of} {userData.consultas_limite}</span> {t.thisMonth}
+                </p>
+              </div>
+
               {/* Progress Bar */}
               <div className="mb-6">
                 <div className="w-full h-3 bg-muted rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-gradient-to-r from-primary to-chart-2 transition-all duration-500"
-                    style={{ width: `${(userData.analysesRemaining / userData.analysesTotal) * 100}%` }}
+                    className={`h-full transition-all duration-500 ${
+                      porcentajeRestante > 50 
+                        ? 'bg-gradient-to-r from-green-500 to-green-400' 
+                        : porcentajeRestante > 20 
+                        ? 'bg-gradient-to-r from-yellow-500 to-yellow-400' 
+                        : 'bg-gradient-to-r from-red-500 to-red-400'
+                    }`}
+                    style={{ width: `${porcentajeRestante}%` }}
                   ></div>
                 </div>
                 <p className="text-xs text-muted-foreground mt-2">
-                  {Math.round((userData.analysesRemaining / userData.analysesTotal) * 100)}% disponible
+                  {porcentajeRestante}% disponible
                 </p>
               </div>
 
               {/* Info Message */}
-              <div className="bg-primary/10 border-2 border-primary/30 rounded-xl p-4">
+              <div className={`border-2 rounded-xl p-4 ${
+                porcentajeRestante > 20 
+                  ? 'bg-primary/10 border-primary/30' 
+                  : 'bg-destructive/10 border-destructive/30'
+              }`}>
                 <p className="text-sm text-foreground">
                   {userData.plan === "free"
-                    ? "¡Actualiza a Plus para más análisis al mes!"
-                    : "¡Tienes 50 análisis al mes con tu plan Plus!"}
+                    ? `¡Actualiza a Plus para más consultas! (20 al mes)`
+                    : userData.plan === "plus"
+                    ? `¡Tienes ${userData.consultas_limite} consultas al mes con tu plan Plus!`
+                    : `¡Tienes ${userData.consultas_limite} consultas al mes con tu plan Premium!`}
                 </p>
               </div>
             </div>
