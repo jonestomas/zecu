@@ -43,3 +43,7 @@ next-env.d.ts
 
 # OS
 Thumbs.db
+
+# n8n workflows exports (pueden contener credenciales)
+docs/n8n-workflows/**/Zecubot*.json
+components/Zecubot*.json
