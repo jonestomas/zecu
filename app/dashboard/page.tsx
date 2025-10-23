@@ -22,6 +22,7 @@ export default function DashboardPage() {
   const [showUnsubscribeModal, setShowUnsubscribeModal] = useState(false)
   const [userData, setUserData] = useState<UserData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [isCancelling, setIsCancelling] = useState(false)
 
   useEffect(() => {
     // Obtener datos del usuario desde la sesión
@@ -60,6 +61,52 @@ export default function DashboardPage() {
     // Eliminar cookie de sesión
     document.cookie = "session_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"
     router.push("/")
+  }
+
+  const handleCancelSubscription = async () => {
+    setIsCancelling(true)
+    
+    try {
+      const response = await fetch("/api/auth/cancel-subscription", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        // Actualizar estado local
+        if (userData) {
+          setUserData({
+            ...userData,
+            plan: "free",
+            plan_expires_at: undefined,
+            consultas_limite: 5,
+            consultas_restantes: Math.max(0, 5 - userData.consultas_mes)
+          })
+        }
+
+        setShowUnsubscribeModal(false)
+        
+        // Mostrar mensaje de éxito (opcional: puedes agregar un toast/notification)
+        alert(language === "es" 
+          ? "Tu suscripción ha sido cancelada. Ahora tienes el plan Free." 
+          : "Your subscription has been cancelled. You now have the Free plan.")
+      } else {
+        alert(language === "es" 
+          ? "Error al cancelar la suscripción. Por favor intenta de nuevo." 
+          : "Error cancelling subscription. Please try again.")
+      }
+    } catch (error) {
+      console.error("Error cancelando suscripción:", error)
+      alert(language === "es" 
+        ? "Error al cancelar la suscripción. Por favor intenta de nuevo." 
+        : "Error cancelling subscription. Please try again.")
+    } finally {
+      setIsCancelling(false)
+    }
   }
 
   if (isLoading || !userData) {
@@ -297,38 +344,42 @@ export default function DashboardPage() {
           </div>
 
           {/* Action Buttons */}
-          <div className="grid md:grid-cols-2 gap-6">
-            {/* Upgrade Plan Button */}
-            <Link
-              href="/#pricing"
-              className="glass-card p-6 rounded-2xl hover:border-primary transition-all group cursor-pointer"
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-xl font-bold text-foreground mb-2 group-hover:text-primary transition-colors">
-                    {t.upgradePlan}
-                  </h3>
-                  <p className="text-sm text-muted-foreground">Accede a más funciones y análisis ilimitados</p>
+          <div className={`grid gap-6 ${userData.plan !== "free" ? "md:grid-cols-2" : "md:grid-cols-1"}`}>
+            {/* Upgrade Plan Button - Solo mostrar si es FREE */}
+            {userData.plan === "free" && (
+              <Link
+                href="/#pricing"
+                className="glass-card p-6 rounded-2xl hover:border-primary transition-all group cursor-pointer"
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-xl font-bold text-foreground mb-2 group-hover:text-primary transition-colors">
+                      {t.upgradePlan}
+                    </h3>
+                    <p className="text-sm text-muted-foreground">Accede a más funciones y análisis</p>
+                  </div>
+                  <TrendingUp className="w-8 h-8 text-primary" />
                 </div>
-                <TrendingUp className="w-8 h-8 text-primary" />
-              </div>
-            </Link>
+              </Link>
+            )}
 
-            {/* Unsubscribe Button */}
-            <button
-              onClick={() => setShowUnsubscribeModal(true)}
-              className="glass-card p-6 rounded-2xl hover:border-destructive transition-all group cursor-pointer text-left"
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-xl font-bold text-foreground mb-2 group-hover:text-destructive transition-colors">
-                    {t.unsubscribe}
-                  </h3>
-                  <p className="text-sm text-muted-foreground">Cancelar tu suscripción actual</p>
+            {/* Unsubscribe Button - Solo mostrar si es PLUS o PREMIUM */}
+            {userData.plan !== "free" && (
+              <button
+                onClick={() => setShowUnsubscribeModal(true)}
+                className="glass-card p-6 rounded-2xl hover:border-destructive transition-all group cursor-pointer text-left"
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-xl font-bold text-foreground mb-2 group-hover:text-destructive transition-colors">
+                      {t.unsubscribe}
+                    </h3>
+                    <p className="text-sm text-muted-foreground">Cancelar tu suscripción actual</p>
+                  </div>
+                  <AlertTriangle className="w-8 h-8 text-destructive" />
                 </div>
-                <AlertTriangle className="w-8 h-8 text-destructive" />
-              </div>
-            </button>
+              </button>
+            )}
           </div>
         </div>
       </main>
@@ -352,13 +403,11 @@ export default function DashboardPage() {
                 {t.cancel}
               </button>
               <button
-                onClick={() => {
-                  // Handle unsubscribe logic here
-                  console.log("[v0] Unsubscribe confirmed")
-                  setShowUnsubscribeModal(false)
-                }}
-                className="flex-1 px-6 py-3 rounded-xl bg-destructive hover:bg-destructive/90 text-white font-semibold transition-colors"
+                onClick={handleCancelSubscription}
+                disabled={isCancelling}
+                className="flex-1 px-6 py-3 rounded-xl bg-destructive hover:bg-destructive/90 text-white font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
+                {isCancelling && <Loader2 className="w-4 h-4 animate-spin" />}
                 {t.confirmUnsubscribe}
               </button>
             </div>
