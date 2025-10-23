@@ -19,6 +19,9 @@ Esta carpeta contiene los workflows de n8n para Zecubot y su documentación.
 | **`QUICK_START_MOCK.md`** | ⚡ Guía rápida (5 min) - Empezar aquí | Todos |
 | **`MOCK_DATA_OTP.md`** | 🧪 Datos de prueba para cada nodo | Testing/Debug |
 | **`DATA_FLOW_DIAGRAM.md`** | 📊 Diagrama visual del flujo de datos | Entender/Debug |
+| **`CORRECCIONES_WORKFLOW_CONTABILIZACION.md`** | 🔧 Guía de correcciones para contabilización | Configuración |
+| **`DIAGRAMA_FLUJO_CORREGIDO.md`** | 📊 Diagramas ASCII del flujo corregido | Entender |
+| **`FLUJOGRAMA_CONTABILIZACION.md`** | 🎨 Flujogramas Mermaid (visuales) | Todos |
 
 ### 📄 Documentación Completa (Carpeta Padre)
 
@@ -211,12 +214,33 @@ N8N_WEBHOOK_SEND_OTP_URL=http://localhost:5678/webhook/zecubot-send-otp
 
 ---
 
+## 📦 Workflows Adicionales
+
+### 2. Sistema de Contabilización de Consultas ✅
+
+**Archivo:** `BOT_WHATSAPP_CON_CONTABILIZACION.json`
+
+**Descripción:** Sistema completo de conteo de consultas con límites por plan (Free: 5/mes, Plus: 50/mes, Premium: 100/mes).
+
+**Documentación:**
+- 📊 [`FLUJOGRAMA_CONTABILIZACION.md`](./FLUJOGRAMA_CONTABILIZACION.md) - Diagramas visuales completos
+- 🔧 [`CORRECCIONES_WORKFLOW_CONTABILIZACION.md`](./CORRECCIONES_WORKFLOW_CONTABILIZACION.md) - Guía de correcciones
+- 📈 [`DIAGRAMA_FLUJO_CORREGIDO.md`](./DIAGRAMA_FLUJO_CORREGIDO.md) - Diagramas ASCII detallados
+- 📚 [`../SISTEMA_CONTABILIZACION.md`](../SISTEMA_CONTABILIZACION.md) - Documentación completa
+
+**APIs incluidas:**
+- `POST /api/consultas/validar` - Verificar si puede consultar
+- `POST /api/consultas/registrar` - Registrar nueva consulta
+- `POST /api/consultas/actualizar` - Actualizar con respuesta y análisis
+
+---
+
 ## 🎉 Próximos Workflows
 
-- [ ] **Detección de Estafas** - Análisis de mensajes con IA
-- [ ] **Contabilización de Consultas** - Sistema de límites por plan
-- [ ] **Webhook Mercado Pago** - Procesamiento de pagos
-- [ ] **Notificaciones** - Alertas y recordatorios
+- [ ] **Detección de Estafas Avanzada** - Análisis profundo de patrones
+- [ ] **Webhook Mercado Pago** - Procesamiento de pagos automatizado
+- [ ] **Notificaciones Proactivas** - Alertas y recordatorios automáticos
+- [ ] **Dashboard Analytics** - Métricas en tiempo real
 
 ---
 
