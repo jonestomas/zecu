@@ -461,5 +461,14 @@ SELECT * FROM pg_proc WHERE proname = 'puede_realizar_consulta';
 
 ---
 
+## 📚 Documentación Adicional
+
+- [🔧 Correcciones para workflow existente](./n8n-workflows/CORRECCIONES_WORKFLOW_CONTABILIZACION.md)
+- [📊 Diagrama del flujo corregido](./n8n-workflows/DIAGRAMA_FLUJO_CORREGIDO.md)
+- [Workflow JSON completo para n8n](./n8n-workflows/BOT_WHATSAPP_CON_CONTABILIZACION.json)
+- [Script de prueba del sistema](../scripts/testing/test-contabilizacion.js)
+
+---
+
 **¡Sistema de Contabilización Completo!** 🎉
 
