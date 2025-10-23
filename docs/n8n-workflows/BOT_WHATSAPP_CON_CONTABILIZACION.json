@@ -1,0 +1,316 @@
+{
+  "name": "Zecubot - Bot WhatsApp con Contabilización",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "zecubot-whatsapp",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-whatsapp",
+      "name": "Webhook WhatsApp",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "zecubot-whatsapp"
+    },
+    {
+      "parameters": {
+        "url": "={{$env.NEXT_PUBLIC_BASE_URL}}/api/consultas/validar",
+        "authentication": "none",
+        "requestMethod": "POST",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "={{ $json.From.replace('whatsapp:', '') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "validar-limite",
+      "name": "Validar Límite",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.puede_consultar }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "puede-consultar",
+      "name": "¿Puede Consultar?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{$env.NEXT_PUBLIC_BASE_URL}}/api/consultas/registrar",
+        "authentication": "none",
+        "requestMethod": "POST",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "={{ $node[\"Webhook WhatsApp\"].json[\"From\"].replace('whatsapp:', '') }}"
+            },
+            {
+              "name": "mensaje",
+              "value": "={{ $node[\"Webhook WhatsApp\"].json[\"Body\"] }}"
+            },
+            {
+              "name": "tipo",
+              "value": "analisis_estafa"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "registrar-consulta",
+      "name": "Registrar Consulta",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [850, 200]
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o-mini",
+        "messages": {
+          "values": [
+            {
+              "content": "=Eres Zecubot, un asistente de WhatsApp experto en detectar estafas y phishing.\n\nTu misión es analizar mensajes que reciben los usuarios y alertarlos sobre posibles intentos de estafa.\n\n**Formato de respuesta:**\n\n🛡️ *Análisis de Seguridad*\n\n*Riesgo:* [SÍ/NO]\n*Nivel:* [BAJO/MEDIO/ALTO]\n*Tipo:* [Phishing/Scam/Malware/Legítimo]\n\n*¿Por qué?*\n[Explicación clara y concisa]\n\n*Recomendación:*\n[Qué debe hacer el usuario]\n\n**Analiza este mensaje:**\n{{ $node[\"Webhook WhatsApp\"].json[\"Body\"] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "analizar-con-ia",
+      "name": "Analizar con IA (OpenAI)",
+      "type": "n8n-nodes-base.openai",
+      "typeVersion": 1,
+      "position": [1050, 200],
+      "credentials": {
+        "openAiApi": {
+          "id": "OPENAI_CREDENTIALS_ID",
+          "name": "OpenAI Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{$env.NEXT_PUBLIC_BASE_URL}}/api/consultas/actualizar",
+        "authentication": "none",
+        "requestMethod": "POST",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "consulta_id",
+              "value": "={{ $node[\"Registrar Consulta\"].json[\"consulta_id\"] }}"
+            },
+            {
+              "name": "respuesta",
+              "value": "={{ $json.message.content }}"
+            },
+            {
+              "name": "riesgo_detectado",
+              "value": "={{ $json.message.content.toLowerCase().includes('riesgo: sí') || $json.message.content.toLowerCase().includes('riesgo: si') }}"
+            },
+            {
+              "name": "nivel_riesgo",
+              "value": "={{ $json.message.content.toLowerCase().includes('nivel: alto') ? 'alto' : ($json.message.content.toLowerCase().includes('nivel: medio') ? 'medio' : 'bajo') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "actualizar-consulta",
+      "name": "Actualizar Consulta",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [1250, 200]
+    },
+    {
+      "parameters": {
+        "from": "+12692562013",
+        "to": "={{ $node[\"Webhook WhatsApp\"].json[\"From\"] }}",
+        "toWhatsapp": true,
+        "message": "={{ $node[\"Analizar con IA (OpenAI)\"].json[\"message\"][\"content\"] }}",
+        "options": {}
+      },
+      "id": "enviar-respuesta",
+      "name": "Enviar Respuesta (Twilio)",
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [1450, 200],
+      "credentials": {
+        "twilioApi": {
+          "id": "TWILIO_CREDENTIALS_ID",
+          "name": "Twilio Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "from": "+12692562013",
+        "to": "={{ $node[\"Webhook WhatsApp\"].json[\"From\"] }}",
+        "toWhatsapp": true,
+        "message": "=🚫 *Límite Alcanzado*\n\nHas alcanzado el límite de consultas de tu plan *{{ $node[\"Validar Límite\"].json[\"plan\"].toUpperCase() }}*.\n\n📊 Consultas usadas: {{ $node[\"Validar Límite\"].json[\"consultas_usadas\"] }}/{{ $node[\"Validar Límite\"].json[\"limite\"] }}\n\n💎 *Actualiza a Plan Plus* para obtener:\n✅ 50 consultas por mes\n✅ Análisis más detallados\n✅ Soporte prioritario\n\n👉 Actualiza aquí: {{$env.NEXT_PUBLIC_BASE_URL}}/checkout",
+        "options": {}
+      },
+      "id": "enviar-limite-alcanzado",
+      "name": "Enviar Límite Alcanzado (Twilio)",
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [850, 400],
+      "credentials": {
+        "twilioApi": {
+          "id": "TWILIO_CREDENTIALS_ID",
+          "name": "Twilio Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "=OK"
+      },
+      "id": "response-success",
+      "name": "Response Success",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1650, 300]
+    }
+  ],
+  "connections": {
+    "Webhook WhatsApp": {
+      "main": [
+        [
+          {
+            "node": "Validar Límite",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validar Límite": {
+      "main": [
+        [
+          {
+            "node": "¿Puede Consultar?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Puede Consultar?": {
+      "main": [
+        [
+          {
+            "node": "Registrar Consulta",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Enviar Límite Alcanzado (Twilio)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Registrar Consulta": {
+      "main": [
+        [
+          {
+            "node": "Analizar con IA (OpenAI)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analizar con IA (OpenAI)": {
+      "main": [
+        [
+          {
+            "node": "Actualizar Consulta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Actualizar Consulta": {
+      "main": [
+        [
+          {
+            "node": "Enviar Respuesta (Twilio)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar Respuesta (Twilio)": {
+      "main": [
+        [
+          {
+            "node": "Response Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar Límite Alcanzado (Twilio)": {
+      "main": [
+        [
+          {
+            "node": "Response Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "versionId": "1",
+  "id": "zecubot-whatsapp-bot",
+  "meta": {
+    "instanceId": "zecubot-production"
+  },
+  "tags": [
+    {
+      "name": "Zecubot",
+      "id": "zecubot"
+    },
+    {
+      "name": "WhatsApp",
+      "id": "whatsapp"
+    },
+    {
+      "name": "Bot",
+      "id": "bot"
+    }
+  ]
+}
+
