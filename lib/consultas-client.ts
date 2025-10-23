@@ -1,5 +1,5 @@
 // Helper functions para el sistema de contabilización de consultas
-import { supabase } from './supabase-client';
+import { supabaseAdmin as supabase } from './supabase-client';
 
 /**
  * Tipos de consulta disponibles
