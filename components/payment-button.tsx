@@ -103,9 +103,33 @@ export function PaymentButton({ planId, planName, price, className = "", childre
   )
 }
 
-// Componente específico para el plan Plus
-export function PlusPlanPaymentButton() {
+interface PlusPlanPaymentButtonProps {
+  language?: "es" | "en"
+}
+
+export function PlusPlanPaymentButton({ language = "en" }: PlusPlanPaymentButtonProps) {
   const [isLoading, setIsLoading] = useState(false)
+
+  const translations = {
+    es: {
+      button: "Suscribirme ahora",
+      processing: "Procesando...",
+      message:
+        "Para suscribirte al plan Plus, primero necesitas crear una cuenta o iniciar sesión. ¡Es rápido y solo toma 1 minuto! 🚀",
+      confirm: "¿Quieres continuar?",
+      error: "Error al procesar tu solicitud. Por favor, intenta nuevamente.",
+    },
+    en: {
+      button: "Subscribe now",
+      processing: "Processing...",
+      message:
+        "To subscribe to the Plus plan, you first need to create an account or log in. It's quick and only takes 1 minute! 🚀",
+      confirm: "Do you want to continue?",
+      error: "Error processing your request. Please try again.",
+    },
+  }
+
+  const t = translations[language]
 
   const handlePlusPlan = async () => {
     setIsLoading(true)
@@ -127,11 +151,8 @@ export function PlusPlanPaymentButton() {
           }),
         )
 
-        const mensaje =
-          "Para suscribirte al plan Plus, primero necesitas crear una cuenta o iniciar sesión. ¡Es rápido y solo toma 1 minuto! 🚀"
-
         if (typeof window !== "undefined") {
-          if (confirm(mensaje + "\n\n¿Quieres continuar?")) {
+          if (confirm(t.message + "\n\n" + t.confirm)) {
             window.location.href = "/login"
           } else {
             setIsLoading(false)
@@ -154,7 +175,7 @@ export function PlusPlanPaymentButton() {
       window.location.href = "/checkout"
     } catch (error) {
       console.error("Error al procesar el pago:", error)
-      alert("Error al procesar tu solicitud. Por favor, intenta nuevamente.")
+      alert(t.error)
       setIsLoading(false)
     }
   }
@@ -168,21 +189,45 @@ export function PlusPlanPaymentButton() {
       {isLoading ? (
         <>
           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          Procesando...
+          {t.processing}
         </>
       ) : (
         <>
           <CreditCard className="mr-2 h-4 w-4" />
-          Suscribirme ahora
+          {t.button}
         </>
       )}
     </Button>
   )
 }
 
-// Componente específico para el plan Free
-export function FreePlanButton() {
+interface FreePlanButtonProps {
+  language?: "es" | "en"
+}
+
+export function FreePlanButton({ language = "en" }: FreePlanButtonProps) {
   const [isLoading, setIsLoading] = useState(false)
+
+  const translations = {
+    es: {
+      button: "Comenzar gratis ahora",
+      processing: "Procesando...",
+      message:
+        "Para activar el plan Free, primero necesitas crear una cuenta o iniciar sesión. ¡Es rápido y solo toma 1 minuto! 🚀",
+      confirm: "¿Quieres continuar?",
+      error: "Error al procesar tu solicitud. Por favor, intenta nuevamente.",
+    },
+    en: {
+      button: "Start free now",
+      processing: "Processing...",
+      message:
+        "To activate the Free plan, you first need to create an account or log in. It's quick and only takes 1 minute! 🚀",
+      confirm: "Do you want to continue?",
+      error: "Error processing your request. Please try again.",
+    },
+  }
+
+  const t = translations[language]
 
   const handleFreePlan = async () => {
     setIsLoading(true)
@@ -204,11 +249,8 @@ export function FreePlanButton() {
           }),
         )
 
-        const mensaje =
-          "Para activar el plan Free, primero necesitas crear una cuenta o iniciar sesión. ¡Es rápido y solo toma 1 minuto! 🚀"
-
         if (typeof window !== "undefined") {
-          if (confirm(mensaje + "\n\n¿Quieres continuar?")) {
+          if (confirm(t.message + "\n\n" + t.confirm)) {
             window.location.href = "/login"
           } else {
             setIsLoading(false)
@@ -234,7 +276,7 @@ export function FreePlanButton() {
       window.location.href = "/welcome"
     } catch (error) {
       console.error("Error al procesar el plan Free:", error)
-      alert("Error al procesar tu solicitud. Por favor, intenta nuevamente.")
+      alert(t.error)
       setIsLoading(false)
     }
   }
@@ -248,10 +290,10 @@ export function FreePlanButton() {
       {isLoading ? (
         <>
           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          Procesando...
+          {t.processing}
         </>
       ) : (
-        "Comenzar gratis ahora"
+        t.button
       )}
     </Button>
   )

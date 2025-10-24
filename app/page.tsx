@@ -187,7 +187,7 @@ const translations = {
       },
       basic: {
         name: "Plus",
-        price: "AR$5.499",
+        price: "$10 USD",
         period: "/month",
         description: "Ideal for complete daily protection",
         features: [
@@ -685,7 +685,7 @@ export default function Home() {
                         strokeLinecap="round"
                         strokeLinejoin="round"
                         strokeWidth={2}
-                        d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                        d="M9 12l2 2 4-4m5.618-4.016A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
                       />
                     </svg>
                   </div>
@@ -748,7 +748,7 @@ export default function Home() {
                     <span className="text-4xl font-bold text-foreground">{t.pricing.free.price}</span>
                     <span className="text-muted-foreground text-sm">{t.pricing.free.period}</span>
                   </div>
-                  <FreePlanButton />
+                  <FreePlanButton language={language} />
                 </div>
               </div>
 
@@ -785,7 +785,7 @@ export default function Home() {
                     </span>
                     <span className="text-muted-foreground text-sm">{t.pricing.basic.period}</span>
                   </div>
-                  <PlusPlanPaymentButton />
+                  <PlusPlanPaymentButton language={language} />
                 </div>
               </div>
             </div>
