@@ -43,10 +43,10 @@ export async function POST(request: NextRequest) {
     // Obtener el plan del body
     const { plan } = await request.json();
 
-    if (!plan || !['plus', 'premium'].includes(plan)) {
+    if (!plan || plan !== 'plus') {
       return NextResponse.json({
         success: false,
-        error: 'Plan inválido'
+        error: 'Plan inválido. Solo está disponible el plan Plus.'
       }, { status: 400 });
     }
 

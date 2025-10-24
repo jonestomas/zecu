@@ -25,20 +25,6 @@ export const POLAR_PRODUCTS = {
       'Soporte prioritario',
       'Detección de estafas en tiempo real'
     ]
-  },
-  premium: {
-    priceId: process.env.POLAR_PRICE_ID_PREMIUM || '',
-    name: 'Zecu Premium',
-    price: 25, // USD
-    currency: 'USD',
-    interval: 'month' as const,
-    features: [
-      '50 consultas al mes',
-      'Análisis premium con IA',
-      'Soporte 24/7',
-      'Detección avanzada de estafas',
-      'Reportes mensuales'
-    ]
   }
 } as const;
 
