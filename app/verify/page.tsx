@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation"
 
 export default function VerifyPage() {
   const router = useRouter()
-  const [language, setLanguage] = useState<"es" | "en">("es")
+  const [language, setLanguage] = useState<"es" | "en">("en")
   const [code, setCode] = useState(["", "", "", "", "", ""])
   const [isLoading, setIsLoading] = useState(false)
   const [phoneNumber, setPhoneNumber] = useState("")
@@ -18,24 +18,6 @@ export default function VerifyPage() {
   const inputRefs = useRef<(HTMLInputElement | null)[]>([])
 
   const t = {
-    es: {
-      title: "Verificar código",
-      subtitle: "Ingresa el código de 6 dígitos enviado a",
-      codeSent: "Código enviado",
-      verify: "Verificar",
-      resend: "Reenviar código",
-      resendIn: "Reenviar en",
-      seconds: "segundos",
-      didntReceive: "¿No recibiste el código?",
-      back: "Volver",
-      success: "¡Verificación exitosa!",
-      redirecting: "Redirigiendo...",
-      welcomeTitle: "¡Bienvenido a Zecu!",
-      welcomeSubtitle: "Para completar tu registro, necesitamos tu nombre",
-      namePlaceholder: "Nombre completo",
-      continue: "Continuar",
-      nameRequired: "Por favor ingresa tu nombre",
-    },
     en: {
       title: "Verify code",
       subtitle: "Enter the 6-digit code sent to",
@@ -53,6 +35,28 @@ export default function VerifyPage() {
       namePlaceholder: "Full name",
       continue: "Continue",
       nameRequired: "Please enter your name",
+      verifying: "Verifying...",
+      creatingAccount: "Creating account...",
+    },
+    es: {
+      title: "Verificar código",
+      subtitle: "Ingresa el código de 6 dígitos enviado a",
+      codeSent: "Código enviado",
+      verify: "Verificar",
+      resend: "Reenviar código",
+      resendIn: "Reenviar en",
+      seconds: "segundos",
+      didntReceive: "¿No recibiste el código?",
+      back: "Volver",
+      success: "¡Verificación exitosa!",
+      redirecting: "Redirigiendo...",
+      welcomeTitle: "¡Bienvenido a Zecu!",
+      welcomeSubtitle: "Para completar tu registro, necesitamos tu nombre",
+      namePlaceholder: "Nombre completo",
+      continue: "Continuar",
+      nameRequired: "Por favor ingresa tu nombre",
+      verifying: "Verificando...",
+      creatingAccount: "Creando cuenta...",
     },
   }
 
@@ -65,10 +69,10 @@ export default function VerifyPage() {
       setCountdown(60)
 
       // Llamar a la API para reenviar OTP
-      const response = await fetch('/api/auth/send-otp', {
-        method: 'POST',
+      const response = await fetch("/api/auth/send-otp", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           phone: phoneNumber,
@@ -78,10 +82,10 @@ export default function VerifyPage() {
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.error || 'Error al reenviar código')
+        throw new Error(data.error || "Error al reenviar código")
       }
 
-      console.log('✅ Código reenviado')
+      console.log("✅ Código reenviado")
 
       // Iniciar countdown
       const timer = setInterval(() => {
@@ -95,8 +99,8 @@ export default function VerifyPage() {
         })
       }, 1000)
     } catch (error) {
-      console.error('Error reenviando código:', error)
-      alert(error instanceof Error ? error.message : 'Error al reenviar código')
+      console.error("Error reenviando código:", error)
+      alert(error instanceof Error ? error.message : "Error al reenviar código")
       setCanResend(true)
     }
   }
@@ -173,10 +177,10 @@ export default function VerifyPage() {
 
     try {
       // Llamar a la API real para verificar OTP
-      const response = await fetch('/api/auth/verify-otp', {
-        method: 'POST',
+      const response = await fetch("/api/auth/verify-otp", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           phone: phoneNumber,
@@ -187,10 +191,10 @@ export default function VerifyPage() {
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.error || 'Código inválido')
+        throw new Error(data.error || "Código inválido")
       }
 
-      console.log('✅ OTP verificado:', data)
+      console.log("✅ OTP verificado:", data)
 
       setIsLoading(false)
       setIsVerified(true)
@@ -200,18 +204,18 @@ export default function VerifyPage() {
         setIsNewUser(true)
       } else {
         // Usuario existente - verificar si hay compra pendiente
-        const pendingPurchase = sessionStorage.getItem('pendingPurchase')
+        const pendingPurchase = sessionStorage.getItem("pendingPurchase")
         if (pendingPurchase) {
           // Hay una compra pendiente - redirigir al checkout
-          router.push('/checkout')
+          router.push("/checkout")
         } else {
           // No hay compra pendiente - ir al dashboard
           router.push("/dashboard")
         }
       }
     } catch (error) {
-      console.error('Error verificando OTP:', error)
-      alert(error instanceof Error ? error.message : 'Código inválido o expirado')
+      console.error("Error verificando OTP:", error)
+      alert(error instanceof Error ? error.message : "Código inválido o expirado")
       setIsLoading(false)
     }
   }
@@ -227,10 +231,10 @@ export default function VerifyPage() {
 
     try {
       // Actualizar el perfil con el nombre
-      const response = await fetch('/api/auth/update-profile', {
-        method: 'POST',
+      const response = await fetch("/api/auth/update-profile", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           name: userName,
@@ -240,26 +244,26 @@ export default function VerifyPage() {
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.error || 'Error al actualizar perfil')
+        throw new Error(data.error || "Error al actualizar perfil")
       }
 
-      console.log('✅ Perfil actualizado:', data)
+      console.log("✅ Perfil actualizado:", data)
       sessionStorage.setItem("userName", userName)
 
       setIsLoading(false)
-      
+
       // Verificar si hay compra pendiente
-      const pendingPurchase = sessionStorage.getItem('pendingPurchase')
+      const pendingPurchase = sessionStorage.getItem("pendingPurchase")
       if (pendingPurchase) {
         // Hay una compra pendiente - redirigir al checkout
-        router.push('/checkout')
+        router.push("/checkout")
       } else {
         // No hay compra pendiente - ir al dashboard
         router.push("/dashboard")
       }
     } catch (error) {
-      console.error('Error actualizando perfil:', error)
-      alert(error instanceof Error ? error.message : 'Error al guardar tu nombre')
+      console.error("Error actualizando perfil:", error)
+      alert(error instanceof Error ? error.message : "Error al guardar tu nombre")
       setIsLoading(false)
     }
   }
@@ -327,7 +331,7 @@ export default function VerifyPage() {
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                     />
                   </svg>
-                  {language === "es" ? "Creando cuenta..." : "Creating account..."}
+                  {t[language].creatingAccount}
                 </span>
               ) : (
                 t[language].continue
@@ -419,7 +423,7 @@ export default function VerifyPage() {
                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                   />
                 </svg>
-                {language === "es" ? "Verificando..." : "Verifying..."}
+                {t[language].verifying}
               </span>
             ) : (
               <span className="flex items-center justify-center gap-2">

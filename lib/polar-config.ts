@@ -50,4 +50,3 @@ export const getSuccessUrl = (checkoutId: string) => {
 
 // Tipo para los planes disponibles
 export type PolarPlan = keyof typeof POLAR_PRODUCTS;
-

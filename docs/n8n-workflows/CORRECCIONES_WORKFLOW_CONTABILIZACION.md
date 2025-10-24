@@ -8,16 +8,16 @@ Debes modificar estos nodos en tu workflow de n8n. Para cada nodo, busca por su 
 ## 1️⃣ **Nodo: "Validar Límite"**
 
 ### ❌ Configuración Actual (INCORRECTA):
-```
+\`\`\`
 Type: HTTP Request
 URL: {{$env.NEXT_PUBLIC_BASE_URL}}/api/consultas/validar
 Method: (no especificado, usa GET por defecto)
 Body Parameters:
   - phone: {{ $json.From.replace('whatsapp:', '') }}
-```
+\`\`\`
 
 ### ✅ Configuración Correcta:
-```
+\`\`\`
 Type: HTTP Request
 Method: POST
 URL: {{$env.NEXT_PUBLIC_BASE_URL}}/api/consultas/validar
@@ -32,7 +32,7 @@ Body:
   {
     "userId": "{{ $('Get a row').item.json.id }}"
   }
-```
+\`\`\`
 
 **Explicación**: 
 - Cambiamos a método **POST**
@@ -44,17 +44,17 @@ Body:
 ## 2️⃣ **Nodo: "Registrar Consulta"**
 
 ### ❌ Configuración Actual (INCORRECTA):
-```
+\`\`\`
 Type: HTTP Request
 URL: {{$env.NEXT_PUBLIC_BASE_URL}}/api/consultas/registrar
 Body Parameters:
   - phone: {{ $node["Webhook WhatsApp"].json["From"].replace('whatsapp:', '') }}
   - mensaje: {{ $node["Webhook WhatsApp"].json["Body"] }}
   - tipo: analisis_estafa
-```
+\`\`\`
 
 ### ✅ Configuración Correcta:
-```
+\`\`\`
 Type: HTTP Request
 Method: POST
 URL: {{$env.NEXT_PUBLIC_BASE_URL}}/api/consultas/registrar
@@ -71,7 +71,7 @@ Body:
     "mensaje": "{{ $('data_extraction').item.json.body }}",
     "tipo": "analisis_estafa"
   }
-```
+\`\`\`
 
 **Explicación**: 
 - Cambiamos referencias a nodos que SÍ existen: `data_extraction` y `Get a row`
@@ -83,15 +83,15 @@ Body:
 ## 3️⃣ **Nodo: "Enviar Límite Alcanzado (Twilio)"**
 
 ### ❌ Configuración Actual (INCORRECTA):
-```
+\`\`\`
 Type: Twilio
 From: +12692562013
 To: =
 (campo vacío)
-```
+\`\`\`
 
 ### ✅ Configuración Correcta:
-```
+\`\`\`
 Type: Twilio
 From: +12692562013
 To: {{ $('data_extraction').item.json.from }}
@@ -110,7 +110,7 @@ Has alcanzado el límite de consultas de tu plan *{{ $('Validar Límite').json.p
 ✅ Soporte prioritario
 
 👉 Actualiza aquí: {{$env.NEXT_PUBLIC_BASE_URL}}/checkout
-```
+\`\`\`
 
 **Explicación**: 
 - Agregamos el campo `To` que estaba vacío
@@ -128,7 +128,7 @@ Este nodo está conectado como **herramienta del AI Agent** (`httpRequestTool`),
 #### Paso 1: Eliminar el nodo "HTTP Request2" actual
 
 #### Paso 2: Crear nuevo nodo "Actualizar Consulta"
-```
+\`\`\`
 Type: HTTP Request (NO httpRequestTool)
 Method: POST
 URL: {{$env.NEXT_PUBLIC_BASE_URL}}/api/consultas/actualizar
@@ -146,16 +146,16 @@ Body:
     "riesgo_detectado": {{ $('AI Agent1').json.output.toLowerCase().includes('riesgo: sí') || $('AI Agent1').json.output.toLowerCase().includes('riesgo: si') }},
     "nivel_riesgo": "{{ $('AI Agent1').json.output.toLowerCase().includes('alto') ? 'alto' : ($('AI Agent1').json.output.toLowerCase().includes('medio') ? 'medio' : 'bajo') }}"
   }
-```
+\`\`\`
 
 #### Paso 3: Reconectar el flujo
-```
+\`\`\`
 AI Agent1 
    ↓
 Actualizar Consulta (nuevo nodo)
    ↓
 Send an SMS/MMS/WhatsApp message3
-```
+\`\`\`
 
 **Explicación**:
 - Convertimos la herramienta en un nodo normal
@@ -167,14 +167,14 @@ Send an SMS/MMS/WhatsApp message3
 ## 5️⃣ **IMPORTANTE: Conectar "Get a row" con "Validar Límite"**
 
 Actualmente tu flujo va:
-```
+\`\`\`
 data_extraction → Validar Límite
-```
+\`\`\`
 
 Debe ir:
-```
+\`\`\`
 data_extraction → Get a row → Validar Límite
-```
+\`\`\`
 
 ### 🔧 Cómo hacerlo:
 1. Desconecta el cable entre `data_extraction` y `Validar Límite`
@@ -187,7 +187,7 @@ data_extraction → Get a row → Validar Límite
 
 ## 📊 **Flujo Corregido Completo**
 
-```
+\`\`\`
 Twilio Trigger
     ↓
 Code in JavaScript
@@ -229,7 +229,7 @@ AI Agent1 (análisis)
 **Actualizar Consulta (NUEVO)** ← AGREGAR AQUÍ
     ↓
 Send an SMS/MMS/WhatsApp message3 (respuesta final)
-```
+\`\`\`
 
 ---
 
@@ -274,4 +274,3 @@ Si tienes dudas sobre cómo aplicar algún cambio en n8n:
 4. Guarda el workflow
 
 ¡Cualquier duda me avisas! 🚀
-

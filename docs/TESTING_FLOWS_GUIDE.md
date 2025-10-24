@@ -15,25 +15,25 @@
 
 ### 1. Verificar que todo esté configurado
 
-```bash
+\`\`\`bash
 # Verificar variables de entorno
 npm run check-env
 
 # Si falta algo, configurarlo en .env.local
-```
+\`\`\`
 
 ### 2. Levantar el servidor
 
-```bash
+\`\`\`bash
 npm run dev
-```
+\`\`\`
 
 Deberías ver:
-```
+\`\`\`
 ▲ Next.js 15.2.4
 - Local:        http://localhost:3000
 - Ready in 2.5s
-```
+\`\`\`
 
 ### 3. Preparar herramientas de testing
 
@@ -44,7 +44,7 @@ Deberías ver:
 
 ### 4. Limpiar estado anterior (opcional)
 
-```javascript
+\`\`\`javascript
 // En la consola del navegador (DevTools):
 // Limpiar sessionStorage
 sessionStorage.clear()
@@ -56,7 +56,7 @@ document.cookie.split(";").forEach(c => {
 
 // Recargar página
 location.reload()
-```
+\`\`\`
 
 ---
 
@@ -69,9 +69,9 @@ location.reload()
 **Pasos:**
 
 1. **Ir a login**
-   ```
+   \`\`\`
    http://localhost:3000/login
-   ```
+   \`\`\`
 
 2. **Ingresar teléfono**
    - Código de país: `+54` (Argentina)
@@ -79,9 +79,9 @@ location.reload()
    - Click "Enviar código"
 
 3. **Ver código OTP en la terminal del servidor**
-   ```bash
+   \`\`\`bash
    📱 [DESARROLLO] Código OTP para +541112345678: 123456
-   ```
+   \`\`\`
    - Copia el código (ej: `123456`)
 
 4. **Ingresar código OTP**
@@ -103,9 +103,9 @@ location.reload()
    - Plan activo: "Free"
 
 **Verificación en Supabase:**
-```sql
+\`\`\`sql
 SELECT * FROM users WHERE phone = '+541112345678';
-```
+\`\`\`
 
 Debería mostrar:
 - `name`: Test User
@@ -137,13 +137,13 @@ Debería mostrar:
    - URL: `https://www.mercadopago.com.ar/checkout/...` (sandbox)
 
 9. **Completar pago con tarjeta de prueba**
-   ```
+   \`\`\`
    Número: 5031 7557 3453 0604
    CVV: 123
    Fecha: 11/25
    Titular: APRO
    DNI: 12345678
-   ```
+   \`\`\`
 
 10. **Click "Pagar"**
 
@@ -152,19 +152,19 @@ Debería mostrar:
     - Auto-redirect a /welcome en 3 segundos
 
 12. **Simular webhook (importante en localhost)**
-    ```bash
+    \`\`\`bash
     # En otra terminal
     # Reemplaza PAYMENT_ID con el ID real del pago (lo ves en la URL de success)
     curl http://localhost:3000/api/webhooks/mercadopago \
       -X POST \
       -H "Content-Type: application/json" \
       -d "{\"type\":\"payment\",\"data\":{\"id\":PAYMENT_ID}}"
-    ```
+    \`\`\`
 
 **Verificación en Supabase:**
-```sql
+\`\`\`sql
 SELECT * FROM users WHERE phone = '+541112345678';
-```
+\`\`\`
 
 Debería mostrar:
 - `plan`: plus
@@ -181,16 +181,16 @@ Debería mostrar:
 **Pasos:**
 
 1. **Crear usuario sin plan completado**
-   ```sql
+   \`\`\`sql
    -- En Supabase SQL Editor
    INSERT INTO users (phone, name, plan)
    VALUES ('+541187654321', NULL, 'free');
-   ```
+   \`\`\`
 
 2. **Ir a login**
-   ```
+   \`\`\`
    http://localhost:3000/login
-   ```
+   \`\`\`
 
 3. **Ingresar teléfono existente**
    - Teléfono: `1187654321`
@@ -220,9 +220,9 @@ Debería mostrar:
    - Teléfono: `+541112345678`
 
 2. **Hacer login**
-   ```
+   \`\`\`
    http://localhost:3000/login
-   ```
+   \`\`\`
 
 3. **Ingresar teléfono y OTP**
 
@@ -244,16 +244,16 @@ Debería mostrar:
 **Pasos:**
 
 1. **Ir al landing**
-   ```
+   \`\`\`
    http://localhost:3000
-   ```
+   \`\`\`
 
 2. **Asegurarse de NO tener sesión activa**
-   ```javascript
+   \`\`\`javascript
    // En consola del navegador
    document.cookie = "session_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"
    location.reload()
-   ```
+   \`\`\`
 
 3. **Scroll hasta la sección de precios**
 
@@ -264,20 +264,20 @@ Debería mostrar:
    - Click "Aceptar"
 
 6. **Verificar que guarda pendingPurchase**
-   ```javascript
+   \`\`\`javascript
    // En consola del navegador
    JSON.parse(sessionStorage.getItem('pendingPurchase'))
-   ```
+   \`\`\`
    
    Debería mostrar:
-   ```json
+   \`\`\`json
    {
      "planId": "free",
      "planName": "Free",
      "price": "AR$0",
      "timestamp": 1234567890123
    }
-   ```
+   \`\`\`
 
 7. **Redirect a /login**
 
@@ -307,19 +307,19 @@ Debería mostrar:
    - Click "Aceptar"
 
 6. **Verificar que guarda pendingPurchase**
-   ```javascript
+   \`\`\`javascript
    JSON.parse(sessionStorage.getItem('pendingPurchase'))
-   ```
+   \`\`\`
    
    Debería mostrar:
-   ```json
+   \`\`\`json
    {
      "planId": "plus",
      "planName": "Plus",
      "price": "AR$5.499",
      "timestamp": 1234567890123
    }
-   ```
+   \`\`\`
 
 7. **Redirect a /login**
 
@@ -349,9 +349,9 @@ Debería mostrar:
    - Debería existir: `session_token`
 
 2. **Ir al landing**
-   ```
+   \`\`\`
    http://localhost:3000
-   ```
+   \`\`\`
 
 3. **Click "Comenzar gratis ahora" (Plan Free)**
 
@@ -361,9 +361,9 @@ Debería mostrar:
    - Redirect directo a /welcome
 
 **Verificación en consola del servidor:**
-```bash
+\`\`\`bash
 ✅ Plan Free activado para usuario: +541112345678 (uuid-...)
-```
+\`\`\`
 
 **✅ Resultado esperado:** Activación instantánea sin pasar por login
 
@@ -378,9 +378,9 @@ Debería mostrar:
 1. **Tener sesión activa** (login previo)
 
 2. **Ir al landing**
-   ```
+   \`\`\`
    http://localhost:3000
-   ```
+   \`\`\`
 
 3. **Click "Comenzar con Mercado Pago" (Plan Plus)**
 
@@ -420,15 +420,15 @@ Debería mostrar:
 
 ### 1. Verificar estado de sesión
 
-```javascript
+\`\`\`javascript
 // En consola del navegador
 fetch('/api/auth/check-session')
   .then(r => r.json())
   .then(console.log)
-```
+\`\`\`
 
 Respuesta:
-```json
+\`\`\`json
 {
   "authenticated": true,
   "userId": "uuid-...",
@@ -437,18 +437,18 @@ Respuesta:
   "plan": "free",
   "plan_expires_at": null
 }
-```
+\`\`\`
 
 ### 2. Ver pendingPurchase
 
-```javascript
+\`\`\`javascript
 // En consola del navegador
 console.log(JSON.parse(sessionStorage.getItem('pendingPurchase')))
-```
+\`\`\`
 
 ### 3. Ver logs del servidor en tiempo real
 
-```bash
+\`\`\`bash
 # Terminal donde corre npm run dev
 # Busca estos logs:
 
@@ -465,11 +465,11 @@ console.log(JSON.parse(sessionStorage.getItem('pendingPurchase')))
 # Pago procesado
 ✅ Pago aprobado: 123456789
 ✅ Plan Plus activado para usuario uuid (+5491112345678)
-```
+\`\`\`
 
 ### 4. Queries útiles en Supabase
 
-```sql
+\`\`\`sql
 -- Ver todos los usuarios
 SELECT 
   phone, 
@@ -494,7 +494,7 @@ ORDER BY created_at DESC;
 -- Limpiar usuario de prueba
 DELETE FROM users WHERE phone = '+541112345678';
 DELETE FROM otp_codes WHERE phone = '+541112345678';
-```
+\`\`\`
 
 ---
 
@@ -519,13 +519,13 @@ DELETE FROM otp_codes WHERE phone = '+541112345678';
 
 **Soluciones:**
 1. Verifica que la cookie `session_token` exista:
-   ```javascript
+   \`\`\`javascript
    document.cookie
-   ```
+   \`\`\`
 2. Verifica sesión:
-   ```javascript
+   \`\`\`javascript
    fetch('/api/auth/check-session').then(r => r.json()).then(console.log)
-   ```
+   \`\`\`
 3. Si no hay sesión, haz login de nuevo
 
 ---
@@ -539,13 +539,13 @@ DELETE FROM otp_codes WHERE phone = '+541112345678';
 - Mercado Pago NO puede enviar webhooks a `localhost`
 
 **Solución:**
-```bash
+\`\`\`bash
 # Simular webhook manualmente
 curl http://localhost:3000/api/webhooks/mercadopago \
   -X POST \
   -H "Content-Type: application/json" \
   -d '{"type":"payment","data":{"id":PAYMENT_ID}}'
-```
+\`\`\`
 
 Obtén el `PAYMENT_ID` de:
 - URL de success: `/payment/success?payment_id=123456789`
@@ -561,9 +561,9 @@ Obtén el `PAYMENT_ID` de:
 
 **Soluciones:**
 1. Verifica que `pendingPurchase` esté en sessionStorage:
-   ```javascript
+   \`\`\`javascript
    sessionStorage.getItem('pendingPurchase')
-   ```
+   \`\`\`
 2. Verifica que no haya expirado (timestamp < 30 min)
 3. Si falta, haz el flujo de nuevo desde el landing
 
@@ -577,12 +577,12 @@ Obtén el `PAYMENT_ID` de:
 **Solución:**
 - Esto es correcto, es una validación
 - Si quieres testear de nuevo:
-  ```sql
+  \`\`\`sql
   -- Expirar el plan manualmente
   UPDATE users 
   SET plan_expires_at = NOW() - INTERVAL '1 day'
   WHERE phone = '+541112345678';
-  ```
+  \`\`\`
 
 ---
 
@@ -609,7 +609,7 @@ Obtén el `PAYMENT_ID` de:
 
 Si encuentras un bug, repórtalo con este formato:
 
-```markdown
+\`\`\`markdown
 ### Bug: [Título descriptivo]
 
 **Caso de prueba:** Caso X.X
@@ -626,21 +626,19 @@ Si encuentras un bug, repórtalo con este formato:
 ...
 
 **Logs del servidor:**
-```
+\`\`\`
 [pegar logs relevantes]
-```
+\`\`\`
 
 **Estado en Supabase:**
-```sql
+\`\`\`sql
 [query y resultado]
-```
+\`\`\`
 
 **Screenshots:**
 [Si aplica]
-```
+\`\`\`
 
 ---
 
 **Última actualización:** Octubre 2025
-
-

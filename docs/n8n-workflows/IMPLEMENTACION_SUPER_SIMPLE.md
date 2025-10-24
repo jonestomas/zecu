@@ -30,17 +30,17 @@
 ### ✅ Paso 2: Nodo "Get a row" (Ya lo tienes)
 
 **Configuración actual (verificar)**:
-```
+\`\`\`
 Type: Supabase → Get Rows
 Table: users
 Filter:
   - Field: phone
   - Operator: Equal
   - Value: {{ $('data_extraction').item.json.from.replace('whatsapp:', '') }}
-```
+\`\`\`
 
 **Output esperado** (ahora con las nuevas columnas):
-```json
+\`\`\`json
 {
   "id": "uuid-usuario",
   "phone": "+5491134070204",
@@ -49,7 +49,7 @@ Filter:
   "consultas_mes": 3,
   "mes_periodo": "2025-10"
 }
-```
+\`\`\`
 
 ---
 
@@ -57,7 +57,7 @@ Filter:
 
 **Ubicación**: Después del Switch "Plan", en la rama `free`, **ANTES** de procesar con el bot
 
-```
+\`\`\`
 Plan Switch
     ↓
   [free] ──→ 🆕 IF: Validar Límite FREE
@@ -65,11 +65,11 @@ Plan Switch
               ¿consultas_mes < 5?
                 ├─ NO → Mensaje límite → FIN
                 └─ SÍ → Bot responde
-```
+\`\`\`
 
 #### Configuración del IF:
 
-```
+\`\`\`
 Nombre del nodo: "¿Puede Consultar? (FREE)"
 Type: IF
 
@@ -80,7 +80,7 @@ Conditions:
     Value 1: {{ $('Get a row').item.json.consultas_mes }}
     Operation: Smaller (<)
     Value 2: 5
-```
+\`\`\`
 
 **Conexiones**:
 - **TRUE** (Verde) → Conectar al flujo actual de FREE (Text Classifier, etc.)
@@ -92,7 +92,7 @@ Conditions:
 
 **Solo se ejecuta si consultas_mes >= 5**
 
-```
+\`\`\`
 Type: Twilio → Send an SMS/MMS/WhatsApp message
 
 From: whatsapp:+12692562013
@@ -112,7 +112,7 @@ Hola {{ $('Get a row').item.json.name || 'Usuario' }}, has usado tus *5 consulta
 ✅ Soporte prioritario
 
 👉 Mejora aquí: {{$env.NEXT_PUBLIC_BASE_URL}}/checkout
-```
+\`\`\`
 
 ---
 
@@ -120,7 +120,7 @@ Hola {{ $('Get a row').item.json.name || 'Usuario' }}, has usado tus *5 consulta
 
 **Ubicación**: Después del Switch "Plan", en la rama `plus`/`premium`, **ANTES** de procesar
 
-```
+\`\`\`
 Plan Switch
     ↓
   [plus] ──→ 🆕 IF: Validar Límite PLUS
@@ -128,11 +128,11 @@ Plan Switch
               ¿consultas_mes < 20?
                 ├─ NO → Mensaje límite → FIN
                 └─ SÍ → AI Agent
-```
+\`\`\`
 
 #### Configuración del IF:
 
-```
+\`\`\`
 Nombre del nodo: "¿Puede Consultar? (PLUS)"
 Type: IF
 
@@ -143,7 +143,7 @@ Conditions:
     Value 1: {{ $('Get a row').item.json.consultas_mes }}
     Operation: Smaller (<)
     Value 2: 20
-```
+\`\`\`
 
 **Conexiones**:
 - **TRUE** → Flujo actual PLUS (Switch multimedia, AI Agent, etc.)
@@ -153,7 +153,7 @@ Conditions:
 
 ### ✅ Paso 6: Nodo "Enviar Límite PLUS" (3 min)
 
-```
+\`\`\`
 Type: Twilio → Send an SMS/MMS/WhatsApp message
 
 From: whatsapp:+12692562013
@@ -173,7 +173,7 @@ Hola {{ $('Get a row').item.json.name || 'Usuario' }}, has usado tus *20 consult
 ✅ Prioridad máxima
 
 👉 Mejora aquí: {{$env.NEXT_PUBLIC_BASE_URL}}/checkout
-```
+\`\`\`
 
 ---
 
@@ -183,7 +183,7 @@ Hola {{ $('Get a row').item.json.name || 'Usuario' }}, has usado tus *20 consult
 
 #### Opción A: Nodo Supabase Update (Recomendado)
 
-```
+\`\`\`
 Nombre: "Incrementar Consultas"
 Type: Supabase → Update a Row
 Table: users
@@ -195,17 +195,17 @@ Filter (para encontrar el usuario):
 
 Columns to Update:
   consultas_mes: {{ $('Get a row').item.json.consultas_mes + 1 }}
-```
+\`\`\`
 
 #### Opción B: Llamar a la Función SQL (Más Robusto)
 
-```
+\`\`\`
 Nombre: "Incrementar Consultas"
 Type: Supabase → Execute SQL
 
 Query:
 SELECT incrementar_consultas('{{ $('Get a row').item.json.id }}'::UUID);
-```
+\`\`\`
 
 **Nota**: La Opción B es mejor porque la función `incrementar_consultas()` ya maneja el reset automático del mes.
 
@@ -213,7 +213,7 @@ SELECT incrementar_consultas('{{ $('Get a row').item.json.id }}'::UUID);
 
 ## 🔄 Flujo Completo Final
 
-```
+\`\`\`
 Usuario envía mensaje
     ↓
 Twilio Trigger
@@ -236,13 +236,13 @@ Plan Switch
         ¿consultas_mes < 20? (IF)
         ├─ NO → Enviar Límite PLUS → FIN
         └─ SÍ → AI Agent → Incrementar → Send → FIN
-```
+\`\`\`
 
 ---
 
 ## 📊 Estructura de Tabla Users (Actualizada)
 
-```sql
+\`\`\`sql
 CREATE TABLE users (
   id UUID PRIMARY KEY,
   phone VARCHAR UNIQUE,
@@ -253,7 +253,7 @@ CREATE TABLE users (
   mes_periodo VARCHAR(7) DEFAULT '2025-10', -- 🆕 NUEVO
   created_at TIMESTAMP DEFAULT NOW()
 );
-```
+\`\`\`
 
 ---
 
@@ -262,11 +262,11 @@ CREATE TABLE users (
 ### Test 1: Usuario FREE con 2 consultas ✅
 
 1. **Simula** en Supabase:
-   ```sql
+   \`\`\`sql
    UPDATE users 
    SET consultas_mes = 2, mes_periodo = '2025-10'
    WHERE phone = '+5491134070204';
-   ```
+   \`\`\`
 
 2. **Envía** mensaje al bot
 3. **Verifica**:
@@ -277,11 +277,11 @@ CREATE TABLE users (
 ### Test 2: Usuario FREE con 5 consultas ❌
 
 1. **Simula**:
-   ```sql
+   \`\`\`sql
    UPDATE users 
    SET consultas_mes = 5
    WHERE phone = '+5491134070204';
-   ```
+   \`\`\`
 
 2. **Envía** mensaje
 3. **Verifica**:
@@ -292,11 +292,11 @@ CREATE TABLE users (
 ### Test 3: Reset automático de mes 🔄
 
 1. **Simula** mes anterior:
-   ```sql
+   \`\`\`sql
    UPDATE users 
    SET consultas_mes = 5, mes_periodo = '2024-09'
    WHERE phone = '+5491134070204';
-   ```
+   \`\`\`
 
 2. **Envía** mensaje
 3. **Verifica**:
@@ -322,7 +322,7 @@ Si quieres cambiar los límites, edita los nodos IF:
 
 Para ver el estado de tus usuarios:
 
-```sql
+\`\`\`sql
 -- Ver contador de todos los usuarios
 SELECT 
   name,
@@ -344,7 +344,7 @@ SELECT name, plan, consultas_mes
 FROM users
 WHERE (plan = 'free' AND consultas_mes >= 5)
    OR (plan = 'plus' AND consultas_mes >= 20);
-```
+\`\`\`
 
 ---
 
@@ -364,9 +364,9 @@ WHERE (plan = 'free' AND consultas_mes >= 5)
 ### ❌ IF no funciona correctamente
 **Causa**: Sintaxis incorrecta en la expresión
 **Solución**: Asegúrate de usar exactamente:
-```
+\`\`\`
 {{ $('Get a row').item.json.consultas_mes }}
-```
+\`\`\`
 
 ---
 
@@ -402,4 +402,3 @@ Una vez que valides con usuarios reales:
 **Complejidad**: ⭐ Baja (perfecto para MVP)
 
 **¿Dudas? Avísame en qué paso estás y te ayudo.** 🚀
-

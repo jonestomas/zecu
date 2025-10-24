@@ -2,7 +2,7 @@
 
 ## 🎯 Flujo Completo Simplificado
 
-```mermaid
+\`\`\`mermaid
 flowchart TD
     Start([👤 Usuario envía<br/>mensaje WhatsApp]) --> Twilio[📱 Twilio Trigger]
     
@@ -60,13 +60,13 @@ flowchart TD
     style EndNO fill:#F44336,stroke:#C62828,stroke-width:2px,color:#fff
     style EndFree fill:#4CAF50,stroke:#2E7D32,stroke-width:2px,color:#fff
     style EndPlus fill:#4CAF50,stroke:#2E7D32,stroke-width:2px,color:#fff
-```
+\`\`\`
 
 ---
 
 ## 🔍 Zoom: Solo la Parte de Contabilización
 
-```mermaid
+\`\`\`mermaid
 flowchart LR
     A[📱 Mensaje<br/>recibido] --> B[🗄️ Get User<br/>Supabase]
     
@@ -92,13 +92,13 @@ flowchart LR
     style E fill:#2196F3,color:#fff
     style F fill:#F44336,color:#fff
     style J fill:#4CAF50,color:#fff
-```
+\`\`\`
 
 ---
 
 ## 📦 Nodos Nuevos a Agregar
 
-```mermaid
+\`\`\`mermaid
 graph TD
     subgraph "🆕 Nodos Nuevos MVP"
         N1[1️⃣ Get User<br/>Supabase Get Rows]
@@ -125,13 +125,13 @@ graph TD
     style N4 fill:#4CAF50,color:#fff
     style N5 fill:#4CAF50,color:#fff
     style M1 fill:#FF9800,color:#000
-```
+\`\`\`
 
 ---
 
 ## 🗃️ Estructura de Datos
 
-```mermaid
+\`\`\`mermaid
 erDiagram
     users ||--o{ consultas : tiene
     
@@ -154,7 +154,7 @@ erDiagram
         string mes_periodo "2025-10"
         timestamp created_at
     }
-```
+\`\`\`
 
 ---
 
@@ -173,7 +173,7 @@ erDiagram
 
 ## 🔄 Secuencia de Operaciones
 
-```mermaid
+\`\`\`mermaid
 sequenceDiagram
     participant U as 👤 Usuario
     participant W as 📱 WhatsApp
@@ -207,7 +207,7 @@ sequenceDiagram
         N->>W: Enviar respuesta
         W->>U: Respuesta del análisis
     end
-```
+\`\`\`
 
 ---
 
@@ -225,7 +225,7 @@ sequenceDiagram
 
 ## ✅ Ventajas Visuales del MVP
 
-```
+\`\`\`
 ┌─────────────────────────────────────────────┐
 │          ❌ ANTES (Complejo)                │
 ├─────────────────────────────────────────────┤
@@ -247,13 +247,13 @@ sequenceDiagram
 │  😊 Cero archivos extra                     │
 │  😊 Menor latencia                          │
 └─────────────────────────────────────────────┘
-```
+\`\`\`
 
 ---
 
 ## 🚀 Tiempo de Implementación
 
-```mermaid
+\`\`\`mermaid
 gantt
     title Implementación MVP Simple
     dateFormat mm
@@ -276,7 +276,7 @@ gantt
     
     section Total
     ✅ LISTO                      :milestone, 23, 0m
-```
+\`\`\`
 
 **Total: ~23 minutos** ⏱️
 
@@ -284,7 +284,7 @@ gantt
 
 ## 📍 Ubicación de Nodos en el Workflow
 
-```
+\`\`\`
 FLUJO ACTUAL:
 ─────────────
 Twilio Trigger
@@ -313,9 +313,8 @@ AI Agent
     └─→ Insert Consulta
     ↓
 Send WhatsApp
-```
+\`\`\`
 
 ---
 
 **¿Listo para implementar? Sigue la guía MVP_SIMPLE_CONTABILIZACION.md** 🚀
-

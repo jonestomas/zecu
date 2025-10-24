@@ -96,6 +96,3 @@ if (allGood) {
   console.log('🧪 Guía de testing: docs/TESTING_GUIDE_DEV.md\n');
   process.exit(1);
 }
-
-
-

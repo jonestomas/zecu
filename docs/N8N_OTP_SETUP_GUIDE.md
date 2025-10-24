@@ -108,13 +108,13 @@ Deberías ver estos nodos:
 3. **Copia la "Production URL"** (la segunda, sin `-test`)
 
 **Ejemplo de URL:**
-```
+\`\`\`
 http://localhost:5678/webhook/zecubot-send-otp
-```
+\`\`\`
 o
-```
+\`\`\`
 https://n8n.tudominio.com/webhook/zecubot-send-otp
-```
+\`\`\`
 
 ---
 
@@ -123,25 +123,25 @@ https://n8n.tudominio.com/webhook/zecubot-send-otp
 ### 5.1 Editar `.env.local`
 1. Abre el archivo `zecu/.env.local`
 2. Busca la línea:
-   ```
+   \`\`\`
    N8N_WEBHOOK_SEND_OTP_URL=
-   ```
+   \`\`\`
 3. Reemplázala con tu URL del webhook:
-   ```
+   \`\`\`
    N8N_WEBHOOK_SEND_OTP_URL=http://localhost:5678/webhook/zecubot-send-otp
-   ```
+   \`\`\`
    o (si usas n8n cloud/remoto):
-   ```
+   \`\`\`
    N8N_WEBHOOK_SEND_OTP_URL=https://n8n.tudominio.com/webhook/zecubot-send-otp
-   ```
+   \`\`\`
 
 ### 5.2 Reiniciar Next.js
 1. En tu terminal, presiona `Ctrl + C` para detener el servidor
 2. Reinicia con:
-   ```bash
+   \`\`\`bash
    cd zecu
    npm run dev
-   ```
+   \`\`\`
 
 ---
 
@@ -157,13 +157,13 @@ https://n8n.tudominio.com/webhook/zecubot-send-otp
    - Ejemplo: `+54 11 3407 0204`
 3. Haz clic en **"Enviar código"**
 4. **Verifica en tu terminal de Next.js**:
-   ```
+   \`\`\`
    📱 Enviando OTP por WhatsApp a +5491134070204
    ✅ OTP enviado por WhatsApp correctamente
-   ```
+   \`\`\`
 5. **Verifica en tu WhatsApp**:
    - Deberías recibir un mensaje como:
-   ```
+   \`\`\`
    Hola Tomas! 👋
 
    Tu código de verificación Zecubot es:
@@ -173,7 +173,7 @@ https://n8n.tudominio.com/webhook/zecubot-send-otp
    Este código expira en 5 minutos.
 
    🔒 Nunca compartas este código con nadie.
-   ```
+   \`\`\`
 
 ### 6.3 Ingresar el Código
 1. Ingresa el código que recibiste en WhatsApp
@@ -250,9 +250,9 @@ Para ver qué está pasando en n8n:
 Cuando estés listo para producción:
 
 1. **Actualiza la URL del webhook** en `.env.local` con tu dominio público:
-   ```
+   \`\`\`
    N8N_WEBHOOK_SEND_OTP_URL=https://n8n.tudominio.com/webhook/zecubot-send-otp
-   ```
+   \`\`\`
 
 2. **Asegúrate de que n8n esté accesible públicamente** (no `localhost`)
 
@@ -274,4 +274,3 @@ Si algo no funciona:
 ---
 
 **¡Listo! Ahora tienes OTP por WhatsApp funcionando con n8n + Twilio 🎉**
-

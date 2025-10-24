@@ -15,9 +15,9 @@ Polar.sh es ideal para expandir Zecu a nivel internacional porque:
 
 ## 📦 Instalación
 
-```bash
+\`\`\`bash
 npm install @polar-sh/nextjs
-```
+\`\`\`
 
 ---
 
@@ -55,14 +55,14 @@ npm install @polar-sh/nextjs
 
 Agrega a tu `.env.local`:
 
-```env
+\`\`\`env
 # Polar.sh Configuration
 POLAR_ACCESS_TOKEN=polar_oat_XXXXXXXXXXXXXXXX
 POLAR_PRICE_ID_PLUS=price_XXXXXXXXX
 POLAR_PRICE_ID_PREMIUM=price_XXXXXXXXX
 POLAR_SUCCESS_URL=https://tu-dominio.com/payment/polar/success?checkout_id={CHECKOUT_ID}
 POLAR_WEBHOOK_SECRET=whsec_XXXXXXXXXXXXXXXX
-```
+\`\`\`
 
 ---
 
@@ -85,7 +85,7 @@ Polar.sh usa Stripe, así que puedes usar las tarjetas de prueba de Stripe:
 
 ## 🔄 Flujo de Pago
 
-```
+\`\`\`
 Usuario selecciona plan Plus/Premium
     ↓
 POST /api/polar/create-checkout
@@ -103,7 +103,7 @@ GET /api/polar/verify-payment
 Supabase: plan actualizado
     ↓
 Usuario redirigido a /welcome
-```
+\`\`\`
 
 ---
 
@@ -111,7 +111,7 @@ Usuario redirigido a /welcome
 
 ### Selector de Método de Pago
 
-```typescript
+\`\`\`typescript
 // En tu página de checkout
 const [paymentMethod, setPaymentMethod] = useState<'mercadopago' | 'polar'>('mercadopago');
 
@@ -125,11 +125,11 @@ const handleCheckout = async () => {
     await handlePolarCheckout();
   }
 };
-```
+\`\`\`
 
 ### Detectar País Automáticamente
 
-```typescript
+\`\`\`typescript
 const detectCountry = async () => {
   const response = await fetch('https://ipapi.co/json/');
   const data = await response.json();
@@ -140,7 +140,7 @@ const detectCountry = async () => {
     setPaymentMethod('polar');
   }
 };
-```
+\`\`\`
 
 ---
 
@@ -150,14 +150,14 @@ const detectCountry = async () => {
 
 Las cancelaciones se manejan automáticamente a través del webhook:
 
-```typescript
+\`\`\`typescript
 case 'subscription.canceled':
   // Actualizar usuario a plan free
   await supabaseAdmin
     .from('users')
     .update({ plan: 'free', plan_expires_at: null })
     .eq('id', userId);
-```
+\`\`\`
 
 ### Renovación
 
@@ -171,14 +171,14 @@ Polar.sh maneja las renovaciones automáticamente. Cada vez que se renueva, env�
 
 El código ya incluye validación de signatures:
 
-```typescript
+\`\`\`typescript
 const event = validateWebhookPayload(
   body, 
   webhookSecret, 
   signature, 
   timestamp
 );
-```
+\`\`\`
 
 ### Variables de Entorno
 
@@ -252,4 +252,3 @@ Polar.sh provee un dashboard con:
 ---
 
 **¡Listo para aceptar pagos internacionales!** 🌍🚀
-

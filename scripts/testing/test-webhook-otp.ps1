@@ -136,4 +136,3 @@ Write-Host "   1. Verifica tu WhatsApp para ver los mensajes" -ForegroundColor G
 Write-Host "   2. Revisa las ejecuciones en n8n (Executions)" -ForegroundColor Gray
 Write-Host "   3. Si todo funciona, actualiza N8N_WEBHOOK_SEND_OTP_URL en .env.local" -ForegroundColor Gray
 Write-Host "`n" -ForegroundColor Cyan
-

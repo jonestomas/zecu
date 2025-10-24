@@ -34,7 +34,7 @@
 
 **Pasos:**
 - [ ] Crear tabla `user_queries` en Supabase
-  ```sql
+  \`\`\`sql
   CREATE TABLE user_queries (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_phone VARCHAR(20) NOT NULL,
@@ -45,10 +45,10 @@
   );
   
   CREATE INDEX idx_user_queries_phone_month ON user_queries(user_phone, month_year);
-  ```
+  \`\`\`
 
 - [ ] Crear función para contar consultas del mes
-  ```sql
+  \`\`\`sql
   CREATE OR REPLACE FUNCTION get_monthly_query_count(p_phone VARCHAR)
   RETURNS INT AS $$
   BEGIN
@@ -60,7 +60,7 @@
     );
   END;
   $$ LANGUAGE plpgsql;
-  ```
+  \`\`\`
 
 - [ ] API endpoint `/api/queries/check-limit`
 - [ ] Implementar lógica en n8n para:
@@ -171,7 +171,7 @@
 - [ ] Audio de llamadas sospechosas
 
 **Flujo Propuesto:**
-```
+\`\`\`
 Usuario: Hola
 Bot: 👋 ¡Hola! Soy Zecu, tu asistente contra estafas.
 
@@ -182,7 +182,7 @@ Puedo ayudarte con:
 4️⃣ Reportar una estafa
 
 Responde con el número o envía directamente el mensaje.
-```
+\`\`\`
 
 **Archivo:**
 - Workflow n8n - Reestructurar flujo
@@ -280,4 +280,3 @@ Responde con el número o envía directamente el mensaje.
 
 **Última actualización:** 21 Octubre 2025  
 **Próxima sesión recomendada:** OTP en Producción
-

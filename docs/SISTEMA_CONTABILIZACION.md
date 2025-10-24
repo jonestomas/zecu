@@ -19,7 +19,7 @@ Sistema completo para contar y limitar las consultas de usuarios según su plan 
 
 ### Flujo Completo
 
-```
+\`\`\`
 Usuario → WhatsApp → Twilio → n8n Webhook
                                     ↓
                          1. Validar Límite (API)
@@ -38,7 +38,7 @@ Usuario → WhatsApp → Twilio → n8n Webhook
             6. Enviar Respuesta
                       ↓
                     FIN
-```
+\`\`\`
 
 ---
 
@@ -46,7 +46,7 @@ Usuario → WhatsApp → Twilio → n8n Webhook
 
 ### Tabla `consultas`
 
-```sql
+\`\`\`sql
 CREATE TABLE consultas (
   id UUID PRIMARY KEY,
   user_id UUID NOT NULL REFERENCES users(id),
@@ -64,7 +64,7 @@ CREATE TABLE consultas (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   mes_periodo VARCHAR(7) NOT NULL -- 'YYYY-MM'
 );
-```
+\`\`\`
 
 ### Funciones SQL
 
@@ -75,7 +75,7 @@ Valida si un usuario puede hacer una consulta.
 **Entrada:** `user_id UUID`
 
 **Salida:**
-```json
+\`\`\`json
 {
   "puede_consultar": true,
   "plan": "plus",
@@ -83,7 +83,7 @@ Valida si un usuario puede hacer una consulta.
   "limite": 50,
   "consultas_restantes": 38
 }
-```
+\`\`\`
 
 #### `get_consultas_mes_actual(user_id)`
 
@@ -102,14 +102,14 @@ Obtiene el conteo de consultas del mes actual.
 **Endpoint:** `POST /api/consultas/validar`
 
 **Request:**
-```json
+\`\`\`json
 {
   "phone": "+5491134070204"
 }
-```
+\`\`\`
 
 **Response:**
-```json
+\`\`\`json
 {
   "puede_consultar": true,
   "plan": "plus",
@@ -117,13 +117,13 @@ Obtiene el conteo de consultas del mes actual.
   "limite": 50,
   "consultas_restantes": 38
 }
-```
+\`\`\`
 
 **Uso en n8n:**
-```javascript
+\`\`\`javascript
 // URL: {{$env.NEXT_PUBLIC_BASE_URL}}/api/consultas/validar
 // Body: { "phone": "{{ $json.From.replace('whatsapp:', '') }}" }
-```
+\`\`\`
 
 ---
 
@@ -132,32 +132,32 @@ Obtiene el conteo de consultas del mes actual.
 **Endpoint:** `POST /api/consultas/registrar`
 
 **Request:**
-```json
+\`\`\`json
 {
   "phone": "+5491134070204",
   "mensaje": "Texto del mensaje a analizar",
   "tipo": "analisis_estafa"
 }
-```
+\`\`\`
 
 **Response:**
-```json
+\`\`\`json
 {
   "success": true,
   "consulta_id": "uuid-de-la-consulta",
   "message": "Consulta registrada correctamente"
 }
-```
+\`\`\`
 
 **Uso en n8n:**
-```javascript
+\`\`\`javascript
 // URL: {{$env.NEXT_PUBLIC_BASE_URL}}/api/consultas/registrar
 // Body: {
 //   "phone": "{{ $node["Webhook WhatsApp"].json["From"].replace('whatsapp:', '') }}",
 //   "mensaje": "{{ $node["Webhook WhatsApp"].json["Body"] }}",
 //   "tipo": "analisis_estafa"
 // }
-```
+\`\`\`
 
 ---
 
@@ -166,25 +166,25 @@ Obtiene el conteo de consultas del mes actual.
 **Endpoint:** `POST /api/consultas/actualizar`
 
 **Request:**
-```json
+\`\`\`json
 {
   "consulta_id": "uuid-de-la-consulta",
   "respuesta": "Texto de la respuesta del bot",
   "riesgo_detectado": true,
   "nivel_riesgo": "alto"
 }
-```
+\`\`\`
 
 **Response:**
-```json
+\`\`\`json
 {
   "success": true,
   "message": "Consulta actualizada correctamente"
 }
-```
+\`\`\`
 
 **Uso en n8n:**
-```javascript
+\`\`\`javascript
 // URL: {{$env.NEXT_PUBLIC_BASE_URL}}/api/consultas/actualizar
 // Body: {
 //   "consulta_id": "{{ $node["Registrar Consulta"].json["consulta_id"] }}",
@@ -192,7 +192,7 @@ Obtiene el conteo de consultas del mes actual.
 //   "riesgo_detectado": true,
 //   "nivel_riesgo": "alto"
 // }
-```
+\`\`\`
 
 ---
 
@@ -241,7 +241,7 @@ Obtiene el conteo de consultas del mes actual.
 
 Asegúrate de tener en `.env.local`:
 
-```env
+\`\`\`env
 # Next.js
 NEXT_PUBLIC_BASE_URL=http://localhost:3000
 
@@ -256,17 +256,17 @@ OPENAI_API_KEY=sk-xxx
 TWILIO_ACCOUNT_SID=ACxxx
 TWILIO_AUTH_TOKEN=xxx
 TWILIO_WHATSAPP_NUMBER=+12692562013
-```
+\`\`\`
 
 ### 2. Aplicar Migración en Supabase
 
 La migración ya está aplicada (`004_create_consultas_table.sql`), pero si necesitas verificar:
 
-```bash
+\`\`\`bash
 # Verifica en Supabase Dashboard → SQL Editor
 SELECT * FROM consultas LIMIT 10;
 SELECT * FROM pg_proc WHERE proname = 'puede_realizar_consulta';
-```
+\`\`\`
 
 ### 3. Importar Workflow en n8n
 
@@ -294,16 +294,16 @@ SELECT * FROM pg_proc WHERE proname = 'puede_realizar_consulta';
 
 ### Test 1: Validar Límite
 
-```bash
+\`\`\`bash
 curl -X POST http://localhost:3000/api/consultas/validar \
   -H "Content-Type: application/json" \
   -d '{
     "phone": "+5491134070204"
   }'
-```
+\`\`\`
 
 **Respuesta Esperada:**
-```json
+\`\`\`json
 {
   "puede_consultar": true,
   "plan": "plus",
@@ -311,13 +311,13 @@ curl -X POST http://localhost:3000/api/consultas/validar \
   "limite": 50,
   "consultas_restantes": 50
 }
-```
+\`\`\`
 
 ---
 
 ### Test 2: Registrar Consulta
 
-```bash
+\`\`\`bash
 curl -X POST http://localhost:3000/api/consultas/registrar \
   -H "Content-Type: application/json" \
   -d '{
@@ -325,16 +325,16 @@ curl -X POST http://localhost:3000/api/consultas/registrar \
     "mensaje": "Gané un premio! Haz click aquí para reclamar",
     "tipo": "analisis_estafa"
   }'
-```
+\`\`\`
 
 **Respuesta Esperada:**
-```json
+\`\`\`json
 {
   "success": true,
   "consulta_id": "abc-123-def-456",
   "message": "Consulta registrada correctamente"
 }
-```
+\`\`\`
 
 ---
 
@@ -348,9 +348,9 @@ curl -X POST http://localhost:3000/api/consultas/registrar \
 4. Verifica en WhatsApp:
    - Deberías recibir el análisis del bot
 5. Verifica en Supabase:
-   ```sql
+   \`\`\`sql
    SELECT * FROM consultas ORDER BY created_at DESC LIMIT 1;
-   ```
+   \`\`\`
 
 ---
 
@@ -358,7 +358,7 @@ curl -X POST http://localhost:3000/api/consultas/registrar \
 
 Para probar el límite, inserta consultas manualmente:
 
-```sql
+\`\`\`sql
 -- Insertar 5 consultas para un usuario Free
 DO $$
 DECLARE
@@ -371,7 +371,7 @@ BEGIN
     VALUES (v_user_id, 'Test ' || i, TO_CHAR(NOW(), 'YYYY-MM'));
   END LOOP;
 END $$;
-```
+\`\`\`
 
 Ahora envía un nuevo mensaje por WhatsApp y deberías recibir:
 > 🚫 Límite Alcanzado
@@ -385,7 +385,7 @@ Ahora envía un nuevo mensaje por WhatsApp y deberías recibir:
 
 ### Ver Consultas por Usuario
 
-```sql
+\`\`\`sql
 SELECT 
   u.phone,
   u.name,
@@ -398,11 +398,11 @@ LEFT JOIN consultas c ON u.id = c.user_id
 WHERE c.mes_periodo = TO_CHAR(NOW(), 'YYYY-MM')
 GROUP BY u.id, c.mes_periodo
 ORDER BY total_consultas DESC;
-```
+\`\`\`
 
 ### Top Usuarios por Consultas
 
-```sql
+\`\`\`sql
 SELECT 
   u.phone,
   u.name,
@@ -414,7 +414,7 @@ WHERE c.created_at >= NOW() - INTERVAL '30 days'
 GROUP BY u.id
 ORDER BY total_consultas DESC
 LIMIT 10;
-```
+\`\`\`
 
 ---
 
@@ -433,12 +433,12 @@ LIMIT 10;
 **Causa:** La función SQL no existe o hay un error
 
 **Solución:**
-```sql
+\`\`\`sql
 -- Verificar que la función existe
 SELECT * FROM pg_proc WHERE proname = 'puede_realizar_consulta';
 
 -- Si no existe, re-aplicar migración
-```
+\`\`\`
 
 ### El bot no responde
 
@@ -471,4 +471,3 @@ SELECT * FROM pg_proc WHERE proname = 'puede_realizar_consulta';
 ---
 
 **¡Sistema de Contabilización Completo!** 🎉
-

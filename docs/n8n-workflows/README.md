@@ -60,22 +60,22 @@ Esta carpeta contiene los workflows de n8n para Zecubot y su documentación.
 7. ⚠️ Respuesta Error (Twilio)
 
 **Input esperado:**
-```json
+\`\`\`json
 {
   "phone": "+5491134070204",
   "code": "123456",
   "name": "Tomás Jones"
 }
-```
+\`\`\`
 
 **Output esperado:**
-```json
+\`\`\`json
 {
   "success": true,
   "message": "OTP enviado correctamente a +5491134070204",
   "timestamp": "2024-10-21T15:30:45.123Z"
 }
-```
+\`\`\`
 
 **Cómo importar:**
 1. n8n → Workflows → + New → Import from File
@@ -84,16 +84,16 @@ Esta carpeta contiene los workflows de n8n para Zecubot y su documentación.
 4. Activa el workflow
 
 **Cómo probar:**
-```powershell
+\`\`\`powershell
 cd zecu
 .\scripts\testing\test-webhook-otp.ps1
-```
+\`\`\`
 
 ---
 
 ## 🎯 Flujo de Trabajo Recomendado
 
-```
+\`\`\`
 1. Lee QUICK_START_MOCK.md          (5 min)
          ↓
 2. Importa SEND_OTP_WORKFLOW.json   (1 min)
@@ -110,20 +110,20 @@ cd zecu
    (actualiza N8N_WEBHOOK_SEND_OTP_URL)
          ↓
 7. ✅ ¡Listo!
-```
+\`\`\`
 
 ---
 
 ## 🧪 Testing
 
 ### Opción 1: Script PowerShell (Windows)
-```powershell
+\`\`\`powershell
 cd zecu
 .\scripts\testing\test-webhook-otp.ps1
-```
+\`\`\`
 
 ### Opción 2: Manual con curl/Invoke-RestMethod
-```powershell
+\`\`\`powershell
 $body = @{
     phone = "+5491134070204"
     code = "123456"
@@ -134,7 +134,7 @@ Invoke-RestMethod -Uri "http://localhost:5678/webhook/zecubot-send-otp" `
   -Method Post `
   -ContentType "application/json" `
   -Body $body
-```
+\`\`\`
 
 ### Opción 3: Test en n8n (sin enviar WhatsApp real)
 1. Deshabilita el nodo de Twilio
@@ -147,23 +147,23 @@ Invoke-RestMethod -Uri "http://localhost:5678/webhook/zecubot-send-otp" `
 ## 📊 Estructura de Datos
 
 ### Entrada (Next.js → n8n)
-```typescript
+\`\`\`typescript
 interface OTPRequest {
   phone: string;      // Ej: "+5491134070204"
   code: string;       // Ej: "123456"
   name?: string;      // Ej: "Tomás Jones" (opcional)
 }
-```
+\`\`\`
 
 ### Salida (n8n → Next.js)
-```typescript
+\`\`\`typescript
 interface OTPResponse {
   success: boolean;
   message?: string;   // Si success: true
   error?: string;     // Si success: false
   timestamp: string;  // ISO 8601
 }
-```
+\`\`\`
 
 ---
 
@@ -179,9 +179,9 @@ interface OTPResponse {
 - [ ] Workflow activo (toggle ON)
 
 ### En Next.js (`.env.local`):
-```env
+\`\`\`env
 N8N_WEBHOOK_SEND_OTP_URL=http://localhost:5678/webhook/zecubot-send-otp
-```
+\`\`\`
 
 ---
 
@@ -257,4 +257,3 @@ N8N_WEBHOOK_SEND_OTP_URL=http://localhost:5678/webhook/zecubot-send-otp
 **¿Preguntas? Abre un issue o consulta la documentación completa.**
 
 **¡Feliz automatización! 🤖**
-

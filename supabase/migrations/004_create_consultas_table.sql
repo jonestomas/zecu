@@ -142,4 +142,3 @@ CREATE POLICY "El sistema puede insertar consultas"
 -- Trigger para refrescar la vista materializada cada hora (opcional, se puede hacer manual)
 -- CREATE EXTENSION IF NOT EXISTS pg_cron;
 -- SELECT cron.schedule('refresh_consultas_por_mes', '0 * * * *', 'SELECT refresh_consultas_por_mes()');
-

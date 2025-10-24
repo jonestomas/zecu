@@ -19,6 +19,3 @@ console.log('─'.repeat(70));
 console.log('\n📋 Copia esta línea a tu .env.local:\n');
 console.log(`JWT_SECRET=${secret}`);
 console.log('\n✅ ¡Listo! Mantén este secreto seguro y nunca lo compartas.\n');
-
-
-

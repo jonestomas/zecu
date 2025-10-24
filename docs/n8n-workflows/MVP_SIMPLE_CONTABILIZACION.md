@@ -10,7 +10,7 @@ Implementar un sistema de conteo de consultas **sin APIs intermedias**, usando s
 
 ## 📊 Flujo Simplificado
 
-```
+\`\`\`
 Usuario envía mensaje
     ↓
 🗄️ Get User (Supabase)
@@ -26,7 +26,7 @@ Usuario envía mensaje
         💾 Insert Consulta (Supabase)
            ↓
         📤 Enviar respuesta → FIN
-```
+\`\`\`
 
 ---
 
@@ -36,7 +36,7 @@ Usuario envía mensaje
 
 **Ubicación**: Después de `data_extraction`, antes del flujo actual
 
-```
+\`\`\`
 Type: Supabase → Get All Rows
 Credentials: Tu conexión de Supabase
 Table: users
@@ -48,10 +48,10 @@ Filters:
 
 Options:
   - Select: * (todos los campos)
-```
+\`\`\`
 
 **Output esperado**:
-```json
+\`\`\`json
 {
   "id": "uuid-del-usuario",
   "phone": "+5491134070204",
@@ -59,7 +59,7 @@ Options:
   "plan": "free",
   "created_at": "2024-10-23T..."
 }
-```
+\`\`\`
 
 ---
 
@@ -67,7 +67,7 @@ Options:
 
 **Ubicación**: Después de `Get User`
 
-```
+\`\`\`
 Type: Supabase → Execute a SQL Query
 Credentials: Tu conexión de Supabase
 
@@ -76,14 +76,14 @@ SELECT COUNT(*) as total
 FROM consultas
 WHERE user_id = '{{ $('Get User').first().json.id }}'
   AND mes_periodo = TO_CHAR(NOW(), 'YYYY-MM');
-```
+\`\`\`
 
 **Output esperado**:
-```json
+\`\`\`json
 {
   "total": 3
 }
-```
+\`\`\`
 
 ---
 
@@ -91,7 +91,7 @@ WHERE user_id = '{{ $('Get User').first().json.id }}'
 
 **Ubicación**: Después de `Count Consultas`
 
-```
+\`\`\`
 Type: Code → Run Once for All Items
 
 JavaScript:
@@ -120,10 +120,10 @@ return [{
     puede_consultar: puedeConsultar
   }
 }];
-```
+\`\`\`
 
 **Output esperado**:
-```json
+\`\`\`json
 {
   "user_id": "uuid",
   "plan": "free",
@@ -132,7 +132,7 @@ return [{
   "consultas_restantes": 2,
   "puede_consultar": true
 }
-```
+\`\`\`
 
 ---
 
@@ -140,7 +140,7 @@ return [{
 
 **Ubicación**: Después de `Calcular Límite`
 
-```
+\`\`\`
 Type: IF
 
 Conditions:
@@ -150,7 +150,7 @@ Conditions:
     Field: {{ $json.puede_consultar }}
     Operation: Equal
     Value: true
-```
+\`\`\`
 
 **Ramas**:
 - **TRUE** → Continuar al AI Agent
@@ -162,7 +162,7 @@ Conditions:
 
 **Ya existe en tu workflow**, solo actualizar el mensaje:
 
-```
+\`\`\`
 Type: Twilio → Send an SMS/MMS/WhatsApp message
 
 From: whatsapp:+12692562013
@@ -182,7 +182,7 @@ Has alcanzado tu límite de consultas del mes.
 ✅ Soporte prioritario
 
 👉 Mejora aquí: {{$env.NEXT_PUBLIC_BASE_URL}}/checkout
-```
+\`\`\`
 
 ---
 
@@ -190,7 +190,7 @@ Has alcanzado tu límite de consultas del mes.
 
 **Ubicación**: **Después del AI Agent**, antes de enviar la respuesta final
 
-```
+\`\`\`
 Type: Supabase → Insert a Row
 Credentials: Tu conexión de Supabase
 Table: consultas
@@ -203,19 +203,19 @@ Columns:
   riesgo_detectado: false
   nivel_riesgo: bajo
   mes_periodo: {{ new Date().toISOString().slice(0, 7) }}
-```
+\`\`\`
 
 **Tips**:
 - Si el AI Agent puede detectar riesgos, puedes usar expresiones como:
-  ```javascript
+  \`\`\`javascript
   {{ $('AI Agent1').item.json.output.toLowerCase().includes('riesgo alto') ? true : false }}
-  ```
+  \`\`\`
 
 ---
 
 ## 🔄 Flujo Completo Actualizado
 
-```
+\`\`\`
 Twilio Trigger
     ↓
 Code in JavaScript
@@ -237,7 +237,7 @@ data_extraction
              🆕 Insert Consulta (Supabase)
              Send WhatsApp Respuesta
              FIN
-```
+\`\`\`
 
 ---
 
@@ -287,7 +287,7 @@ data_extraction
 ### Test 2: Usuario sin consultas disponibles ❌
 
 1. **Ejecuta** en Supabase (para simular límite):
-   ```sql
+   \`\`\`sql
    -- Insertar 5 consultas del mes actual para un usuario FREE
    INSERT INTO consultas (user_id, mensaje, mes_periodo)
    SELECT 
@@ -295,7 +295,7 @@ data_extraction
      'Consulta de prueba ' || i,
      TO_CHAR(NOW(), 'YYYY-MM')
    FROM generate_series(1, 5) i;
-   ```
+   \`\`\`
 2. **Envía** mensaje al bot
 3. **Verifica**:
    - ✅ Recibes mensaje "🚫 Límite Alcanzado"
@@ -351,10 +351,10 @@ Estos límites están en el nodo "Calcular Límite". Modifícalos ahí si necesi
 ### ❌ Error: "relation consultas does not exist"
 **Causa**: La tabla `consultas` no existe
 **Solución**: Ejecuta la migración 004:
-```bash
+\`\`\`bash
 cd zecu
 # Aplicar en Supabase desde el dashboard
-```
+\`\`\`
 
 ### ❌ Error en "Count Consultas"
 **Causa**: Sintaxis SQL incorrecta
@@ -390,4 +390,3 @@ Cuando tengas usuarios reales y necesites más control, puedes migrar a la soluc
 **¡Listo para implementar! 🚀**
 
 ¿Alguna duda sobre cómo configurar algún nodo?
-

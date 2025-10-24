@@ -18,7 +18,7 @@ interface UserData {
 
 export default function DashboardPage() {
   const router = useRouter()
-  const [language, setLanguage] = useState<"es" | "en">("es")
+  const [language, setLanguage] = useState<"es" | "en">("en")
   const [showUnsubscribeModal, setShowUnsubscribeModal] = useState(false)
   const [userData, setUserData] = useState<UserData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -65,7 +65,7 @@ export default function DashboardPage() {
 
   const handleCancelSubscription = async () => {
     setIsCancelling(true)
-    
+
     try {
       const response = await fetch("/api/auth/cancel-subscription", {
         method: "POST",
@@ -84,26 +84,32 @@ export default function DashboardPage() {
             plan: "free",
             plan_expires_at: undefined,
             consultas_limite: 5,
-            consultas_restantes: Math.max(0, 5 - userData.consultas_mes)
+            consultas_restantes: Math.max(0, 5 - userData.consultas_mes),
           })
         }
 
         setShowUnsubscribeModal(false)
-        
+
         // Mostrar mensaje de éxito (opcional: puedes agregar un toast/notification)
-        alert(language === "es" 
-          ? "Tu suscripción ha sido cancelada. Ahora tienes el plan Free." 
-          : "Your subscription has been cancelled. You now have the Free plan.")
+        alert(
+          language === "es"
+            ? "Tu suscripción ha sido cancelada. Ahora tienes el plan Free."
+            : "Your subscription has been cancelled. You now have the Free plan.",
+        )
       } else {
-        alert(language === "es" 
-          ? "Error al cancelar la suscripción. Por favor intenta de nuevo." 
-          : "Error cancelling subscription. Please try again.")
+        alert(
+          language === "es"
+            ? "Error al cancelar la suscripción. Por favor intenta de nuevo."
+            : "Error cancelling subscription. Please try again.",
+        )
       }
     } catch (error) {
       console.error("Error cancelando suscripción:", error)
-      alert(language === "es" 
-        ? "Error al cancelar la suscripción. Por favor intenta de nuevo." 
-        : "Error cancelling subscription. Please try again.")
+      alert(
+        language === "es"
+          ? "Error al cancelar la suscripción. Por favor intenta de nuevo."
+          : "Error cancelling subscription. Please try again.",
+      )
     } finally {
       setIsCancelling(false)
     }
@@ -118,45 +124,22 @@ export default function DashboardPage() {
   }
 
   const planName = userData.plan === "plus" ? "Plus" : userData.plan === "premium" ? "Premium" : "Free"
-  const nextRenewal = userData.plan_expires_at 
-    ? new Date(userData.plan_expires_at).toLocaleDateString("es-AR", { 
-        day: "numeric", 
-        month: "long", 
-        year: "numeric" 
+  const nextRenewal = userData.plan_expires_at
+    ? new Date(userData.plan_expires_at).toLocaleDateString("es-AR", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
       })
     : "Plan Free (sin vencimiento)"
 
   // Calcular porcentaje de consultas usadas
-  const porcentajeUsado = userData.consultas_limite > 0 
-    ? Math.round((userData.consultas_mes / userData.consultas_limite) * 100)
-    : 0
-  
+  const porcentajeUsado =
+    userData.consultas_limite > 0 ? Math.round((userData.consultas_mes / userData.consultas_limite) * 100) : 0
+
   // Calcular porcentaje restante
   const porcentajeRestante = 100 - porcentajeUsado
 
   const translations = {
-    es: {
-      title: "Mi Dashboard",
-      currentPlan: "Plan Actual",
-      analysesRemaining: "Consultas Restantes",
-      analysesUsed: "Consultas Usadas",
-      of: "de",
-      thisMonth: "este mes",
-      nextRenewal: "Próxima renovación",
-      unsubscribe: "Quiero darme de baja",
-      upgradePlan: "Mejorar plan",
-      logout: "Cerrar sesión",
-      backToHome: "Volver al inicio",
-      unsubscribeTitle: "¿Estás seguro?",
-      unsubscribeMessage: "Lamentamos que quieras irte. ¿Estás seguro de que deseas cancelar tu suscripción?",
-      cancel: "Cancelar",
-      confirmUnsubscribe: "Sí, darme de baja",
-      planBenefits: "Beneficios de tu plan",
-      benefit1: "Detección de estafas",
-      benefit2: "Análisis en tiempo real",
-      benefit3: "Soporte prioritario",
-      benefit4: "Actualizaciones automáticas",
-    },
     en: {
       title: "My Dashboard",
       currentPlan: "Current Plan",
@@ -178,6 +161,42 @@ export default function DashboardPage() {
       benefit2: "Real-time analysis",
       benefit3: "Priority support",
       benefit4: "Automatic updates",
+      freePlanNoExpiry: "Free Plan (no expiration)",
+      available: "available",
+      upgradeMessage: "Upgrade to Plus for more queries! (50 per month)",
+      plusMessage: "You have {limit} queries per month with your Plus plan!",
+      premiumMessage: "You have {limit} queries per month with your Premium plan!",
+      accessMoreFeatures: "Access more features and analyses",
+      cancelSubscription: "Cancel your current subscription",
+    },
+    es: {
+      title: "Mi Dashboard",
+      currentPlan: "Plan Actual",
+      analysesRemaining: "Consultas Restantes",
+      analysesUsed: "Consultas Usadas",
+      of: "de",
+      thisMonth: "este mes",
+      nextRenewal: "Próxima renovación",
+      unsubscribe: "Quiero darme de baja",
+      upgradePlan: "Mejorar plan",
+      logout: "Cerrar sesión",
+      backToHome: "Volver al inicio",
+      unsubscribeTitle: "¿Estás seguro?",
+      unsubscribeMessage: "Lamentamos que quieras irte. ¿Estás seguro de que deseas cancelar tu suscripción?",
+      cancel: "Cancelar",
+      confirmUnsubscribe: "Sí, darme de baja",
+      planBenefits: "Beneficios de tu plan",
+      benefit1: "Detección de estafas",
+      benefit2: "Análisis en tiempo real",
+      benefit3: "Soporte prioritario",
+      benefit4: "Actualizaciones automáticas",
+      freePlanNoExpiry: "Plan Free (sin vencimiento)",
+      available: "disponible",
+      upgradeMessage: "¡Actualiza a Plus para más consultas! (50 al mes)",
+      plusMessage: "¡Tienes {limit} consultas al mes con tu plan Plus!",
+      premiumMessage: "¡Tienes {limit} consultas al mes con tu plan Premium!",
+      accessMoreFeatures: "Accede a más funciones y análisis",
+      cancelSubscription: "Cancelar tu suscripción actual",
     },
   }
 
@@ -214,7 +233,7 @@ export default function DashboardPage() {
               </button>
 
               {/* Logout Button */}
-              <button 
+              <button
                 onClick={handleLogout}
                 className="flex items-center gap-2 px-4 py-2 rounded-lg border-2 border-border hover:border-destructive hover:text-destructive transition-colors text-sm font-medium"
               >
@@ -303,7 +322,11 @@ export default function DashboardPage() {
               {/* Consultas Usadas */}
               <div className="mb-4">
                 <p className="text-sm text-muted-foreground mb-2">
-                  {t.analysesUsed}: <span className="text-foreground font-semibold">{userData.consultas_mes} {t.of} {userData.consultas_limite}</span> {t.thisMonth}
+                  {t.analysesUsed}:{" "}
+                  <span className="text-foreground font-semibold">
+                    {userData.consultas_mes} {t.of} {userData.consultas_limite}
+                  </span>{" "}
+                  {t.thisMonth}
                 </p>
               </div>
 
@@ -312,32 +335,34 @@ export default function DashboardPage() {
                 <div className="w-full h-3 bg-muted rounded-full overflow-hidden">
                   <div
                     className={`h-full transition-all duration-500 ${
-                      porcentajeRestante > 50 
-                        ? 'bg-gradient-to-r from-green-500 to-green-400' 
-                        : porcentajeRestante > 20 
-                        ? 'bg-gradient-to-r from-yellow-500 to-yellow-400' 
-                        : 'bg-gradient-to-r from-red-500 to-red-400'
+                      porcentajeRestante > 50
+                        ? "bg-gradient-to-r from-green-500 to-green-400"
+                        : porcentajeRestante > 20
+                          ? "bg-gradient-to-r from-yellow-500 to-yellow-400"
+                          : "bg-gradient-to-r from-red-500 to-red-400"
                     }`}
                     style={{ width: `${porcentajeRestante}%` }}
                   ></div>
                 </div>
                 <p className="text-xs text-muted-foreground mt-2">
-                  {porcentajeRestante}% disponible
+                  {porcentajeRestante}% {t.available}
                 </p>
               </div>
 
               {/* Info Message */}
-              <div className={`border-2 rounded-xl p-4 ${
-                porcentajeRestante > 20 
-                  ? 'bg-primary/10 border-primary/30' 
-                  : 'bg-destructive/10 border-destructive/30'
-              }`}>
+              <div
+                className={`border-2 rounded-xl p-4 ${
+                  porcentajeRestante > 20
+                    ? "bg-primary/10 border-primary/30"
+                    : "bg-destructive/10 border-destructive/30"
+                }`}
+              >
                 <p className="text-sm text-foreground">
                   {userData.plan === "free"
-                    ? `¡Actualiza a Plus para más consultas! (20 al mes)`
+                    ? t.upgradeMessage
                     : userData.plan === "plus"
-                    ? `¡Tienes ${userData.consultas_limite} consultas al mes con tu plan Plus!`
-                    : `¡Tienes ${userData.consultas_limite} consultas al mes con tu plan Premium!`}
+                      ? t.plusMessage.replace("{limit}", userData.consultas_limite.toString())
+                      : t.premiumMessage.replace("{limit}", userData.consultas_limite.toString())}
                 </p>
               </div>
             </div>
@@ -356,7 +381,7 @@ export default function DashboardPage() {
                     <h3 className="text-xl font-bold text-foreground mb-2 group-hover:text-primary transition-colors">
                       {t.upgradePlan}
                     </h3>
-                    <p className="text-sm text-muted-foreground">Accede a más funciones y análisis</p>
+                    <p className="text-sm text-muted-foreground">{t.accessMoreFeatures}</p>
                   </div>
                   <TrendingUp className="w-8 h-8 text-primary" />
                 </div>
@@ -374,7 +399,7 @@ export default function DashboardPage() {
                     <h3 className="text-xl font-bold text-foreground mb-2 group-hover:text-destructive transition-colors">
                       {t.unsubscribe}
                     </h3>
-                    <p className="text-sm text-muted-foreground">Cancelar tu suscripción actual</p>
+                    <p className="text-sm text-muted-foreground">{t.cancelSubscription}</p>
                   </div>
                   <AlertTriangle className="w-8 h-8 text-destructive" />
                 </div>

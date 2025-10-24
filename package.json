@@ -7,19 +7,20 @@
   "author": "Zecu Team",
   "scripts": {
     "build": "next build",
+    "check-env": "node scripts/check-env.js",
     "dev": "next dev",
+    "dev:check": "npm run check-env && npm run dev",
+    "generate-jwt": "node scripts/generate-jwt-secret.js",
     "lint": "next lint",
     "preview": "npm run build && npm run start",
     "start": "next start",
-    "type-check": "tsc --noEmit",
-    "check-env": "node scripts/check-env.js",
-    "generate-jwt": "node scripts/generate-jwt-secret.js",
-    "dev:check": "npm run check-env && npm run dev",
-    "test:flows": "node scripts/testing/test-flows.js"
+    "test:flows": "node scripts/testing/test-flows.js",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
     "@polar-sh/nextjs": "^0.4.11",
+    "@polar-sh/sdk": "latest",
     "@radix-ui/react-accordion": "1.2.2",
     "@radix-ui/react-alert-dialog": "1.1.4",
     "@radix-ui/react-aspect-ratio": "1.1.1",
@@ -68,6 +69,7 @@
     "react-dom": "^19",
     "react-hook-form": "^7.60.0",
     "react-resizable-panels": "^2.1.7",
+    "readline": "latest",
     "recharts": "2.15.4",
     "sonner": "^1.7.4",
     "tailwind-merge": "^2.5.5",

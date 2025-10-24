@@ -27,10 +27,10 @@ Esta es la forma MÁS RÁPIDA de probar tu workflow de OTP en n8n sin código.
 
 **Opción A: Desde PowerShell (Windows)**
 
-```powershell
+\`\`\`powershell
 cd zecu
 .\scripts\testing\test-webhook-otp.ps1
-```
+\`\`\`
 
 **Opción B: Activar en n8n y usar curl**
 
@@ -39,7 +39,7 @@ cd zecu
 3. Copia la **"Production URL"**
 4. Ejecuta:
 
-```powershell
+\`\`\`powershell
 $body = @{
     phone = "+5491134070204"
     code = "123456"
@@ -47,7 +47,7 @@ $body = @{
 } | ConvertTo-Json
 
 Invoke-RestMethod -Uri "http://localhost:5678/webhook/zecubot-send-otp" -Method Post -ContentType "application/json" -Body $body
-```
+\`\`\`
 
 **Opción C: Test Manual en n8n (sin enviar WhatsApp real)**
 
@@ -62,7 +62,7 @@ Invoke-RestMethod -Uri "http://localhost:5678/webhook/zecubot-send-otp" -Method 
 4. Click en **"Listen for Test Event"**
 
 5. En una nueva terminal:
-```powershell
+\`\`\`powershell
 $body = @{
     phone = "+5491134070204"
     code = "123456"
@@ -70,7 +70,7 @@ $body = @{
 } | ConvertTo-Json
 
 Invoke-RestMethod -Uri "http://localhost:5678/webhook-test/zecubot-send-otp" -Method Post -ContentType "application/json" -Body $body
-```
+\`\`\`
 
 6. ✅ Verás los datos fluir por cada nodo (excepto Twilio que está deshabilitado)
 
@@ -82,31 +82,31 @@ Invoke-RestMethod -Uri "http://localhost:5678/webhook-test/zecubot-send-otp" -Me
 
 ### ✅ Caso Exitoso
 
-```json
+\`\`\`json
 {
   "phone": "+5491134070204",
   "code": "123456",
   "name": "Tomás Jones"
 }
-```
+\`\`\`
 
 ### ✅ Sin Nombre (usa "Usuario" por defecto)
 
-```json
+\`\`\`json
 {
   "phone": "+5491134070204",
   "code": "999999"
 }
-```
+\`\`\`
 
 ### ❌ Datos Inválidos (debe fallar)
 
-```json
+\`\`\`json
 {
   "phone": "",
   "code": ""
 }
-```
+\`\`\`
 
 ---
 
@@ -129,10 +129,10 @@ Después de probar, verifica:
 **Causa:** n8n no está corriendo
 
 **Solución:**
-```bash
+\`\`\`bash
 # Verifica que n8n esté corriendo
 # Debería abrir: http://localhost:5678
-```
+\`\`\`
 
 ### ❌ "Webhook not found"
 
@@ -165,20 +165,20 @@ Después de probar, verifica:
 ## 🎉 Si Todo Funciona
 
 1. Copia la URL del webhook:
-   ```
+   \`\`\`
    http://localhost:5678/webhook/zecubot-send-otp
-   ```
+   \`\`\`
 
 2. Agrégala a `zecu/.env.local`:
-   ```env
+   \`\`\`env
    N8N_WEBHOOK_SEND_OTP_URL=http://localhost:5678/webhook/zecubot-send-otp
-   ```
+   \`\`\`
 
 3. Reinicia Next.js:
-   ```bash
+   \`\`\`bash
    cd zecu
    npm run dev
-   ```
+   \`\`\`
 
 4. Prueba el login en: http://localhost:3000/login
 
@@ -197,4 +197,3 @@ Después de probar, verifica:
 **⏱️ Tiempo total: ~5 minutos**
 
 **🎯 Resultado: Workflow funcionando con datos mock**
-

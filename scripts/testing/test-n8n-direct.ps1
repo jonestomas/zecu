@@ -124,4 +124,3 @@ Write-Host "=" * 60 -ForegroundColor Gray
 Write-Host "Diagnóstico completado" -ForegroundColor Cyan
 Write-Host "=" * 60 -ForegroundColor Gray
 Write-Host "`n"
-

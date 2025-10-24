@@ -48,14 +48,14 @@
 
 ## 📊 **Estado Actual del Usuario de Prueba:**
 
-```
+\`\`\`
 👤 Usuario: Tomas Jones
 📱 Teléfono: +54 9 11 3407 0204
 📧 Email: null
 🎯 Plan: Plus ⭐
 📅 Expira: 20 Nov 2025 (30 días)
 🌍 Ubicación: Lomas De Zamora, Argentina
-```
+\`\`\`
 
 ---
 
@@ -152,24 +152,23 @@
 ## 💡 **Notas Técnicas:**
 
 ### **Normalización de Teléfonos:**
-```typescript
+\`\`\`typescript
 // Argentina: +54 11 3407 0204 → +54 9 11 3407 0204
 normalizePhoneNumber('+541134070204') // '+5491134070204'
-```
+\`\`\`
 
 ### **Variables de Entorno Clave:**
-```bash
+\`\`\`bash
 NEXT_PUBLIC_SUPABASE_URL=https://pguikxzntrotsrqrzwuh.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=[configurado]
 JWT_SECRET=[configurado]
 MERCADOPAGO_ACCESS_TOKEN=TEST-*** (sandbox) o APP_USR-*** (producción)
 NEXT_PUBLIC_WHATSAPP_BOT_NUMBER=12692562013
 N8N_WEBHOOK_SEND_OTP_URL= (vacío = modo desarrollo)
-```
+\`\`\`
 
 ---
 
 **Fecha:** 21 Octubre 2025  
 **Duración:** ~4 horas  
 **Estado:** ✅ Sesión exitosa - Sistema base funcional
-

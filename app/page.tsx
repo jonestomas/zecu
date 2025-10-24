@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { PlusPlanPaymentButton, FreePlanButton } from "@/components/payment-button"
 import Image from "next/image"
 
@@ -81,11 +81,7 @@ const translations = {
         price: "AR$0",
         period: "/mes",
         description: "Perfecto para comenzar a protegerte",
-        features: [
-          "5 análisis de mensajes al mes",
-          "Detección básica de phishing",
-          "Respuestas automáticas",
-            ],
+        features: ["5 análisis de mensajes al mes", "Detección básica de phishing", "Respuestas automáticas"],
       },
       basic: {
         name: "Plus",
@@ -218,7 +214,10 @@ const translations = {
 
 export default function Home() {
   const [currentConversation, setCurrentConversation] = useState(0)
-  const [language, setLanguage] = useState<"es" | "en">("es")
+  const [language, setLanguage] = useState<"es" | "en">("en")
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const dropdownRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const browserLang = navigator.language.toLowerCase()
@@ -228,12 +227,45 @@ export default function Home() {
   }, [])
 
   useEffect(() => {
+    const checkAuth = () => {
+      const token = sessionStorage.getItem("token") || localStorage.getItem("token")
+      setIsLoggedIn(!!token)
+    }
+
+    checkAuth()
+    window.addEventListener("storage", checkAuth)
+    return () => window.removeEventListener("storage", checkAuth)
+  }, [])
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false)
+      }
+    }
+
+    if (isDropdownOpen) {
+      document.addEventListener("mousedown", handleClickOutside)
+    }
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [isDropdownOpen])
+
+  useEffect(() => {
     const interval = setInterval(() => {
       setCurrentConversation((prev) => (prev === 0 ? 1 : 0))
     }, 6000)
 
     return () => clearInterval(interval)
   }, [])
+
+  const handleLogout = () => {
+    sessionStorage.removeItem("token")
+    localStorage.removeItem("token")
+    sessionStorage.removeItem("user")
+    setIsLoggedIn(false)
+    setIsDropdownOpen(false)
+    window.location.href = "/"
+  }
 
   const t = translations[language]
 
@@ -301,18 +333,89 @@ export default function Home() {
             >
               {t.nav.subscription}
             </a>
-            <a
-              href="/login"
-              className="nav-link text-foreground hover:text-primary font-medium px-4 py-2 rounded-lg transition-colors"
-            >
-              {t.nav.login}
-            </a>
-            <a
-              href="#privacidad"
-              className="nav-link text-foreground hover:text-primary font-medium px-4 py-2 rounded-lg transition-colors"
-            >
-              {t.nav.privacy}
-            </a>
+            {isLoggedIn ? (
+              <div className="relative" ref={dropdownRef}>
+                <button
+                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                  className="nav-link text-foreground hover:text-primary font-medium p-2 rounded-lg transition-colors flex items-center gap-2"
+                  aria-label="User menu"
+                >
+                  <div className="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center">
+                    <svg className="w-6 h-6 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                      />
+                    </svg>
+                  </div>
+                </button>
+
+                {isDropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-card border border-border rounded-lg shadow-lg py-2 z-50">
+                    <a
+                      href="/dashboard"
+                      className="block px-4 py-2 text-foreground hover:bg-muted transition-colors"
+                      onClick={() => setIsDropdownOpen(false)}
+                    >
+                      <div className="flex items-center gap-2">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+                          />
+                        </svg>
+                        <span>Dashboard</span>
+                      </div>
+                    </a>
+                    <a
+                      href="/"
+                      className="block px-4 py-2 text-foreground hover:bg-muted transition-colors"
+                      onClick={() => setIsDropdownOpen(false)}
+                    >
+                      <div className="flex items-center gap-2">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+                          />
+                        </svg>
+                        <span>{language === "es" ? "Inicio" : "Home"}</span>
+                      </div>
+                    </a>
+                    <hr className="my-2 border-border" />
+                    <button
+                      onClick={handleLogout}
+                      className="w-full text-left px-4 py-2 text-destructive hover:bg-muted transition-colors"
+                    >
+                      <div className="flex items-center gap-2">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                          />
+                        </svg>
+                        <span>{language === "es" ? "Cerrar sesión" : "Logout"}</span>
+                      </div>
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <a
+                href="/login"
+                className="nav-link text-foreground hover:text-primary font-medium px-4 py-2 rounded-lg transition-colors"
+              >
+                {t.nav.login}
+              </a>
+            )}
             <button
               onClick={() => setLanguage(language === "es" ? "en" : "es")}
               className="nav-link text-foreground hover:text-primary font-medium px-4 py-2 rounded-lg flex items-center gap-2 border border-border hover:border-primary transition-colors"
@@ -504,36 +607,89 @@ export default function Home() {
         </section>
 
         {/* Cómo Funciona */}
-        <section className="py-20 px-4 piano-black-section">
+        <section className="py-20 px-4 piano-black-section relative overflow-hidden">
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-20 left-10 w-72 h-72 bg-primary rounded-full blur-3xl" />
+            <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent rounded-full blur-3xl" />
+          </div>
+
           <div className="container mx-auto max-w-6xl relative z-10">
             <div className="text-center mb-16">
               <h2 className="text-4xl md:text-5xl font-bold text-secondary-foreground mb-6">{t.howItWorks.title}</h2>
               <p className="text-xl text-muted-foreground max-w-2xl mx-auto">{t.howItWorks.subtitle}</p>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-8">
-              <div className="glass-card rounded-2xl p-8 text-center">
-                <div className="w-20 h-20 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center mx-auto mb-6 yellow-glow">
-                  <span className="text-3xl font-bold text-secondary">1</span>
+            <div className="grid md:grid-cols-3 gap-8 relative">
+              {/* Connecting lines between steps */}
+              <div className="hidden md:block absolute top-24 left-1/3 right-1/3 h-0.5 bg-gradient-to-r from-primary via-accent to-primary opacity-30" />
+
+              {/* Step 1 */}
+              <div className="glass-card rounded-3xl p-8 text-center relative group hover:scale-105 transition-all duration-300">
+                <div className="absolute -top-6 left-1/2 -translate-x-1/2 w-24 h-24 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center shadow-2xl yellow-glow group-hover:scale-110 transition-transform">
+                  <span className="text-4xl font-bold text-secondary">1</span>
                 </div>
-                <h3 className="text-xl font-semibold text-secondary-foreground mb-4">{t.howItWorks.step1.title}</h3>
-                <p className="text-muted-foreground leading-relaxed">{t.howItWorks.step1.description}</p>
+
+                <div className="mt-12 mb-6">
+                  <div className="w-20 h-20 bg-gradient-to-br from-primary/20 to-accent/20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:rotate-6 transition-transform">
+                    <svg className="w-10 h-10 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
+                      />
+                    </svg>
+                  </div>
+                </div>
+
+                <h3 className="text-2xl font-bold text-secondary-foreground mb-4">{t.howItWorks.step1.title}</h3>
+                <p className="text-muted-foreground leading-relaxed text-base">{t.howItWorks.step1.description}</p>
               </div>
 
-              <div className="glass-card rounded-2xl p-8 text-center">
-                <div className="w-20 h-20 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center mx-auto mb-6 yellow-glow">
-                  <span className="text-3xl font-bold text-secondary">2</span>
+              {/* Step 2 */}
+              <div className="glass-card rounded-3xl p-8 text-center relative group hover:scale-105 transition-all duration-300">
+                <div className="absolute -top-6 left-1/2 -translate-x-1/2 w-24 h-24 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center shadow-2xl yellow-glow group-hover:scale-110 transition-transform">
+                  <span className="text-4xl font-bold text-secondary">2</span>
                 </div>
-                <h3 className="text-xl font-semibold text-secondary-foreground mb-4">{t.howItWorks.step2.title}</h3>
-                <p className="text-muted-foreground leading-relaxed">{t.howItWorks.step2.description}</p>
+
+                <div className="mt-12 mb-6">
+                  <div className="w-20 h-20 bg-gradient-to-br from-primary/20 to-accent/20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:rotate-6 transition-transform">
+                    <svg className="w-10 h-10 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
+                      />
+                    </svg>
+                  </div>
+                </div>
+
+                <h3 className="text-2xl font-bold text-secondary-foreground mb-4">{t.howItWorks.step2.title}</h3>
+                <p className="text-muted-foreground leading-relaxed text-base">{t.howItWorks.step2.description}</p>
               </div>
 
-              <div className="glass-card rounded-2xl p-8 text-center">
-                <div className="w-20 h-20 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center mx-auto mb-6 yellow-glow">
-                  <span className="text-3xl font-bold text-secondary">3</span>
+              {/* Step 3 */}
+              <div className="glass-card rounded-3xl p-8 text-center relative group hover:scale-105 transition-all duration-300">
+                <div className="absolute -top-6 left-1/2 -translate-x-1/2 w-24 h-24 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center shadow-2xl yellow-glow group-hover:scale-110 transition-transform">
+                  <span className="text-4xl font-bold text-secondary">3</span>
                 </div>
-                <h3 className="text-xl font-semibold text-secondary-foreground mb-4">{t.howItWorks.step3.title}</h3>
-                <p className="text-muted-foreground leading-relaxed">{t.howItWorks.step3.description}</p>
+
+                <div className="mt-12 mb-6">
+                  <div className="w-20 h-20 bg-gradient-to-br from-primary/20 to-accent/20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:rotate-6 transition-transform">
+                    <svg className="w-10 h-10 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                      />
+                    </svg>
+                  </div>
+                </div>
+
+                <h3 className="text-2xl font-bold text-secondary-foreground mb-4">{t.howItWorks.step3.title}</h3>
+                <p className="text-muted-foreground leading-relaxed text-base">{t.howItWorks.step3.description}</p>
               </div>
             </div>
           </div>
@@ -644,19 +800,75 @@ export default function Home() {
         </section>
 
         {/* CTA Final */}
-        <section className="py-20 px-4 piano-black-section">
-          <div className="container mx-auto max-w-4xl text-center relative z-10">
-            <div className="glass-card rounded-3xl p-12">
-              <h2 className="text-4xl md:text-5xl font-bold text-secondary-foreground mb-6">{t.finalCta.title}</h2>
-              <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto leading-relaxed">
+        <section className="py-32 px-4 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-background via-primary/5 to-accent/5" />
+          <div className="absolute inset-0 opacity-20">
+            <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_30%_50%,rgba(251,191,36,0.15),transparent_50%)]" />
+            <div className="absolute top-0 right-0 w-full h-full bg-[radial-gradient(circle_at_70%_50%,rgba(245,158,11,0.15),transparent_50%)]" />
+          </div>
+
+          <div className="container mx-auto max-w-5xl text-center relative z-10">
+            <div className="glass-card rounded-[2.5rem] p-16 shadow-2xl border-2 border-primary/20 yellow-glow">
+              {/* Icon decoration */}
+              <div className="flex justify-center mb-8">
+                <div className="w-24 h-24 bg-gradient-to-br from-primary to-accent rounded-3xl flex items-center justify-center shadow-2xl yellow-glow animate-pulse">
+                  <svg className="w-14 h-14 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                    />
+                  </svg>
+                </div>
+              </div>
+
+              <h2 className="text-5xl md:text-6xl font-bold mb-6">
+                <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
+                  {t.finalCta.title}
+                </span>
+              </h2>
+
+              <p className="text-xl md:text-2xl text-muted-foreground mb-10 max-w-3xl mx-auto leading-relaxed">
                 {t.finalCta.subtitle}
               </p>
-              <button className="cta-button text-white font-bold text-xl px-12 py-6 rounded-2xl inline-flex items-center gap-3">
-                <svg className="w-7 h-7" fill="currentColor" viewBox="0 0 24 24">
+
+              <button className="cta-button text-white font-bold text-xl md:text-2xl px-14 py-7 rounded-2xl inline-flex items-center gap-4 shadow-2xl hover:scale-105 transition-all duration-300">
+                <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488" />
                 </svg>
-                {t.hero.ctaFinal}
+                <span className="animate-shine">{t.hero.ctaFinal}</span>
               </button>
+
+              {/* Trust indicators */}
+              <div className="mt-12 flex flex-wrap justify-center gap-8 text-muted-foreground text-sm">
+                <div className="flex items-center gap-2">
+                  <svg className="w-5 h-5 text-primary" fill="currentColor" viewBox="0 0 20 20">
+                    <path
+                      fillRule="evenodd"
+                      d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  <span>{language === "es" ? "100% Seguro" : "100% Secure"}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <svg className="w-5 h-5 text-primary" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.8 2.4z" />
+                  </svg>
+                  <span>{language === "es" ? "Sin tarjeta requerida" : "No card required"}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <svg className="w-5 h-5 text-primary" fill="currentColor" viewBox="0 0 20 20">
+                    <path
+                      fillRule="evenodd"
+                      d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  <span>{language === "es" ? "Respuesta instantánea" : "Instant response"}</span>
+                </div>
+              </div>
             </div>
           </div>
         </section>

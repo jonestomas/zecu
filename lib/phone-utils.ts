@@ -72,5 +72,3 @@ export function formatPhoneNumber(phone: string): string {
   // Formato genérico
   return normalized;
 }
-
-

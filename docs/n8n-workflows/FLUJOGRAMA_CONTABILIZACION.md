@@ -2,7 +2,7 @@
 
 ## 📊 Diagrama Principal
 
-```mermaid
+\`\`\`mermaid
 flowchart TD
     Start([👤 Usuario envía mensaje<br/>por WhatsApp]) --> Twilio[📱 Twilio Trigger<br/>Recibe mensaje]
     
@@ -77,13 +77,13 @@ flowchart TD
     style End2 fill:#4CAF50,stroke:#2E7D32,stroke-width:3px,color:#fff
     style End3 fill:#4CAF50,stroke:#2E7D32,stroke-width:3px,color:#fff
     style End4 fill:#4CAF50,stroke:#2E7D32,stroke-width:3px,color:#fff
-```
+\`\`\`
 
 ---
 
 ## 🎯 Diagrama Simplificado (Solo Contabilización)
 
-```mermaid
+\`\`\`mermaid
 flowchart TD
     Start([📱 Mensaje recibido]) --> Extract[🔍 Extraer datos]
     
@@ -112,13 +112,13 @@ flowchart TD
     style Actualizar fill:#2196F3,stroke:#1565C0,stroke-width:2px,color:#fff
     style Check fill:#FF9800,stroke:#E65100,stroke-width:2px,color:#fff
     style Rechazar fill:#F44336,stroke:#C62828,stroke-width:2px,color:#fff
-```
+\`\`\`
 
 ---
 
 ## 🔄 Diagrama de Secuencia (Interacción entre Componentes)
 
-```mermaid
+\`\`\`mermaid
 sequenceDiagram
     participant U as 👤 Usuario
     participant W as 📱 WhatsApp/Twilio
@@ -169,13 +169,13 @@ sequenceDiagram
         N->>W: Enviar respuesta
         W->>U: Respuesta del análisis
     end
-```
+\`\`\`
 
 ---
 
 ## 📊 Diagrama de Estados del Usuario
 
-```mermaid
+\`\`\`mermaid
 stateDiagram-v2
     [*] --> Recibido: Mensaje llega
     
@@ -208,13 +208,13 @@ stateDiagram-v2
         API: /api/consultas/actualizar
         Campos: respuesta, riesgo_detectado
     end note
-```
+\`\`\`
 
 ---
 
 ## 🗄️ Diagrama de Base de Datos
 
-```mermaid
+\`\`\`mermaid
 erDiagram
     users ||--o{ consultas : tiene
     
@@ -245,13 +245,13 @@ erDiagram
         varchar mes_periodo
         int total_consultas
     }
-```
+\`\`\`
 
 ---
 
 ## 🔧 Diagrama de Arquitectura
 
-```mermaid
+\`\`\`mermaid
 graph TB
     subgraph "🌐 Cliente"
         User[👤 Usuario]
@@ -314,13 +314,13 @@ graph TB
     style API2 fill:#2196F3,stroke:#1565C0,color:#fff
     style API3 fill:#2196F3,stroke:#1565C0,color:#fff
     style ConsultasTable fill:#FF9800,stroke:#E65100,color:#fff
-```
+\`\`\`
 
 ---
 
 ## 📈 Flujo de Decisión por Plan
 
-```mermaid
+\`\`\`mermaid
 flowchart LR
     Start([Usuario envía consulta]) --> Plan{Plan del<br/>usuario}
     
@@ -356,7 +356,7 @@ flowchart LR
     style Block2 fill:#F44336,stroke:#C62828,color:#fff
     style Block3 fill:#F44336,stroke:#C62828,color:#fff
     style Response fill:#4CAF50,stroke:#2E7D32,color:#fff
-```
+\`\`\`
 
 ---
 
@@ -376,7 +376,7 @@ flowchart LR
 
 ### Caso 1: Usuario FREE con 3 consultas usadas ✅
 
-```
+\`\`\`
 Usuario: "¿Es legítimo este email?"
    ↓
 Twilio recibe → n8n extrae datos
@@ -396,11 +396,11 @@ POST /api/consultas/actualizar {consultaId: "xyz", respuesta: "...", riesgo: fal
 WhatsApp envía respuesta al usuario
    ↓
 ✅ Completado (ahora tiene 4/5 consultas)
-```
+\`\`\`
 
 ### Caso 2: Usuario FREE con 5 consultas usadas ❌
 
-```
+\`\`\`
 Usuario: "Analiza este link"
    ↓
 Twilio recibe → n8n extrae datos
@@ -414,7 +414,7 @@ Respuesta: {puede_consultar: false, consultas_usadas: 5, limite: 5}
 WhatsApp envía: "🚫 Límite alcanzado. Actualiza a PLUS..."
    ↓
 ❌ Bloqueado (no se registra la consulta)
-```
+\`\`\`
 
 ---
 
@@ -462,4 +462,3 @@ Con estos diagramas puedes:
 4. ✅ Documentar la arquitectura
 
 **¿Listo para aplicar las correcciones en n8n?** 🚀
-
