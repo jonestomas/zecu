@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Crear checkout session en Polar
-    const checkout = await polar.checkouts.custom.create({
+    const checkout = await polar.checkouts.create({
       productPriceId: selectedPlan.priceId,
       successUrl: getSuccessUrl('{CHECKOUT_ID}'),
       customerEmail: session.phone + '@zecu.app', // Usar phone como identificador único
