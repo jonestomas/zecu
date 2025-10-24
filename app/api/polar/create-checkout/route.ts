@@ -43,10 +43,10 @@ export async function POST(request: NextRequest) {
     // Obtener el plan del body
     const { plan } = await request.json();
 
-    if (!plan || plan !== 'plus') {
+    if (!plan || !['plus', 'premium'].includes(plan)) {
       return NextResponse.json({
         success: false,
-        error: 'Plan inválido. Solo está disponible el plan Plus.'
+        error: 'Plan inválido'
       }, { status: 400 });
     }
 
@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Crear checkout session en Polar
-    const checkout = await polar.checkouts.create({
+    const checkout = await polar.checkouts.custom.create({
       productPriceId: selectedPlan.priceId,
       successUrl: getSuccessUrl('{CHECKOUT_ID}'),
       customerEmail: session.phone + '@zecu.app', // Usar phone como identificador único
