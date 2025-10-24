@@ -85,7 +85,7 @@ const translations = {
       },
       basic: {
         name: "Plus",
-        price: "AR$5.499",
+        price: "$10 USD",
         period: "/mes",
         description: "Ideal para protección diaria completa",
         features: [

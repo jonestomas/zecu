@@ -105,15 +105,78 @@ export function PaymentButton({ planId, planName, price, className = "", childre
 
 // Componente específico para el plan Plus
 export function PlusPlanPaymentButton() {
+  const [isLoading, setIsLoading] = useState(false)
+
+  const handlePlusPlan = async () => {
+    setIsLoading(true)
+
+    try {
+      // Verificar si el usuario tiene sesión activa
+      const sessionCheck = await fetch("/api/auth/check-session")
+      const { authenticated } = await sessionCheck.json()
+
+      if (!authenticated) {
+        // Usuario NO autenticado → Guardar intención de compra y redirigir a login
+        sessionStorage.setItem(
+          "pendingPurchase",
+          JSON.stringify({
+            planId: "plus",
+            planName: "Plus",
+            price: "$10 USD",
+            timestamp: Date.now(),
+          }),
+        )
+
+        const mensaje =
+          "Para suscribirte al plan Plus, primero necesitas crear una cuenta o iniciar sesión. ¡Es rápido y solo toma 1 minuto! 🚀"
+
+        if (typeof window !== "undefined") {
+          if (confirm(mensaje + "\n\n¿Quieres continuar?")) {
+            window.location.href = "/login"
+          } else {
+            setIsLoading(false)
+          }
+        }
+        return
+      }
+
+      // Usuario SÍ autenticado → Guardar compra pendiente y redirigir a checkout
+      sessionStorage.setItem(
+        "pendingPurchase",
+        JSON.stringify({
+          planId: "plus",
+          planName: "Plus",
+          price: "$10 USD",
+          timestamp: Date.now(),
+        }),
+      )
+
+      window.location.href = "/checkout"
+    } catch (error) {
+      console.error("Error al procesar el pago:", error)
+      alert("Error al procesar tu solicitud. Por favor, intenta nuevamente.")
+      setIsLoading(false)
+    }
+  }
+
   return (
-    <PaymentButton
-      planId="plus"
-      planName="Plus"
-      price="AR$5.499"
-      className="cta-button text-white font-semibold text-base py-3 px-6 rounded-xl shadow-lg h-12"
+    <Button
+      onClick={handlePlusPlan}
+      disabled={isLoading}
+      className="w-full cta-button text-white font-semibold text-base py-3 px-6 rounded-xl shadow-lg h-12 flex items-center justify-center"
     >
-      Comenzar con Mercado Pago
-    </PaymentButton>
+      {isLoading ? (
+        <>
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          Procesando...
+        </>
+      ) : (
+        <>
+          <CreditCard className="mr-2 h-4 w-4" />
+          Suscribirme ahora
+        </>
+      )}
+    </Button>
   )
 }
 
