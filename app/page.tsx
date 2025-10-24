@@ -227,14 +227,18 @@ export default function Home() {
   }, [])
 
   useEffect(() => {
-    const checkAuth = () => {
-      const token = sessionStorage.getItem("token") || localStorage.getItem("token")
-      setIsLoggedIn(!!token)
+    const checkAuth = async () => {
+      try {
+        const response = await fetch("/api/auth/check-session")
+        const data = await response.json()
+        setIsLoggedIn(data.authenticated)
+      } catch (error) {
+        console.error("Error checking auth:", error)
+        setIsLoggedIn(false)
+      }
     }
 
     checkAuth()
-    window.addEventListener("storage", checkAuth)
-    return () => window.removeEventListener("storage", checkAuth)
   }, [])
 
   useEffect(() => {
@@ -259,9 +263,8 @@ export default function Home() {
   }, [])
 
   const handleLogout = () => {
-    sessionStorage.removeItem("token")
-    localStorage.removeItem("token")
-    sessionStorage.removeItem("user")
+    // Eliminar cookie de sesión
+    document.cookie = "session_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"
     setIsLoggedIn(false)
     setIsDropdownOpen(false)
     window.location.href = "/"

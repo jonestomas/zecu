@@ -372,9 +372,22 @@ export default function DashboardPage() {
           <div className={`grid gap-6 ${userData.plan !== "free" ? "md:grid-cols-2" : "md:grid-cols-1"}`}>
             {/* Upgrade Plan Button - Solo mostrar si es FREE */}
             {userData.plan === "free" && (
-              <Link
-                href="/#pricing"
-                className="glass-card p-6 rounded-2xl hover:border-primary transition-all group cursor-pointer"
+              <button
+                onClick={() => {
+                  // Guardar intención de compra
+                  sessionStorage.setItem(
+                    "pendingPurchase",
+                    JSON.stringify({
+                      planId: "plus",
+                      planName: "Plus",
+                      price: "$10 USD",
+                      timestamp: Date.now(),
+                    }),
+                  )
+                  // Redirigir a checkout
+                  router.push("/checkout")
+                }}
+                className="glass-card p-6 rounded-2xl hover:border-primary transition-all group cursor-pointer text-left w-full"
               >
                 <div className="flex items-center justify-between">
                   <div>
@@ -385,7 +398,7 @@ export default function DashboardPage() {
                   </div>
                   <TrendingUp className="w-8 h-8 text-primary" />
                 </div>
-              </Link>
+              </button>
             )}
 
             {/* Unsubscribe Button - Solo mostrar si es PLUS o PREMIUM */}
