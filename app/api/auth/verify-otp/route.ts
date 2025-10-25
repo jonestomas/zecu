@@ -11,6 +11,7 @@ import { SignJWT } from 'jose';
 import { validateOrigin, logSecurityEvent } from '@/lib/security-headers';
 import { withAuthRateLimit } from '@/lib/rate-limit-middleware';
 import { createLogger, createAuthLogger } from '@/lib/secure-logging';
+import { handleError, handleAuthError, createSecureErrorResponse } from '@/lib/secure-error-handling';
 
 // Schema de validación
 const verifyOTPSchema = z.object({
@@ -146,36 +147,8 @@ async function verifyOTPHandler(request: NextRequest) {
     return response;
 
   } catch (error) {
-    console.error('Error en verify-otp:', error);
-
-    if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: 'Datos inválidos',
-          details: error.errors
-        },
-        { status: 400 }
-      );
-    }
-
-    if (error instanceof Error) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: error.message
-        },
-        { status: 500 }
-      );
-    }
-
-    return NextResponse.json(
-      {
-        success: false,
-        error: 'Error interno del servidor'
-      },
-      { status: 500 }
-    );
+    // Usar el sistema de manejo de errores seguro
+    return handleError(error, request);
   }
 }
 

@@ -4,6 +4,7 @@ import { normalizePhoneNumber } from '@/lib/phone-utils';
 import { z } from 'zod';
 import { withAuthRateLimit } from '@/lib/rate-limit-middleware';
 import { createLogger, createAuthLogger } from '@/lib/secure-logging';
+import { handleError, handleZodError, createSecureErrorResponse } from '@/lib/secure-error-handling';
 
 // Schema de validación
 const sendOTPSchema = z.object({
@@ -108,43 +109,8 @@ async function sendOTPHandler(request: NextRequest) {
     });
 
   } catch (error) {
-    logger.error('AUTH', 'OTP send failed', error, {
-      errorType: error instanceof Error ? error.name : 'Unknown',
-      errorMessage: error instanceof Error ? error.message : String(error)
-    });
-
-    if (error instanceof z.ZodError) {
-      logger.warn('AUTH', 'Validation error in OTP send', {
-        validationErrors: error.errors
-      });
-      
-      return NextResponse.json(
-        { 
-          success: false,
-          error: 'Datos inválidos', 
-          details: error.errors 
-        },
-        { status: 400 }
-      );
-    }
-
-    if (error instanceof Error) {
-      return NextResponse.json(
-        { 
-          success: false,
-          error: error.message 
-        },
-        { status: 500 }
-      );
-    }
-
-    return NextResponse.json(
-      { 
-        success: false,
-        error: 'Error interno del servidor' 
-      },
-      { status: 500 }
-    );
+    // Usar el sistema de manejo de errores seguro
+    return handleError(error, request);
   }
 }
 

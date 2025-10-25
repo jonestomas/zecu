@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { polar, POLAR_PRODUCTS, getSuccessUrl, PolarPlan } from '@/lib/polar-config';
 import { jwtVerify } from 'jose';
 import { withPaymentRateLimit } from '@/lib/rate-limit-middleware';
+import { handleError, handlePaymentError, createSecureErrorResponse } from '@/lib/secure-error-handling';
 
 // Verificar token de sesión
 async function verifySessionToken(token: string): Promise<{ userId: string; phone: string } | null> {
@@ -104,11 +105,8 @@ async function createCheckoutHandler(request: NextRequest) {
     });
 
   } catch (error: any) {
-    console.error('Error creando checkout de Polar.sh:', error);
-    return NextResponse.json({
-      success: false,
-      error: error.message || 'Error interno del servidor'
-    }, { status: 500 });
+    // Usar el sistema de manejo de errores seguro
+    return handleError(error, request, undefined, 'PAYMENT_ERROR');
   }
 }
 
