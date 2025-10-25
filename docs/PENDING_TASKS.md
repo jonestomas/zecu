@@ -280,5 +280,3 @@ Responde con el número o envía directamente el mensaje.
 
 **Última actualización:** 21 Octubre 2025  
 **Próxima sesión recomendada:** OTP en Producción
-
-

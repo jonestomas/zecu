@@ -402,5 +402,3 @@ Una vez que valides con usuarios reales:
 **Complejidad**: ⭐ Baja (perfecto para MVP)
 
 **¿Dudas? Avísame en qué paso estás y te ayudo.** 🚀
-
-

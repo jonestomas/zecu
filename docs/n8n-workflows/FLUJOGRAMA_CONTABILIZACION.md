@@ -462,5 +462,3 @@ Con estos diagramas puedes:
 4. ✅ Documentar la arquitectura
 
 **¿Listo para aplicar las correcciones en n8n?** 🚀
-
-
