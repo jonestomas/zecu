@@ -262,12 +262,31 @@ export default function Home() {
     return () => clearInterval(interval)
   }, [])
 
-  const handleLogout = () => {
-    // Eliminar cookie de sesión
-    document.cookie = "session_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"
-    setIsLoggedIn(false)
-    setIsDropdownOpen(false)
-    window.location.href = "/"
+  const handleLogout = async () => {
+    try {
+      const response = await fetch("/api/auth/logout", {
+        method: "POST",
+      })
+
+      if (response.ok) {
+        // Clear any client-side storage
+        sessionStorage.clear()
+        localStorage.clear()
+
+        // Update UI state
+        setIsLoggedIn(false)
+        setIsDropdownOpen(false)
+
+        // Redirect to home and force reload to clear any cached state
+        window.location.href = "/"
+      } else {
+        console.error("Error al cerrar sesión")
+        alert("Error al cerrar sesión. Por favor, intenta de nuevo.")
+      }
+    } catch (error) {
+      console.error("Error en logout:", error)
+      alert("Error al cerrar sesión. Por favor, intenta de nuevo.")
+    }
   }
 
   const t = translations[language]

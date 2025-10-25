@@ -14,7 +14,7 @@ interface PendingPurchase {
 
 export default function CheckoutPage() {
   const router = useRouter()
-  const [language, setLanguage] = useState<"es" | "en">("es")
+  const [language, setLanguage] = useState<"es" | "en">("en")
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [pendingPurchase, setPendingPurchase] = useState<PendingPurchase | null>(null)
@@ -116,7 +116,6 @@ export default function CheckoutPage() {
         }
 
         setIsLoading(false)
-
       } catch (err) {
         console.error("Error en checkout:", err)
         setError(err instanceof Error ? err.message : "Error al inicializar checkout")
@@ -183,10 +182,10 @@ export default function CheckoutPage() {
   // Determinar beneficios según el plan
   const getPlanBenefits = () => {
     const planId = pendingPurchase?.planId
-    if (planId === 'plus') {
-      return ['20 ' + t.queryLimit, t.advancedAnalysis, t.prioritySupport, t.scamDetection]
-    } else if (planId === 'premium') {
-      return ['50 ' + t.queryLimit, t.advancedAnalysis, t.prioritySupport, t.scamDetection]
+    if (planId === "plus") {
+      return ["20 " + t.queryLimit, t.advancedAnalysis, t.prioritySupport, t.scamDetection]
+    } else if (planId === "premium") {
+      return ["50 " + t.queryLimit, t.advancedAnalysis, t.prioritySupport, t.scamDetection]
     }
     return []
   }
@@ -237,6 +236,14 @@ export default function CheckoutPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50 p-4">
+      {/* Language Switcher - Fixed position */}
+      <button
+        onClick={() => setLanguage(language === "es" ? "en" : "es")}
+        className="fixed top-4 right-4 z-50 px-4 py-2 rounded-lg border-2 border-gray-300 hover:border-blue-500 transition-colors text-sm font-medium bg-white shadow-lg"
+      >
+        {language === "es" ? "EN" : "ES"}
+      </button>
+
       <div className="max-w-lg w-full bg-white rounded-2xl shadow-xl p-8">
         <div className="text-center mb-8">
           <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">

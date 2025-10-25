@@ -28,8 +28,8 @@ const jetbrainsMono = JetBrains_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "Zecubot - Tu asistente digital contra estafas online",
-  description: "¿Es una estafa o un mensaje seguro? ¿Qué debo hacer? Resuélvelo en segundos con Zecubot.",
+  title: "Zecubot - Your digital assistant against online scams",
+  description: "Is it a scam or a safe message? What should I do? Solve it in seconds with Zecubot.",
   generator: "v0.app",
 }
 
@@ -39,7 +39,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="es" className={`${plusJakartaSans.variable} ${inter.variable} ${jetbrainsMono.variable}`}>
+    <html lang="en" className={`${plusJakartaSans.variable} ${inter.variable} ${jetbrainsMono.variable}`}>
       <body className="font-sans antialiased">{children}</body>
     </html>
   )
