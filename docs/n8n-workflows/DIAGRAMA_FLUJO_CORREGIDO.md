@@ -4,63 +4,63 @@
 
 \`\`\`
 ┌─────────────────────────────────────────────────────────────────┐
-│                   INICIO: Usuario envía mensaje                  │
-│                         por WhatsApp                             │
+│ INICIO: Usuario envía mensaje │
+│ por WhatsApp │
 └────────────────────────────┬────────────────────────────────────┘
-                             ↓
-                    ┌────────────────┐
-                    │ Twilio Trigger │
-                    │  (Recepción)   │
-                    └────────┬───────┘
-                             ↓
-              ┌──────────────────────────┐
-              │ Code in JavaScript       │
-              │ (Limpia "whatsapp:")     │
-              └──────────┬───────────────┘
-                         ↓
-              ┌──────────────────────┐
-              │  data_extraction     │
-              │  (Extrae campos)     │
-              └──────────┬───────────┘
-                         ↓
+↓
+┌────────────────┐
+│ Twilio Trigger │
+│ (Recepción) │
+└────────┬───────┘
+↓
+┌──────────────────────────┐
+│ Code in JavaScript │
+│ (Limpia "whatsapp:") │
+└──────────┬───────────────┘
+↓
+┌──────────────────────┐
+│ data_extraction │
+│ (Extrae campos) │
+└──────────┬───────────┘
+↓
 ┌────────────────────────────────────────────────────────────────┐
-│                  SISTEMA DE CONTABILIZACIÓN                     │
-│                        ⚡ EMPIEZA AQUÍ ⚡                         │
+│ SISTEMA DE CONTABILIZACIÓN │
+│ ⚡ EMPIEZA AQUÍ ⚡ │
 └────────────────────────────────────────────────────────────────┘
-                         ↓
-              ┌──────────────────────┐
-              │   Get a row          │◄─── ✅ AGREGAR ESTA CONEXIÓN
-              │  (Obtener user_id    │
-              │   de Supabase)       │
-              └──────────┬───────────┘
-                         ↓
-              ┌──────────────────────┐
-              │  Validar Límite      │
-              │  POST /validar       │
-              │  {userId}            │◄─── ✅ CAMBIAR phone → userId
-              └──────────┬───────────┘
-                         ↓
-              ┌──────────────────────┐
-              │ ¿Puede Consultar?    │
-              │  (if node)           │
-              └────┬──────────────┬──┘
-                   │              │
-         ❌ NO     │              │  ✅ SÍ
-                   ↓              ↓
-     ┌──────────────────┐   ┌──────────────────┐
-     │ Enviar Límite    │   │ Registrar        │
-     │   Alcanzado      │   │   Consulta       │
-     │  (Twilio)        │   │ POST /registrar  │◄─── ✅ CAMBIAR phone → userId
-     └────────┬─────────┘   │ {userId, mensaje}│
-              │             └────────┬─────────┘
-              ↓                      ↓
-            [FIN]         ┌──────────────────┐
-                          │      Plan        │
-                          │   (Switch)       │
-                          └────────┬─────────┘
-                                   ↓
-                          (Continúa con el
-                           flujo de análisis)
+↓
+┌──────────────────────┐
+│ Get a row │◄─── ✅ AGREGAR ESTA CONEXIÓN
+│ (Obtener user_id │
+│ de Supabase) │
+└──────────┬───────────┘
+↓
+┌──────────────────────┐
+│ Validar Límite │
+│ POST /validar │
+│ {userId} │◄─── ✅ CAMBIAR phone → userId
+└──────────┬───────────┘
+↓
+┌──────────────────────┐
+│ ¿Puede Consultar? │
+│ (if node) │
+└────┬──────────────┬──┘
+│ │
+❌ NO │ │ ✅ SÍ
+↓ ↓
+┌──────────────────┐ ┌──────────────────┐
+│ Enviar Límite │ │ Registrar │
+│ Alcanzado │ │ Consulta │
+│ (Twilio) │ │ POST /registrar │◄─── ✅ CAMBIAR phone → userId
+└────────┬─────────┘ │ {userId, mensaje}│
+│ └────────┬─────────┘
+↓ ↓
+[FIN] ┌──────────────────┐
+│ Plan │
+│ (Switch) │
+└────────┬─────────┘
+↓
+(Continúa con el
+flujo de análisis)
 \`\`\`
 
 ---
@@ -69,32 +69,32 @@
 
 \`\`\`
 ┌─────────────────────────────────────────────────────┐
-│              NODO: Validar Límite                   │
+│ NODO: Validar Límite │
 ├─────────────────────────────────────────────────────┤
-│  Type: HTTP Request                                 │
-│  Method: POST  ◄─── ✅ IMPORTANTE: Debe ser POST   │
-│  URL: {{$env.NEXT_PUBLIC_BASE_URL}}/api/           │
-│       consultas/validar                             │
-│                                                     │
-│  Headers:                                           │
-│    Content-Type: application/json                   │
-│                                                     │
-│  Body (JSON):                                       │
-│  {                                                  │
-│    "userId": "{{ $('Get a row').item.json.id }}"  │◄── ✅ Desde Supabase
-│  }                                                  │
+│ Type: HTTP Request │
+│ Method: POST ◄─── ✅ IMPORTANTE: Debe ser POST │
+│ URL: {{$env.NEXT_PUBLIC_BASE_URL}}/api/ │
+│ consultas/validar │
+│ │
+│ Headers: │
+│ Content-Type: application/json │
+│ │
+│ Body (JSON): │
+│ { │
+│ "userId": "{{ $('Get a row').item.json.id }}" │◄── ✅ Desde Supabase
+│ } │
 └─────────────────────────────────────────────────────┘
-           ↓
+↓
 ┌─────────────────────────────────────────────────────┐
-│              RESPUESTA ESPERADA                     │
+│ RESPUESTA ESPERADA │
 ├─────────────────────────────────────────────────────┤
-│  {                                                  │
-│    "puede_consultar": true,                         │
-│    "plan": "free",                                  │
-│    "consultas_usadas": 2,                           │
-│    "limite": 5,                                     │
-│    "consultas_restantes": 3                         │
-│  }                                                  │
+│ { │
+│ "puede_consultar": true, │
+│ "plan": "free", │
+│ "consultas_usadas": 2, │
+│ "limite": 5, │
+│ "consultas_restantes": 3 │
+│ } │
 └─────────────────────────────────────────────────────┘
 \`\`\`
 
@@ -104,33 +104,33 @@
 
 \`\`\`
 ┌─────────────────────────────────────────────────────┐
-│           NODO: Registrar Consulta                  │
+│ NODO: Registrar Consulta │
 ├─────────────────────────────────────────────────────┤
-│  Type: HTTP Request                                 │
-│  Method: POST                                       │
-│  URL: {{$env.NEXT_PUBLIC_BASE_URL}}/api/           │
-│       consultas/registrar                           │
-│                                                     │
-│  Headers:                                           │
-│    Content-Type: application/json                   │
-│                                                     │
-│  Body (JSON):                                       │
-│  {                                                  │
-│    "userId": "{{ $('Get a row').item.json.id }}",  │
-│    "mensaje": "{{ $('data_extraction').           │
-│                      item.json.body }}",            │
-│    "tipo": "analisis_estafa"                        │
-│  }                                                  │
+│ Type: HTTP Request │
+│ Method: POST │
+│ URL: {{$env.NEXT_PUBLIC_BASE_URL}}/api/ │
+│ consultas/registrar │
+│ │
+│ Headers: │
+│ Content-Type: application/json │
+│ │
+│ Body (JSON): │
+│ { │
+│ "userId": "{{ $('Get a row').item.json.id }}", │
+│ "mensaje": "{{ $('data_extraction').           │
+│                      item.json.body }}", │
+│ "tipo": "analisis_estafa" │
+│ } │
 └─────────────────────────────────────────────────────┘
-           ↓
+↓
 ┌─────────────────────────────────────────────────────┐
-│              RESPUESTA ESPERADA                     │
+│ RESPUESTA ESPERADA │
 ├─────────────────────────────────────────────────────┤
-│  {                                                  │
-│    "success": true,                                 │
-│    "consultaId": "uuid-aquí",  ◄─── ✅ GUARDAR ESTE ID
-│    "message": "Consulta registrada correctamente"   │
-│  }                                                  │
+│ { │
+│ "success": true, │
+│ "consultaId": "uuid-aquí", ◄─── ✅ GUARDAR ESTE ID
+│ "message": "Consulta registrada correctamente" │
+│ } │
 └─────────────────────────────────────────────────────┘
 \`\`\`
 
@@ -140,46 +140,46 @@
 
 \`\`\`
 ┌─────────────────────────────────────────────────────┐
-│  UBICACIÓN: Entre AI Agent1 y envío de respuesta   │
+│ UBICACIÓN: Entre AI Agent1 y envío de respuesta │
 └─────────────────────────────────────────────────────┘
-                      ↓
-         ┌──────────────────────┐
-         │     AI Agent1        │
-         │   (Análisis IA)      │
-         └──────────┬───────────┘
-                    ↓
+↓
+┌──────────────────────┐
+│ AI Agent1 │
+│ (Análisis IA) │
+└──────────┬───────────┘
+↓
 ┌─────────────────────────────────────────────────────┐
-│         NODO: Actualizar Consulta (NUEVO)           │
+│ NODO: Actualizar Consulta (NUEVO) │
 ├─────────────────────────────────────────────────────┤
-│  Type: HTTP Request (NO httpRequestTool)            │
-│  Method: POST                                       │
-│  URL: {{$env.NEXT_PUBLIC_BASE_URL}}/api/           │
-│       consultas/actualizar                          │
-│                                                     │
-│  Body (JSON):                                       │
-│  {                                                  │
-│    "consultaId": "{{ $('Registrar Consulta').      │
-│                      json.consultaId }}",           │
-│    "respuesta": "{{ $('AI Agent1').json.output }}",│
-│    "riesgo_detectado": {{                           │
+│ Type: HTTP Request (NO httpRequestTool) │
+│ Method: POST │
+│ URL: {{$env.NEXT_PUBLIC_BASE_URL}}/api/ │
+│ consultas/actualizar │
+│ │
+│ Body (JSON): │
+│ { │
+│ "consultaId": "{{ $('Registrar Consulta').      │
+│                      json.consultaId }}", │
+│ "respuesta": "{{ $('AI Agent1').json.output }}",│
+│ "riesgo_detectado": {{                           │
 │      $('AI Agent1').json.output.toLowerCase()       │
 │        .includes('riesgo: sí') ||                   │
 │      $('AI Agent1').json.output.toLowerCase()       │
 │        .includes('riesgo: si')                      │
-│    }},                                              │
-│    "nivel_riesgo": "{{                              │
+│    }}, │
+│ "nivel_riesgo": "{{                              │
 │      $('AI Agent1').json.output.toLowerCase()       │
 │        .includes('alto') ? 'alto' :                 │
 │      ($('AI Agent1').json.output.toLowerCase()      │
 │        .includes('medio') ? 'medio' : 'bajo')       │
-│    }}"                                              │
-│  }                                                  │
+│    }}" │
+│ } │
 └─────────────────────────────────────────────────────┘
-                    ↓
-         ┌──────────────────────┐
-         │ Send SMS/WhatsApp    │
-         │  (Respuesta final)   │
-         └──────────────────────┘
+↓
+┌──────────────────────┐
+│ Send SMS/WhatsApp │
+│ (Respuesta final) │
+└──────────────────────┘
 \`\`\`
 
 ---

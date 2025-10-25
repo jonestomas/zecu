@@ -41,9 +41,9 @@ cd zecu
 
 \`\`\`powershell
 $body = @{
-    phone = "+5491134070204"
-    code = "123456"
-    name = "Tomás"
+phone = "+5491134070204"
+code = "123456"
+name = "Tomás"
 } | ConvertTo-Json
 
 Invoke-RestMethod -Uri "http://localhost:5678/webhook/zecubot-send-otp" -Method Post -ContentType "application/json" -Body $body
@@ -62,12 +62,12 @@ Invoke-RestMethod -Uri "http://localhost:5678/webhook/zecubot-send-otp" -Method 
 4. Click en **"Listen for Test Event"**
 
 5. En una nueva terminal:
-\`\`\`powershell
-$body = @{
-    phone = "+5491134070204"
-    code = "123456"
-    name = "Tomás"
-} | ConvertTo-Json
+   \`\`\`powershell
+   $body = @{
+   phone = "+5491134070204"
+   code = "123456"
+   name = "Tomás"
+   } | ConvertTo-Json
 
 Invoke-RestMethod -Uri "http://localhost:5678/webhook-test/zecubot-send-otp" -Method Post -ContentType "application/json" -Body $body
 \`\`\`
@@ -84,9 +84,9 @@ Invoke-RestMethod -Uri "http://localhost:5678/webhook-test/zecubot-send-otp" -Me
 
 \`\`\`json
 {
-  "phone": "+5491134070204",
-  "code": "123456",
-  "name": "Tomás Jones"
+"phone": "+5491134070204",
+"code": "123456",
+"name": "Tomás Jones"
 }
 \`\`\`
 
@@ -94,8 +94,8 @@ Invoke-RestMethod -Uri "http://localhost:5678/webhook-test/zecubot-send-otp" -Me
 
 \`\`\`json
 {
-  "phone": "+5491134070204",
-  "code": "999999"
+"phone": "+5491134070204",
+"code": "999999"
 }
 \`\`\`
 
@@ -103,8 +103,8 @@ Invoke-RestMethod -Uri "http://localhost:5678/webhook-test/zecubot-send-otp" -Me
 
 \`\`\`json
 {
-  "phone": "",
-  "code": ""
+"phone": "",
+"code": ""
 }
 \`\`\`
 
@@ -130,8 +130,11 @@ Después de probar, verifica:
 
 **Solución:**
 \`\`\`bash
+
 # Verifica que n8n esté corriendo
+
 # Debería abrir: http://localhost:5678
+
 \`\`\`
 
 ### ❌ "Webhook not found"
@@ -139,6 +142,7 @@ Después de probar, verifica:
 **Causa:** El workflow no está activo
 
 **Solución:**
+
 1. Abre n8n
 2. Abre el workflow
 3. Activa el toggle (arriba a la derecha)
@@ -148,6 +152,7 @@ Después de probar, verifica:
 **Causa:** Credenciales de Twilio incorrectas
 
 **Solución:**
+
 1. Ve a https://console.twilio.com
 2. Copia tu Account SID y Auth Token
 3. Actualiza las credenciales en n8n
@@ -155,6 +160,7 @@ Después de probar, verifica:
 ### ⚠️ No recibo WhatsApp
 
 **Si usas Twilio Trial:**
+
 1. Ve a: https://console.twilio.com/us1/develop/phone-numbers/manage/verified
 2. Agrega tu número de teléfono
 3. Verifica con el código que te envían por SMS

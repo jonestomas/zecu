@@ -21,23 +21,17 @@ Sistema completo para contar y limitar las consultas de usuarios según su plan 
 
 \`\`\`
 Usuario → WhatsApp → Twilio → n8n Webhook
-                                    ↓
-                         1. Validar Límite (API)
-                                    ↓
-                         2. ¿Puede consultar?
-                                    ↓
-                      ┌──────────────┴──────────────┐
-                      │                             │
-                   SÍ ↓                          NO ↓
-            3. Registrar Consulta        Enviar "Límite Alcanzado"
-                      ↓                             ↓
-            4. Analizar con IA (OpenAI)          FIN
-                      ↓
-            5. Actualizar Consulta
-                      ↓
-            6. Enviar Respuesta
-                      ↓
-                    FIN
+↓ 1. Validar Límite (API)
+↓ 2. ¿Puede consultar?
+↓
+┌──────────────┴──────────────┐
+│ │
+SÍ ↓ NO ↓ 3. Registrar Consulta Enviar "Límite Alcanzado"
+↓ ↓ 4. Analizar con IA (OpenAI) FIN
+↓ 5. Actualizar Consulta
+↓ 6. Enviar Respuesta
+↓
+FIN
 \`\`\`
 
 ---
@@ -48,21 +42,21 @@ Usuario → WhatsApp → Twilio → n8n Webhook
 
 \`\`\`sql
 CREATE TABLE consultas (
-  id UUID PRIMARY KEY,
-  user_id UUID NOT NULL REFERENCES users(id),
-  
-  -- Datos de la consulta
-  mensaje TEXT NOT NULL,
-  respuesta TEXT,
-  tipo VARCHAR(50) DEFAULT 'analisis_estafa',
-  
-  -- Análisis de riesgo
-  riesgo_detectado BOOLEAN DEFAULT false,
-  nivel_riesgo VARCHAR(20), -- 'bajo', 'medio', 'alto'
-  
-  -- Metadatos
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  mes_periodo VARCHAR(7) NOT NULL -- 'YYYY-MM'
+id UUID PRIMARY KEY,
+user_id UUID NOT NULL REFERENCES users(id),
+
+-- Datos de la consulta
+mensaje TEXT NOT NULL,
+respuesta TEXT,
+tipo VARCHAR(50) DEFAULT 'analisis_estafa',
+
+-- Análisis de riesgo
+riesgo_detectado BOOLEAN DEFAULT false,
+nivel_riesgo VARCHAR(20), -- 'bajo', 'medio', 'alto'
+
+-- Metadatos
+created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+mes_periodo VARCHAR(7) NOT NULL -- 'YYYY-MM'
 );
 \`\`\`
 
@@ -77,11 +71,11 @@ Valida si un usuario puede hacer una consulta.
 **Salida:**
 \`\`\`json
 {
-  "puede_consultar": true,
-  "plan": "plus",
-  "consultas_usadas": 12,
-  "limite": 50,
-  "consultas_restantes": 38
+"puede_consultar": true,
+"plan": "plus",
+"consultas_usadas": 12,
+"limite": 50,
+"consultas_restantes": 38
 }
 \`\`\`
 
@@ -104,18 +98,18 @@ Obtiene el conteo de consultas del mes actual.
 **Request:**
 \`\`\`json
 {
-  "phone": "+5491134070204"
+"phone": "+5491134070204"
 }
 \`\`\`
 
 **Response:**
 \`\`\`json
 {
-  "puede_consultar": true,
-  "plan": "plus",
-  "consultas_usadas": 12,
-  "limite": 50,
-  "consultas_restantes": 38
+"puede_consultar": true,
+"plan": "plus",
+"consultas_usadas": 12,
+"limite": 50,
+"consultas_restantes": 38
 }
 \`\`\`
 
@@ -134,18 +128,18 @@ Obtiene el conteo de consultas del mes actual.
 **Request:**
 \`\`\`json
 {
-  "phone": "+5491134070204",
-  "mensaje": "Texto del mensaje a analizar",
-  "tipo": "analisis_estafa"
+"phone": "+5491134070204",
+"mensaje": "Texto del mensaje a analizar",
+"tipo": "analisis_estafa"
 }
 \`\`\`
 
 **Response:**
 \`\`\`json
 {
-  "success": true,
-  "consulta_id": "uuid-de-la-consulta",
-  "message": "Consulta registrada correctamente"
+"success": true,
+"consulta_id": "uuid-de-la-consulta",
+"message": "Consulta registrada correctamente"
 }
 \`\`\`
 
@@ -153,9 +147,9 @@ Obtiene el conteo de consultas del mes actual.
 \`\`\`javascript
 // URL: {{$env.NEXT_PUBLIC_BASE_URL}}/api/consultas/registrar
 // Body: {
-//   "phone": "{{ $node["Webhook WhatsApp"].json["From"].replace('whatsapp:', '') }}",
-//   "mensaje": "{{ $node["Webhook WhatsApp"].json["Body"] }}",
-//   "tipo": "analisis_estafa"
+// "phone": "{{ $node["Webhook WhatsApp"].json["From"].replace('whatsapp:', '') }}",
+// "mensaje": "{{ $node["Webhook WhatsApp"].json["Body"] }}",
+// "tipo": "analisis_estafa"
 // }
 \`\`\`
 
@@ -168,18 +162,18 @@ Obtiene el conteo de consultas del mes actual.
 **Request:**
 \`\`\`json
 {
-  "consulta_id": "uuid-de-la-consulta",
-  "respuesta": "Texto de la respuesta del bot",
-  "riesgo_detectado": true,
-  "nivel_riesgo": "alto"
+"consulta_id": "uuid-de-la-consulta",
+"respuesta": "Texto de la respuesta del bot",
+"riesgo_detectado": true,
+"nivel_riesgo": "alto"
 }
 \`\`\`
 
 **Response:**
 \`\`\`json
 {
-  "success": true,
-  "message": "Consulta actualizada correctamente"
+"success": true,
+"message": "Consulta actualizada correctamente"
 }
 \`\`\`
 
@@ -187,10 +181,10 @@ Obtiene el conteo de consultas del mes actual.
 \`\`\`javascript
 // URL: {{$env.NEXT_PUBLIC_BASE_URL}}/api/consultas/actualizar
 // Body: {
-//   "consulta_id": "{{ $node["Registrar Consulta"].json["consulta_id"] }}",
-//   "respuesta": "{{ $json.message.content }}",
-//   "riesgo_detectado": true,
-//   "nivel_riesgo": "alto"
+// "consulta_id": "{{ $node["Registrar Consulta"].json["consulta_id"] }}",
+// "respuesta": "{{ $json.message.content }}",
+// "riesgo_detectado": true,
+// "nivel_riesgo": "alto"
 // }
 \`\`\`
 
@@ -203,34 +197,42 @@ Obtiene el conteo de consultas del mes actual.
 **Archivo:** `zecu/docs/n8n-workflows/BOT_WHATSAPP_CON_CONTABILIZACION.json`
 
 #### 1. **Webhook WhatsApp**
+
 - Recibe mensajes de WhatsApp vía Twilio
 - Extrae: `From` (número), `Body` (mensaje)
 
 #### 2. **Validar Límite**
+
 - Llama a `/api/consultas/validar`
 - Verifica si el usuario puede hacer más consultas
 
 #### 3. **¿Puede Consultar?** (Condicional)
+
 - **TRUE:** Continúa al análisis
 - **FALSE:** Envía mensaje de límite alcanzado
 
 #### 4. **Registrar Consulta**
+
 - Llama a `/api/consultas/registrar`
 - Guarda el mensaje en la BD
 - Obtiene `consulta_id` para actualizar después
 
 #### 5. **Analizar con IA (OpenAI)**
+
 - Usa GPT-4o-mini para analizar el mensaje
 - Detecta: tipo de riesgo, nivel, recomendaciones
 
 #### 6. **Actualizar Consulta**
+
 - Llama a `/api/consultas/actualizar`
 - Guarda la respuesta y análisis de riesgo
 
 #### 7. **Enviar Respuesta (Twilio)**
+
 - Envía el análisis al usuario por WhatsApp
 
 #### 8. **Enviar Límite Alcanzado (Twilio)**
+
 - Si no puede consultar, envía mensaje con opción de upgrade
 
 ---
@@ -242,17 +244,22 @@ Obtiene el conteo de consultas del mes actual.
 Asegúrate de tener en `.env.local`:
 
 \`\`\`env
+
 # Next.js
+
 NEXT_PUBLIC_BASE_URL=http://localhost:3000
 
 # Supabase
+
 NEXT_PUBLIC_SUPABASE_URL=https://xxx.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=xxx
 
 # OpenAI (para n8n)
+
 OPENAI_API_KEY=sk-xxx
 
 # Twilio (para n8n)
+
 TWILIO_ACCOUNT_SID=ACxxx
 TWILIO_AUTH_TOKEN=xxx
 TWILIO_WHATSAPP_NUMBER=+12692562013
@@ -263,9 +270,11 @@ TWILIO_WHATSAPP_NUMBER=+12692562013
 La migración ya está aplicada (`004_create_consultas_table.sql`), pero si necesitas verificar:
 
 \`\`\`bash
+
 # Verifica en Supabase Dashboard → SQL Editor
-SELECT * FROM consultas LIMIT 10;
-SELECT * FROM pg_proc WHERE proname = 'puede_realizar_consulta';
+
+SELECT _ FROM consultas LIMIT 10;
+SELECT _ FROM pg_proc WHERE proname = 'puede_realizar_consulta';
 \`\`\`
 
 ### 3. Importar Workflow en n8n
@@ -296,20 +305,20 @@ SELECT * FROM pg_proc WHERE proname = 'puede_realizar_consulta';
 
 \`\`\`bash
 curl -X POST http://localhost:3000/api/consultas/validar \
-  -H "Content-Type: application/json" \
-  -d '{
-    "phone": "+5491134070204"
-  }'
+ -H "Content-Type: application/json" \
+ -d '{
+"phone": "+5491134070204"
+}'
 \`\`\`
 
 **Respuesta Esperada:**
 \`\`\`json
 {
-  "puede_consultar": true,
-  "plan": "plus",
-  "consultas_usadas": 0,
-  "limite": 50,
-  "consultas_restantes": 50
+"puede_consultar": true,
+"plan": "plus",
+"consultas_usadas": 0,
+"limite": 50,
+"consultas_restantes": 50
 }
 \`\`\`
 
@@ -319,20 +328,20 @@ curl -X POST http://localhost:3000/api/consultas/validar \
 
 \`\`\`bash
 curl -X POST http://localhost:3000/api/consultas/registrar \
-  -H "Content-Type: application/json" \
-  -d '{
-    "phone": "+5491134070204",
-    "mensaje": "Gané un premio! Haz click aquí para reclamar",
-    "tipo": "analisis_estafa"
-  }'
+ -H "Content-Type: application/json" \
+ -d '{
+"phone": "+5491134070204",
+"mensaje": "Gané un premio! Haz click aquí para reclamar",
+"tipo": "analisis_estafa"
+}'
 \`\`\`
 
 **Respuesta Esperada:**
 \`\`\`json
 {
-  "success": true,
-  "consulta_id": "abc-123-def-456",
-  "message": "Consulta registrada correctamente"
+"success": true,
+"consulta_id": "abc-123-def-456",
+"message": "Consulta registrada correctamente"
 }
 \`\`\`
 
@@ -349,7 +358,7 @@ curl -X POST http://localhost:3000/api/consultas/registrar \
    - Deberías recibir el análisis del bot
 5. Verifica en Supabase:
    \`\`\`sql
-   SELECT * FROM consultas ORDER BY created_at DESC LIMIT 1;
+   SELECT \* FROM consultas ORDER BY created_at DESC LIMIT 1;
    \`\`\`
 
 ---
@@ -362,20 +371,21 @@ Para probar el límite, inserta consultas manualmente:
 -- Insertar 5 consultas para un usuario Free
 DO $$
 DECLARE
-  v_user_id UUID;
+v_user_id UUID;
 BEGIN
-  SELECT id INTO v_user_id FROM users WHERE phone = '+5491134070204';
-  
-  FOR i IN 1..5 LOOP
-    INSERT INTO consultas (user_id, mensaje, mes_periodo)
-    VALUES (v_user_id, 'Test ' || i, TO_CHAR(NOW(), 'YYYY-MM'));
-  END LOOP;
+SELECT id INTO v_user_id FROM users WHERE phone = '+5491134070204';
+
+FOR i IN 1..5 LOOP
+INSERT INTO consultas (user_id, mensaje, mes_periodo)
+VALUES (v_user_id, 'Test ' || i, TO_CHAR(NOW(), 'YYYY-MM'));
+END LOOP;
 END $$;
 \`\`\`
 
 Ahora envía un nuevo mensaje por WhatsApp y deberías recibir:
+
 > 🚫 Límite Alcanzado
-> 
+>
 > Has alcanzado el límite de consultas de tu plan FREE.
 > ...
 
@@ -386,13 +396,13 @@ Ahora envía un nuevo mensaje por WhatsApp y deberías recibir:
 ### Ver Consultas por Usuario
 
 \`\`\`sql
-SELECT 
-  u.phone,
-  u.name,
-  u.plan,
-  COUNT(c.id) as total_consultas,
-  COUNT(c.id) FILTER (WHERE c.riesgo_detectado = true) as con_riesgo,
-  c.mes_periodo
+SELECT
+u.phone,
+u.name,
+u.plan,
+COUNT(c.id) as total_consultas,
+COUNT(c.id) FILTER (WHERE c.riesgo_detectado = true) as con_riesgo,
+c.mes_periodo
 FROM users u
 LEFT JOIN consultas c ON u.id = c.user_id
 WHERE c.mes_periodo = TO_CHAR(NOW(), 'YYYY-MM')
@@ -403,11 +413,11 @@ ORDER BY total_consultas DESC;
 ### Top Usuarios por Consultas
 
 \`\`\`sql
-SELECT 
-  u.phone,
-  u.name,
-  u.plan,
-  COUNT(c.id) as total_consultas
+SELECT
+u.phone,
+u.name,
+u.plan,
+COUNT(c.id) as total_consultas
 FROM users u
 LEFT JOIN consultas c ON u.id = c.user_id
 WHERE c.created_at >= NOW() - INTERVAL '30 days'
@@ -425,6 +435,7 @@ LIMIT 10;
 **Causa:** El número de teléfono no existe en la tabla `users`
 
 **Solución:**
+
 1. Verifica que el usuario esté registrado
 2. Verifica el formato del número (+54 9 11...)
 
@@ -435,7 +446,7 @@ LIMIT 10;
 **Solución:**
 \`\`\`sql
 -- Verificar que la función existe
-SELECT * FROM pg_proc WHERE proname = 'puede_realizar_consulta';
+SELECT \* FROM pg_proc WHERE proname = 'puede_realizar_consulta';
 
 -- Si no existe, re-aplicar migración
 \`\`\`
@@ -445,6 +456,7 @@ SELECT * FROM pg_proc WHERE proname = 'puede_realizar_consulta';
 **Causa:** Webhook de Twilio no configurado o n8n inactivo
 
 **Solución:**
+
 1. Verifica que el workflow esté ACTIVO en n8n
 2. Verifica la URL del webhook en Twilio
 3. Revisa las ejecuciones en n8n para ver errores

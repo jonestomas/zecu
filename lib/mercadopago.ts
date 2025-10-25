@@ -5,12 +5,12 @@ const client = new MercadoPagoConfig({
   accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN!,
   options: {
     timeout: 5000,
-    idempotencyKey: 'abc'
-  }
+    idempotencyKey: 'abc',
+  },
 });
 
-export const mercadopago = {
-  preference: new Preference(client)
+export const _mercadopago = {
+  preference: new Preference(client),
 };
 
 // Tipos para los planes
@@ -37,9 +37,9 @@ export const plans: Record<string, Plan> = {
       'Análisis de imágenes y audios',
       'Guía paso a paso personalizada',
       'Soporte prioritario 24/7',
-      'Alertas en tiempo real'
-    ]
-  }
+      'Alertas en tiempo real',
+    ],
+  },
 };
 
 // Datos opcionales del usuario para la preferencia de pago
@@ -51,24 +51,24 @@ export interface UserPaymentData {
 
 // Función para crear una preferencia de pago
 export async function createPaymentPreference(
-  planId: string, 
+  planId: string,
   userEmail?: string,
   userData?: UserPaymentData
 ) {
   const plan = plans[planId];
-  
+
   if (!plan) {
     throw new Error('Plan no encontrado');
   }
 
   // Asegurar que tenemos una URL base válida
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-  
+
   // Crear referencia externa con el ID del usuario si está disponible
-  const externalReference = userData 
+  const externalReference = userData
     ? `zecu-${plan.id}-${userData.userId}-${Date.now()}`
     : `zecu-${plan.id}-${Date.now()}`;
-  
+
   const preference = {
     items: [
       {
@@ -77,18 +77,18 @@ export async function createPaymentPreference(
         description: plan.description,
         quantity: 1,
         currency_id: plan.currency,
-        unit_price: plan.price
-      }
+        unit_price: plan.price,
+      },
     ],
     payer: {
       email: userEmail || 'test@test.com',
       ...(userData?.name && { name: userData.name }),
-      ...(userData?.phone && { phone: { number: userData.phone } })
+      ...(userData?.phone && { phone: { number: userData.phone } }),
     },
     back_urls: {
       success: `${baseUrl}/payment/success`,
       failure: `${baseUrl}/payment/failure`,
-      pending: `${baseUrl}/payment/pending`
+      pending: `${baseUrl}/payment/pending`,
     },
     external_reference: externalReference,
     notification_url: `${baseUrl}/api/webhooks/mercadopago`,
@@ -97,13 +97,15 @@ export async function createPaymentPreference(
     metadata: {
       user_id: userData?.userId,
       user_phone: userData?.phone,
-      plan_id: planId
-    }
+      plan_id: planId,
+    },
   };
 
   try {
     const response = await mercadopago.preference.create({ body: preference });
-    console.log(`💳 Preferencia creada: ${response.id} para usuario ${userData?.userId || 'anónimo'}`);
+    console.warn(
+      `💳 Preferencia creada: ${response.id} para usuario ${userData?.userId || 'anónimo'}`
+    );
     return response;
   } catch (error) {
     console.error('Error creating payment preference:', error);

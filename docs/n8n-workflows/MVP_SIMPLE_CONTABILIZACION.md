@@ -12,20 +12,20 @@ Implementar un sistema de conteo de consultas **sin APIs intermedias**, usando s
 
 \`\`\`
 Usuario envía mensaje
-    ↓
+↓
 🗄️ Get User (Supabase)
-    ↓
+↓
 📊 Count Consultas (Supabase SQL)
-    ↓
+↓
 🧮 Calcular Límite (Code)
-    ↓
+↓
 🤔 ¿Puede consultar? (IF)
-    ├─ NO → 📵 Mensaje límite → FIN
-    └─ SÍ → 🤖 AI Agent
-           ↓
-        💾 Insert Consulta (Supabase)
-           ↓
-        📤 Enviar respuesta → FIN
+├─ NO → 📵 Mensaje límite → FIN
+└─ SÍ → 🤖 AI Agent
+↓
+💾 Insert Consulta (Supabase)
+↓
+📤 Enviar respuesta → FIN
 \`\`\`
 
 ---
@@ -42,22 +42,24 @@ Credentials: Tu conexión de Supabase
 Table: users
 
 Filters:
-  - Field: phone
-  - Operator: Equal
-  - Value: {{ $('data_extraction').item.json.from.replace('whatsapp:', '') }}
+
+- Field: phone
+- Operator: Equal
+- Value: {{ $('data_extraction').item.json.from.replace('whatsapp:', '') }}
 
 Options:
-  - Select: * (todos los campos)
-\`\`\`
+
+- Select: \* (todos los campos)
+  \`\`\`
 
 **Output esperado**:
 \`\`\`json
 {
-  "id": "uuid-del-usuario",
-  "phone": "+5491134070204",
-  "name": "Tomás Jones",
-  "plan": "free",
-  "created_at": "2024-10-23T..."
+"id": "uuid-del-usuario",
+"phone": "+5491134070204",
+"name": "Tomás Jones",
+"plan": "free",
+"created_at": "2024-10-23T..."
 }
 \`\`\`
 
@@ -72,16 +74,16 @@ Type: Supabase → Execute a SQL Query
 Credentials: Tu conexión de Supabase
 
 Query (copiar exactamente):
-SELECT COUNT(*) as total
+SELECT COUNT(\*) as total
 FROM consultas
 WHERE user_id = '{{ $('Get User').first().json.id }}'
-  AND mes_periodo = TO_CHAR(NOW(), 'YYYY-MM');
+AND mes_periodo = TO_CHAR(NOW(), 'YYYY-MM');
 \`\`\`
 
 **Output esperado**:
 \`\`\`json
 {
-  "total": 3
+"total": 3
 }
 \`\`\`
 
@@ -101,9 +103,9 @@ const consultasUsadas = $('Count Consultas').first().json.total;
 
 // Definir límites por plan
 const limites = {
-  free: 5,
-  plus: 50,
-  premium: 100
+free: 5,
+plus: 50,
+premium: 100
 };
 
 const limite = limites[user.plan] || 5;
@@ -111,26 +113,26 @@ const puedeConsultar = consultasUsadas < limite;
 
 // Retornar resultado
 return [{
-  json: {
-    user_id: user.id,
-    plan: user.plan,
-    consultas_usadas: consultasUsadas,
-    limite: limite,
-    consultas_restantes: limite - consultasUsadas,
-    puede_consultar: puedeConsultar
-  }
+json: {
+user_id: user.id,
+plan: user.plan,
+consultas_usadas: consultasUsadas,
+limite: limite,
+consultas_restantes: limite - consultasUsadas,
+puede_consultar: puedeConsultar
+}
 }];
 \`\`\`
 
 **Output esperado**:
 \`\`\`json
 {
-  "user_id": "uuid",
-  "plan": "free",
-  "consultas_usadas": 3,
-  "limite": 5,
-  "consultas_restantes": 2,
-  "puede_consultar": true
+"user_id": "uuid",
+"plan": "free",
+"consultas_usadas": 3,
+"limite": 5,
+"consultas_restantes": 2,
+"puede_consultar": true
 }
 \`\`\`
 
@@ -144,15 +146,16 @@ return [{
 Type: IF
 
 Conditions:
-  Mode: Simple
-  
-  Condition 1:
-    Field: {{ $json.puede_consultar }}
-    Operation: Equal
-    Value: true
+Mode: Simple
+
+Condition 1:
+Field: {{ $json.puede_consultar }}
+Operation: Equal
+Value: true
 \`\`\`
 
 **Ramas**:
+
 - **TRUE** → Continuar al AI Agent
 - **FALSE** → Ir a "Enviar Límite Alcanzado"
 
@@ -169,14 +172,14 @@ From: whatsapp:+12692562013
 To: {{ $('data_extraction').item.json.from }}
 
 Message:
-🚫 *Límite Alcanzado*
+🚫 _Límite Alcanzado_
 
 Has alcanzado tu límite de consultas del mes.
 
-📊 *Tu plan:* {{ $('Calcular Límite').item.json.plan.toUpperCase() }}
-📈 *Consultas:* {{ $('Calcular Límite').item.json.consultas_usadas }}/{{ $('Calcular Límite').item.json.limite }}
+📊 _Tu plan:_ {{ $('Calcular Límite').item.json.plan.toUpperCase() }}
+📈 _Consultas:_ {{ $('Calcular Límite').item.json.consultas_usadas }}/{{ $('Calcular Límite').item.json.limite }}
 
-💎 *Actualiza a Plan Plus*
+💎 _Actualiza a Plan Plus_
 ✅ 50 consultas al mes
 ✅ Análisis más profundos
 ✅ Soporte prioritario
@@ -196,16 +199,17 @@ Credentials: Tu conexión de Supabase
 Table: consultas
 
 Columns:
-  user_id: {{ $('Get User').first().json.id }}
-  mensaje: {{ $('data_extraction').item.json.body }}
-  respuesta: {{ $('AI Agent1').item.json.output }}
-  tipo: analisis_estafa
-  riesgo_detectado: false
-  nivel_riesgo: bajo
-  mes_periodo: {{ new Date().toISOString().slice(0, 7) }}
+user_id: {{ $('Get User').first().json.id }}
+mensaje: {{ $('data_extraction').item.json.body }}
+respuesta: {{ $('AI Agent1').item.json.output }}
+tipo: analisis_estafa
+riesgo_detectado: false
+nivel_riesgo: bajo
+mes_periodo: {{ new Date().toISOString().slice(0, 7) }}
 \`\`\`
 
 **Tips**:
+
 - Si el AI Agent puede detectar riesgos, puedes usar expresiones como:
   \`\`\`javascript
   {{ $('AI Agent1').item.json.output.toLowerCase().includes('riesgo alto') ? true : false }}
@@ -217,26 +221,26 @@ Columns:
 
 \`\`\`
 Twilio Trigger
-    ↓
+↓
 Code in JavaScript
-    ↓
+↓
 data_extraction
-    ↓
+↓
 🆕 Get User (Supabase)
-    ↓
+↓
 🆕 Count Consultas (Supabase SQL)
-    ↓
+↓
 🆕 Calcular Límite (Code)
-    ↓
+↓
 🆕 ¿Puede Consultar? (IF)
-    ├─ NO → Enviar Límite Alcanzado → FIN
-    └─ SÍ → (continúa con flujo actual)
-             Plan Switch
-             Text Classifier
-             AI Agent
-             🆕 Insert Consulta (Supabase)
-             Send WhatsApp Respuesta
-             FIN
+├─ NO → Enviar Límite Alcanzado → FIN
+└─ SÍ → (continúa con flujo actual)
+Plan Switch
+Text Classifier
+AI Agent
+🆕 Insert Consulta (Supabase)
+Send WhatsApp Respuesta
+FIN
 \`\`\`
 
 ---
@@ -244,11 +248,13 @@ data_extraction
 ## 📝 Checklist de Implementación
 
 ### Preparación (5 min)
+
 - [ ] La tabla `consultas` ya existe en Supabase (creada con migración 004)
 - [ ] Credenciales de Supabase configuradas en n8n
 - [ ] Workflow actual funcionando
 
 ### Agregar Nodos (15 min)
+
 - [ ] 1. Nodo "Get User" agregado
 - [ ] 2. Nodo "Count Consultas" agregado
 - [ ] 3. Nodo "Calcular Límite" agregado
@@ -257,6 +263,7 @@ data_extraction
 - [ ] 6. Nodo "Insert Consulta" agregado
 
 ### Conexiones (5 min)
+
 - [ ] `data_extraction` → `Get User`
 - [ ] `Get User` → `Count Consultas`
 - [ ] `Count Consultas` → `Calcular Límite`
@@ -290,10 +297,10 @@ data_extraction
    \`\`\`sql
    -- Insertar 5 consultas del mes actual para un usuario FREE
    INSERT INTO consultas (user_id, mensaje, mes_periodo)
-   SELECT 
-     'tu-user-id-aqui',
-     'Consulta de prueba ' || i,
-     TO_CHAR(NOW(), 'YYYY-MM')
+   SELECT
+   'tu-user-id-aqui',
+   'Consulta de prueba ' || i,
+   TO_CHAR(NOW(), 'YYYY-MM')
    FROM generate_series(1, 5) i;
    \`\`\`
 2. **Envía** mensaje al bot
@@ -306,14 +313,14 @@ data_extraction
 
 ## 📊 Ventajas de Esta Solución MVP
 
-| Ventaja | Descripción |
-|---------|-------------|
-| ✅ **Simplicidad** | Solo nodos de n8n, sin APIs |
-| ✅ **Velocidad** | Menos latencia (acceso directo a BD) |
-| ✅ **Menos código** | Sin archivos TypeScript adicionales |
-| ✅ **Fácil debug** | Todo en un solo lugar (n8n) |
-| ✅ **Menos mantenimiento** | Menos archivos = menos problemas |
-| ✅ **Ideal para MVP** | Validar idea rápido |
+| Ventaja                    | Descripción                          |
+| -------------------------- | ------------------------------------ |
+| ✅ **Simplicidad**         | Solo nodos de n8n, sin APIs          |
+| ✅ **Velocidad**           | Menos latencia (acceso directo a BD) |
+| ✅ **Menos código**        | Sin archivos TypeScript adicionales  |
+| ✅ **Fácil debug**         | Todo en un solo lugar (n8n)          |
+| ✅ **Menos mantenimiento** | Menos archivos = menos problemas     |
+| ✅ **Ideal para MVP**      | Validar idea rápido                  |
 
 ---
 
@@ -332,11 +339,11 @@ Si aún no tienes configuradas las credenciales de Supabase en n8n:
 
 ## 📈 Límites por Plan
 
-| Plan | Consultas/Mes | Código |
-|------|---------------|--------|
-| **Free** | 5 | `free` |
-| **Plus** | 50 | `plus` |
-| **Premium** | 100 | `premium` |
+| Plan        | Consultas/Mes | Código    |
+| ----------- | ------------- | --------- |
+| **Free**    | 5             | `free`    |
+| **Plus**    | 50            | `plus`    |
+| **Premium** | 100           | `premium` |
 
 Estos límites están en el nodo "Calcular Límite". Modifícalos ahí si necesitas cambiarlos.
 
@@ -345,22 +352,28 @@ Estos límites están en el nodo "Calcular Límite". Modifícalos ahí si necesi
 ## 🚨 Solución de Problemas
 
 ### ❌ Error: "user_id not found"
+
 **Causa**: El nodo "Get User" no encontró al usuario
 **Solución**: Verifica que el `phone` en la BD tenga el formato correcto (+549...)
 
 ### ❌ Error: "relation consultas does not exist"
+
 **Causa**: La tabla `consultas` no existe
 **Solución**: Ejecuta la migración 004:
 \`\`\`bash
 cd zecu
+
 # Aplicar en Supabase desde el dashboard
+
 \`\`\`
 
 ### ❌ Error en "Count Consultas"
+
 **Causa**: Sintaxis SQL incorrecta
 **Solución**: Copia el SQL exactamente como está en el Paso 2
 
 ### ⚠️ El contador no actualiza
+
 **Causa**: El nodo "Insert Consulta" está mal conectado
 **Solución**: Debe estar DESPUÉS del AI Agent, ANTES del envío final
 

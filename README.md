@@ -9,7 +9,9 @@ Este proyecto está optimizado para ser desplegado en Vercel. Sigue estos pasos:
 ### 1. Preparación del repositorio
 
 \`\`\`bash
+
 # Clona o sube tu código a un repositorio de Git
+
 git init
 git add .
 git commit -m "Initial commit"
@@ -28,6 +30,7 @@ git push -u origin main
 ### 3. Configuración automática
 
 El proyecto incluye:
+
 - ✅ `vercel.json` con configuración optimizada
 - ✅ `next.config.mjs` configurado para producción
 - ✅ Variables de entorno preparadas
@@ -37,33 +40,43 @@ El proyecto incluye:
 ## 🛠️ Desarrollo Local
 
 \`\`\`bash
+
 # Instalar dependencias
+
 npm install
 
 # Ejecutar en modo desarrollo
+
 npm run dev
 
 # Construir para producción
+
 npm run build
 
 # Vista previa de producción
+
 npm run preview
 \`\`\`
 
 ## 🧪 Testing
 
 \`\`\`bash
+
 # Testing interactivo de flujos
+
 npm run test:flows
 
 # Verificar variables de entorno
+
 npm run check-env
 
 # Generar JWT secret
+
 npm run generate-jwt
 \`\`\`
 
 **Documentación de testing:**
+
 - 📖 [Guía completa de testing](docs/TESTING_FLOWS_GUIDE.md)
 - 🚀 [Quick start de testing](docs/TESTING_QUICK_START.md)
 
@@ -85,6 +98,7 @@ npm run generate-jwt
 ## 📱 Responsive Design
 
 La landing page está completamente optimizada para:
+
 - 📱 Móviles (320px+)
 - 📱 Tablets (768px+)
 - 💻 Desktop (1024px+)
@@ -92,6 +106,7 @@ La landing page está completamente optimizada para:
 ## 🎨 Personalización
 
 Los colores y estilos principales se pueden personalizar en:
+
 - `app/globals.css` - Estilos globales
 - `components/ui/` - Componentes de UI reutilizables
 

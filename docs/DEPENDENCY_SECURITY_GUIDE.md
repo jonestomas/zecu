@@ -3,6 +3,7 @@
 ## 📋 Checklist de Seguridad
 
 ### **✅ Implementado**
+
 - [x] **Auditoría automática**: Script `npm run audit`
 - [x] **Dependabot configurado**: Actualizaciones automáticas semanales
 - [x] **Vulnerabilidades resueltas**: Next.js actualizado a v16.0.0
@@ -12,6 +13,7 @@
 ### **🔄 Proceso de Auditoría**
 
 #### **Auditoría Manual**
+
 ```bash
 # Ejecutar auditoría completa
 npm run audit
@@ -27,6 +29,7 @@ npm run audit:fix
 ```
 
 #### **Auditoría Automática**
+
 - **Dependabot**: Actualizaciones semanales los lunes a las 9:00 AM
 - **Reportes**: Generados en `./security-reports/`
 - **Notificaciones**: Pull requests automáticos para vulnerabilidades críticas
@@ -34,21 +37,25 @@ npm run audit:fix
 ## 🚨 Niveles de Severidad
 
 ### **🔴 CRÍTICO**
+
 - **Acción**: Actualizar inmediatamente
 - **Tiempo**: < 24 horas
 - **Ejemplo**: RCE (Remote Code Execution)
 
 ### **🟠 ALTO**
+
 - **Acción**: Actualizar en las próximas 24 horas
 - **Tiempo**: < 48 horas
 - **Ejemplo**: Privilege escalation
 
 ### **🟡 MODERADO**
+
 - **Acción**: Planificar actualización
 - **Tiempo**: < 1 semana
 - **Ejemplo**: Information disclosure
 
 ### **🟢 BAJO**
+
 - **Acción**: Actualizar en próximo ciclo
 - **Tiempo**: < 1 mes
 - **Ejemplo**: Denial of service
@@ -56,16 +63,19 @@ npm run audit:fix
 ## 📊 Configuración de Dependabot
 
 ### **Actualizaciones Semanales**
+
 - **Dependencias**: Todos los lunes a las 9:00 AM
 - **GitHub Actions**: Todos los lunes a las 9:00 AM
 - **Límite de PRs**: 10 para dependencias, 5 para actions
 
 ### **Grupos de Actualización**
+
 - **@radix-ui/\***: Actualizaciones agrupadas
 - **@types/\***: Dependencias de desarrollo agrupadas
 - **typescript, tailwindcss, postcss**: Herramientas de desarrollo
 
 ### **Ignorar Actualizaciones Mayores**
+
 - **react**: Versiones mayores ignoradas
 - **react-dom**: Versiones mayores ignoradas
 - **next**: Versiones mayores ignoradas
@@ -74,12 +84,14 @@ npm run audit:fix
 ## 🔍 Script de Auditoría
 
 ### **Características**
+
 - **Análisis completo**: Todas las vulnerabilidades
 - **Reportes JSON**: Formato estructurado
 - **Recomendaciones**: Acciones específicas por severidad
 - **Códigos de salida**: Integración con CI/CD
 
 ### **Uso**
+
 ```bash
 # Ejecutar auditoría
 node scripts/security-audit.js
@@ -89,6 +101,7 @@ cat security-reports/dependency-audit.json
 ```
 
 ### **Salida del Script**
+
 ```
 🛡️ AUDITORÍA DE SEGURIDAD DE DEPENDENCIAS
 ══════════════════════════════════════════════════
@@ -112,11 +125,12 @@ cat security-reports/dependency-audit.json
 ## 🚀 Integración con CI/CD
 
 ### **GitHub Actions (Futuro)**
+
 ```yaml
 name: Security Audit
 on:
   schedule:
-    - cron: '0 9 * * 1'  # Lunes a las 9:00 AM
+    - cron: '0 9 * * 1' # Lunes a las 9:00 AM
   workflow_dispatch:
 
 jobs:
@@ -138,6 +152,7 @@ jobs:
 ## 📈 Métricas de Seguridad
 
 ### **Estado Actual**
+
 - **Vulnerabilidades críticas**: 0 ✅
 - **Vulnerabilidades altas**: 0 ✅
 - **Vulnerabilidades moderadas**: 0 ✅
@@ -145,6 +160,7 @@ jobs:
 - **Dependencias deprecadas**: 0 ✅
 
 ### **Última Auditoría**
+
 - **Fecha**: 25/10/2025
 - **Next.js**: v16.0.0 (actualizado)
 - **React**: v19.2.0 (actualizado)
@@ -153,16 +169,19 @@ jobs:
 ## 🎯 Próximos Pasos
 
 ### **Corto Plazo**
+
 - [ ] Configurar GitHub Actions para auditoría automática
 - [ ] Integrar reportes con Slack/Discord
 - [ ] Configurar alertas para vulnerabilidades críticas
 
 ### **Mediano Plazo**
+
 - [ ] Implementar análisis de licencias
 - [ ] Configurar escaneo de dependencias en tiempo real
 - [ ] Integrar con servicios de seguridad externos
 
 ### **Largo Plazo**
+
 - [ ] Implementar SBOM (Software Bill of Materials)
 - [ ] Configurar análisis de código estático
 - [ ] Implementar políticas de seguridad automatizadas

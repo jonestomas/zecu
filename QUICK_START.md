@@ -13,7 +13,9 @@ npm install
 Crea un archivo `.env.local` en la raíz del proyecto:
 
 \`\`\`bash
+
 # Copia este template
+
 NEXT_PUBLIC_SUPABASE_URL=https://tu-proyecto.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 JWT_SECRET=genera-con-npm-run-generate-jwt
@@ -51,14 +53,14 @@ Ve a Supabase SQL Editor y ejecuta estos scripts:
 
 \`\`\`sql
 CREATE TABLE IF NOT EXISTS public.users (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  phone VARCHAR(20) UNIQUE NOT NULL,
-  name VARCHAR(255),
-  email VARCHAR(255),
-  plan VARCHAR(20) DEFAULT 'free' CHECK (plan IN ('free', 'plus')),
-  plan_expires_at TIMESTAMP,
-  created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP DEFAULT NOW()
+id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+phone VARCHAR(20) UNIQUE NOT NULL,
+name VARCHAR(255),
+email VARCHAR(255),
+plan VARCHAR(20) DEFAULT 'free' CHECK (plan IN ('free', 'plus')),
+plan_expires_at TIMESTAMP,
+created_at TIMESTAMP DEFAULT NOW(),
+updated_at TIMESTAMP DEFAULT NOW()
 );
 
 CREATE INDEX IF NOT EXISTS idx_users_phone ON public.users(phone);
@@ -69,13 +71,13 @@ CREATE INDEX IF NOT EXISTS idx_users_plan_expires ON public.users(plan, plan_exp
 
 \`\`\`sql
 CREATE TABLE IF NOT EXISTS public.otp_codes (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  phone VARCHAR(20) NOT NULL,
-  code VARCHAR(6) NOT NULL,
-  expires_at TIMESTAMP NOT NULL,
-  verified BOOLEAN DEFAULT FALSE,
-  attempts INTEGER DEFAULT 0,
-  created_at TIMESTAMP DEFAULT NOW()
+id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+phone VARCHAR(20) NOT NULL,
+code VARCHAR(6) NOT NULL,
+expires_at TIMESTAMP NOT NULL,
+verified BOOLEAN DEFAULT FALSE,
+attempts INTEGER DEFAULT 0,
+created_at TIMESTAMP DEFAULT NOW()
 );
 
 CREATE INDEX IF NOT EXISTS idx_otp_phone_code ON public.otp_codes(phone, code);
@@ -111,12 +113,19 @@ Abre [http://localhost:3000](http://localhost:3000) 🎉
 ### 1. Test de Login/Registro
 
 \`\`\`bash
+
 # 1. Ir a http://localhost:3000/login
+
 # 2. Ingresar teléfono: +5491112345678
+
 # 3. Ver código en consola del servidor
+
 # 4. Copiar código (ej: 123456)
+
 # 5. Verificar
+
 # 6. Ingresar nombre
+
 \`\`\`
 
 **En la consola del servidor verás:**
@@ -128,27 +137,41 @@ Abre [http://localhost:3000](http://localhost:3000) 🎉
 ### 2. Test de Pago (Sandbox)
 
 \`\`\`bash
+
 # 1. Ir a http://localhost:3000
+
 # 2. Click "Suscribirse a Plus"
+
 # 3. Confirmar → Login si no estás autenticado
+
 # 4. Redirige a Mercado Pago
+
 # 5. Usar tarjeta de prueba:
-#    Número: 5031 7557 3453 0604
-#    CVV: 123
-#    Fecha: 11/25
-#    Nombre: APRO
+
+# Número: 5031 7557 3453 0604
+
+# CVV: 123
+
+# Fecha: 11/25
+
+# Nombre: APRO
+
 # 6. Completar pago
+
 # 7. Success! ✅
+
 \`\`\`
 
 **Simular webhook (porque localhost no recibe webhooks reales):**
 
 \`\`\`bash
+
 # En otra terminal
+
 curl http://localhost:3000/api/webhooks/mercadopago \
-  -X POST \
-  -H "Content-Type: application/json" \
-  -d '{"type":"payment","data":{"id":PAYMENT_ID_DEL_PASO_6}}'
+ -X POST \
+ -H "Content-Type: application/json" \
+ -d '{"type":"payment","data":{"id":PAYMENT_ID_DEL_PASO_6}}'
 \`\`\`
 
 ### 3. Verificar en Base de Datos
@@ -172,19 +195,25 @@ Ve a Supabase → Table Editor → `users`:
 ## 🛠️ Scripts Útiles
 
 \`\`\`bash
+
 # Verificar variables de entorno
+
 npm run check-env
 
 # Generar JWT Secret
+
 npm run generate-jwt
 
 # Iniciar con verificación
+
 npm run dev:check
 
 # Build para producción
+
 npm run build
 
 # Linter
+
 npm run lint
 \`\`\`
 
@@ -215,19 +244,29 @@ npm run lint
 ### Vercel
 
 \`\`\`bash
+
 # 1. Push a GitHub
+
 git push origin main
 
 # 2. Conectar en Vercel
+
 # 3. Configurar variables de entorno en Vercel:
-#    - NEXT_PUBLIC_SUPABASE_URL
-#    - SUPABASE_SERVICE_ROLE_KEY
-#    - JWT_SECRET (genera uno nuevo)
-#    - MERCADOPAGO_ACCESS_TOKEN (usa APP_USR-)
-#    - NEXT_PUBLIC_BASE_URL (tu dominio de producción)
-#    - N8N_WEBHOOK_SEND_OTP_URL
+
+# - NEXT_PUBLIC_SUPABASE_URL
+
+# - SUPABASE_SERVICE_ROLE_KEY
+
+# - JWT_SECRET (genera uno nuevo)
+
+# - MERCADOPAGO_ACCESS_TOKEN (usa APP_USR-)
+
+# - NEXT_PUBLIC_BASE_URL (tu dominio de producción)
+
+# - N8N_WEBHOOK_SEND_OTP_URL
 
 # 4. Deploy automático ✅
+
 \`\`\`
 
 ---

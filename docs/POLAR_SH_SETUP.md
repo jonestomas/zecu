@@ -56,7 +56,9 @@ npm install @polar-sh/nextjs
 Agrega a tu `.env.local`:
 
 \`\`\`env
+
 # Polar.sh Configuration
+
 POLAR_ACCESS_TOKEN=polar_oat_XXXXXXXXXXXXXXXX
 POLAR_PRICE_ID_PLUS=price_XXXXXXXXX
 POLAR_PRICE_ID_PREMIUM=price_XXXXXXXXX
@@ -87,21 +89,21 @@ Polar.sh usa Stripe, así que puedes usar las tarjetas de prueba de Stripe:
 
 \`\`\`
 Usuario selecciona plan Plus/Premium
-    ↓
+↓
 POST /api/polar/create-checkout
-    ↓
+↓
 Polar.sh crea checkout session
-    ↓
+↓
 Usuario es redirigido a Polar.sh
-    ↓
+↓
 Usuario completa el pago
-    ↓
+↓
 Redirige a /payment/polar/success
-    ↓
+↓
 GET /api/polar/verify-payment
-    ↓
+↓
 Supabase: plan actualizado
-    ↓
+↓
 Usuario redirigido a /welcome
 \`\`\`
 
@@ -117,13 +119,13 @@ const [paymentMethod, setPaymentMethod] = useState<'mercadopago' | 'polar'>('mer
 
 // Lógica de selección
 const handleCheckout = async () => {
-  if (paymentMethod === 'mercadopago') {
-    // Flujo de Mercado Pago (Argentina)
-    await handleMercadoPagoCheckout();
-  } else {
-    // Flujo de Polar.sh (Internacional)
-    await handlePolarCheckout();
-  }
+if (paymentMethod === 'mercadopago') {
+// Flujo de Mercado Pago (Argentina)
+await handleMercadoPagoCheckout();
+} else {
+// Flujo de Polar.sh (Internacional)
+await handlePolarCheckout();
+}
 };
 \`\`\`
 
@@ -131,14 +133,14 @@ const handleCheckout = async () => {
 
 \`\`\`typescript
 const detectCountry = async () => {
-  const response = await fetch('https://ipapi.co/json/');
-  const data = await response.json();
-  
-  if (data.country_code === 'AR') {
-    setPaymentMethod('mercadopago');
-  } else {
-    setPaymentMethod('polar');
-  }
+const response = await fetch('https://ipapi.co/json/');
+const data = await response.json();
+
+if (data.country_code === 'AR') {
+setPaymentMethod('mercadopago');
+} else {
+setPaymentMethod('polar');
+}
 };
 \`\`\`
 
@@ -152,11 +154,11 @@ Las cancelaciones se manejan automáticamente a través del webhook:
 
 \`\`\`typescript
 case 'subscription.canceled':
-  // Actualizar usuario a plan free
-  await supabaseAdmin
-    .from('users')
-    .update({ plan: 'free', plan_expires_at: null })
-    .eq('id', userId);
+// Actualizar usuario a plan free
+await supabaseAdmin
+.from('users')
+.update({ plan: 'free', plan_expires_at: null })
+.eq('id', userId);
 \`\`\`
 
 ### Renovación
@@ -173,10 +175,10 @@ El código ya incluye validación de signatures:
 
 \`\`\`typescript
 const event = validateWebhookPayload(
-  body, 
-  webhookSecret, 
-  signature, 
-  timestamp
+body,
+webhookSecret,
+signature,
+timestamp
 );
 \`\`\`
 
@@ -221,7 +223,8 @@ Polar.sh provee un dashboard con:
 
 ### Webhook no se ejecuta
 
-**Solución**: 
+**Solución**:
+
 1. Verifica que la URL del webhook sea accesible públicamente
 2. Usa ngrok en desarrollo: `ngrok http 3001`
 3. Actualiza la URL del webhook en Polar.sh

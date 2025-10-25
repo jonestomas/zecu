@@ -3,6 +3,7 @@
 ## 📋 Principios de Seguridad
 
 ### **✅ Implementado**
+
 - [x] **Mensajes de error seguros**: Sin exposición de información técnica
 - [x] **Logging detallado**: Información técnica solo en logs del servidor
 - [x] **Categorización de errores**: Tipos específicos con respuestas apropiadas
@@ -10,6 +11,7 @@
 - [x] **Páginas de error personalizadas**: UX mejorada para usuarios
 
 ### **🔒 Información Protegida**
+
 - **Passwords, tokens, secrets**: Nunca expuestos al usuario
 - **Stack traces**: Solo en desarrollo
 - **Detalles técnicos**: Solo en logs del servidor
@@ -19,6 +21,7 @@
 ## 🎯 Tipos de Errores Manejados
 
 ### **VALIDATION_ERROR (400)**
+
 ```json
 {
   "success": false,
@@ -30,6 +33,7 @@
 ```
 
 ### **AUTHENTICATION_ERROR (401)**
+
 ```json
 {
   "success": false,
@@ -41,6 +45,7 @@
 ```
 
 ### **AUTHORIZATION_ERROR (403)**
+
 ```json
 {
   "success": false,
@@ -52,6 +57,7 @@
 ```
 
 ### **NOT_FOUND_ERROR (404)**
+
 ```json
 {
   "success": false,
@@ -63,6 +69,7 @@
 ```
 
 ### **RATE_LIMIT_ERROR (429)**
+
 ```json
 {
   "success": false,
@@ -75,6 +82,7 @@
 ```
 
 ### **PAYMENT_ERROR (402)**
+
 ```json
 {
   "success": false,
@@ -86,6 +94,7 @@
 ```
 
 ### **EXTERNAL_SERVICE_ERROR (503)**
+
 ```json
 {
   "success": false,
@@ -97,6 +106,7 @@
 ```
 
 ### **DATABASE_ERROR (500)**
+
 ```json
 {
   "success": false,
@@ -108,6 +118,7 @@
 ```
 
 ### **INTERNAL_ERROR (500)**
+
 ```json
 {
   "success": false,
@@ -121,6 +132,7 @@
 ## 🛠️ Uso del Sistema
 
 ### **Manejo Básico de Errores**
+
 ```typescript
 import { handleError } from '@/lib/secure-error-handling';
 
@@ -136,12 +148,13 @@ export async function POST(request: NextRequest) {
 ```
 
 ### **Manejo Específico por Tipo**
+
 ```typescript
-import { 
-  handleZodError, 
-  handleAuthError, 
+import {
+  handleZodError,
+  handleAuthError,
   handlePaymentError,
-  createSecureErrorResponse 
+  createSecureErrorResponse,
 } from '@/lib/secure-error-handling';
 
 // Para errores de validación
@@ -164,11 +177,12 @@ if (error.provider === 'polar') {
 ```
 
 ### **Middleware de Manejo de Errores**
+
 ```typescript
-import { 
+import {
   withErrorHandling,
   withAuthErrorHandling,
-  withPaymentErrorHandling 
+  withPaymentErrorHandling,
 } from '@/lib/error-handling-middleware';
 
 // Manejo general
@@ -190,6 +204,7 @@ export const POST = withPaymentErrorHandling(async (request: NextRequest) => {
 ## 📊 Logging de Errores
 
 ### **Información Registrada en Logs**
+
 ```typescript
 {
   "timestamp": "2025-01-28T22:55:06.580Z",
@@ -215,6 +230,7 @@ export const POST = withPaymentErrorHandling(async (request: NextRequest) => {
 ```
 
 ### **Información NO Registrada**
+
 - ❌ Passwords o tokens completos
 - ❌ Datos de tarjetas de crédito
 - ❌ Información personal sensible
@@ -224,6 +240,7 @@ export const POST = withPaymentErrorHandling(async (request: NextRequest) => {
 ## 🎨 Páginas de Error Personalizadas
 
 ### **Página de Error General (`/error`)**
+
 - **Diseño**: Card centrado con gradiente de fondo
 - **Iconos**: Diferentes según tipo de error
 - **Acciones**: Reintentar, volver, ir al inicio
@@ -231,6 +248,7 @@ export const POST = withPaymentErrorHandling(async (request: NextRequest) => {
 - **Contacto**: Email de soporte
 
 ### **Página 404 (`/not-found`)**
+
 - **Diseño**: Similar a error general
 - **Enlaces útiles**: Login, registro, dashboard
 - **Navegación**: Botones de acción claros
@@ -239,6 +257,7 @@ export const POST = withPaymentErrorHandling(async (request: NextRequest) => {
 ## 🔍 Desarrollo vs Producción
 
 ### **Desarrollo**
+
 ```json
 {
   "success": false,
@@ -258,6 +277,7 @@ export const POST = withPaymentErrorHandling(async (request: NextRequest) => {
 ```
 
 ### **Producción**
+
 ```json
 {
   "success": false,
@@ -271,18 +291,21 @@ export const POST = withPaymentErrorHandling(async (request: NextRequest) => {
 ## 🚀 Beneficios Implementados
 
 ### **Seguridad**
+
 - ✅ **Sin exposición de información técnica**
 - ✅ **Logging detallado para debugging**
 - ✅ **Sanitización automática de datos sensibles**
 - ✅ **Categorización apropiada de errores**
 
 ### **UX/UI**
+
 - ✅ **Mensajes de error amigables**
 - ✅ **Páginas de error personalizadas**
 - ✅ **Acciones claras para el usuario**
 - ✅ **Información de contacto disponible**
 
 ### **Desarrollo**
+
 - ✅ **Debugging facilitado en desarrollo**
 - ✅ **Middleware reutilizable**
 - ✅ **Tipado fuerte con TypeScript**
@@ -291,6 +314,7 @@ export const POST = withPaymentErrorHandling(async (request: NextRequest) => {
 ## 📈 Métricas de Seguridad
 
 ### **Estado Actual**
+
 - **APIs con manejo seguro**: 3/3 ✅
 - **Tipos de error cubiertos**: 9/9 ✅
 - **Páginas de error personalizadas**: 2/2 ✅
@@ -298,6 +322,7 @@ export const POST = withPaymentErrorHandling(async (request: NextRequest) => {
 - **Documentación completa**: ✅
 
 ### **Cobertura de Errores**
+
 - **Validación**: ✅ Zod errors
 - **Autenticación**: ✅ JWT errors
 - **Autorización**: ✅ Permission errors
@@ -311,16 +336,19 @@ export const POST = withPaymentErrorHandling(async (request: NextRequest) => {
 ## 🎯 Próximos Pasos
 
 ### **Corto Plazo**
+
 - [ ] Implementar en todas las APIs restantes
 - [ ] Agregar métricas de errores
 - [ ] Configurar alertas para errores críticos
 
 ### **Mediano Plazo**
+
 - [ ] Dashboard de errores para administradores
 - [ ] Análisis de patrones de errores
 - [ ] Integración con servicios de monitoreo
 
 ### **Largo Plazo**
+
 - [ ] Machine learning para detección de anomalías
 - [ ] Auto-recuperación de errores transitorios
 - [ ] Predicción de errores basada en patrones

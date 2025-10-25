@@ -5,6 +5,7 @@
 **Idea**: En lugar de una tabla separada de `consultas`, agregamos una columna `consultas_mes` directamente en la tabla `users`. Cada mes se resetea automáticamente.
 
 **Ventajas**:
+
 - ✅ Una sola query para obtener usuario Y contador
 - ✅ No necesitas contar registros
 - ✅ Súper rápido y simple
@@ -22,6 +23,7 @@
 4. **Verifica** que veas: "✅ Migración 005 completada"
 
 **Resultado**: La tabla `users` ahora tiene:
+
 - `consultas_mes` (INTEGER) - Contador de consultas del mes
 - `mes_periodo` (VARCHAR) - Mes actual (ej: "2025-10")
 
@@ -34,20 +36,21 @@
 Type: Supabase → Get Rows
 Table: users
 Filter:
-  - Field: phone
-  - Operator: Equal
-  - Value: {{ $('data_extraction').item.json.from.replace('whatsapp:', '') }}
-\`\`\`
+
+- Field: phone
+- Operator: Equal
+- Value: {{ $('data_extraction').item.json.from.replace('whatsapp:', '') }}
+  \`\`\`
 
 **Output esperado** (ahora con las nuevas columnas):
 \`\`\`json
 {
-  "id": "uuid-usuario",
-  "phone": "+5491134070204",
-  "name": "Tomás",
-  "plan": "free",
-  "consultas_mes": 3,
-  "mes_periodo": "2025-10"
+"id": "uuid-usuario",
+"phone": "+5491134070204",
+"name": "Tomás",
+"plan": "free",
+"consultas_mes": 3,
+"mes_periodo": "2025-10"
 }
 \`\`\`
 
@@ -59,12 +62,12 @@ Filter:
 
 \`\`\`
 Plan Switch
-    ↓
-  [free] ──→ 🆕 IF: Validar Límite FREE
-                ↓
-              ¿consultas_mes < 5?
-                ├─ NO → Mensaje límite → FIN
-                └─ SÍ → Bot responde
+↓
+[free] ──→ 🆕 IF: Validar Límite FREE
+↓
+¿consultas_mes < 5?
+├─ NO → Mensaje límite → FIN
+└─ SÍ → Bot responde
 \`\`\`
 
 #### Configuración del IF:
@@ -74,15 +77,16 @@ Nombre del nodo: "¿Puede Consultar? (FREE)"
 Type: IF
 
 Conditions:
-  Mode: Simple
-  
-  Condition 1:
-    Value 1: {{ $('Get a row').item.json.consultas_mes }}
-    Operation: Smaller (<)
-    Value 2: 5
+Mode: Simple
+
+Condition 1:
+Value 1: {{ $('Get a row').item.json.consultas_mes }}
+Operation: Smaller (<)
+Value 2: 5
 \`\`\`
 
 **Conexiones**:
+
 - **TRUE** (Verde) → Conectar al flujo actual de FREE (Text Classifier, etc.)
 - **FALSE** (Rojo) → Conectar a nuevo nodo "Enviar Límite FREE"
 
@@ -99,14 +103,14 @@ From: whatsapp:+12692562013
 To: {{ $('data_extraction').item.json.from }}
 
 Message:
-🚫 *Límite Alcanzado*
+🚫 _Límite Alcanzado_
 
-Hola {{ $('Get a row').item.json.name || 'Usuario' }}, has usado tus *5 consultas gratuitas* de este mes.
+Hola {{ $('Get a row').item.json.name || 'Usuario' }}, has usado tus _5 consultas gratuitas_ de este mes.
 
-📊 Plan actual: *FREE*
+📊 Plan actual: _FREE_
 📈 Consultas: {{ $('Get a row').item.json.consultas_mes }}/5
 
-💎 *Actualiza a Plan Plus*
+💎 _Actualiza a Plan Plus_
 ✅ 20 consultas al mes
 ✅ Análisis más profundos
 ✅ Soporte prioritario
@@ -122,12 +126,12 @@ Hola {{ $('Get a row').item.json.name || 'Usuario' }}, has usado tus *5 consulta
 
 \`\`\`
 Plan Switch
-    ↓
-  [plus] ──→ 🆕 IF: Validar Límite PLUS
-                ↓
-              ¿consultas_mes < 20?
-                ├─ NO → Mensaje límite → FIN
-                └─ SÍ → AI Agent
+↓
+[plus] ──→ 🆕 IF: Validar Límite PLUS
+↓
+¿consultas_mes < 20?
+├─ NO → Mensaje límite → FIN
+└─ SÍ → AI Agent
 \`\`\`
 
 #### Configuración del IF:
@@ -137,15 +141,16 @@ Nombre del nodo: "¿Puede Consultar? (PLUS)"
 Type: IF
 
 Conditions:
-  Mode: Simple
-  
-  Condition 1:
-    Value 1: {{ $('Get a row').item.json.consultas_mes }}
-    Operation: Smaller (<)
-    Value 2: 20
+Mode: Simple
+
+Condition 1:
+Value 1: {{ $('Get a row').item.json.consultas_mes }}
+Operation: Smaller (<)
+Value 2: 20
 \`\`\`
 
 **Conexiones**:
+
 - **TRUE** → Flujo actual PLUS (Switch multimedia, AI Agent, etc.)
 - **FALSE** → "Enviar Límite PLUS"
 
@@ -160,14 +165,14 @@ From: whatsapp:+12692562013
 To: {{ $('data_extraction').item.json.from }}
 
 Message:
-🚫 *Límite Alcanzado*
+🚫 _Límite Alcanzado_
 
-Hola {{ $('Get a row').item.json.name || 'Usuario' }}, has usado tus *20 consultas* de este mes.
+Hola {{ $('Get a row').item.json.name || 'Usuario' }}, has usado tus _20 consultas_ de este mes.
 
-📊 Plan actual: *PLUS*
+📊 Plan actual: _PLUS_
 📈 Consultas: {{ $('Get a row').item.json.consultas_mes }}/20
 
-💎 *Actualiza a Plan Premium*
+💎 _Actualiza a Plan Premium_
 ✅ 50 consultas al mes
 ✅ Análisis avanzados
 ✅ Prioridad máxima
@@ -189,12 +194,13 @@ Type: Supabase → Update a Row
 Table: users
 
 Filter (para encontrar el usuario):
-  - Field: id
-  - Operator: Equal
-  - Value: {{ $('Get a row').item.json.id }}
+
+- Field: id
+- Operator: Equal
+- Value: {{ $('Get a row').item.json.id }}
 
 Columns to Update:
-  consultas_mes: {{ $('Get a row').item.json.consultas_mes + 1 }}
+consultas_mes: {{ $('Get a row').item.json.consultas_mes + 1 }}
 \`\`\`
 
 #### Opción B: Llamar a la Función SQL (Más Robusto)
@@ -215,27 +221,27 @@ SELECT incrementar_consultas('{{ $('Get a row').item.json.id }}'::UUID);
 
 \`\`\`
 Usuario envía mensaje
-    ↓
+↓
 Twilio Trigger
-    ↓
+↓
 Code JavaScript
-    ↓
+↓
 data_extraction
-    ↓
+↓
 Get a row (Supabase)
-    ↓
+↓
 Plan Switch
-    ├─ [FREE]
-    │   ↓
-    │   ¿consultas_mes < 5? (IF)
-    │   ├─ NO → Enviar Límite FREE → FIN
-    │   └─ SÍ → Text Classifier → Bot → Incrementar → Send → FIN
-    │
-    └─ [PLUS/PREMIUM]
-        ↓
-        ¿consultas_mes < 20? (IF)
-        ├─ NO → Enviar Límite PLUS → FIN
-        └─ SÍ → AI Agent → Incrementar → Send → FIN
+├─ [FREE]
+│ ↓
+│ ¿consultas_mes < 5? (IF)
+│ ├─ NO → Enviar Límite FREE → FIN
+│ └─ SÍ → Text Classifier → Bot → Incrementar → Send → FIN
+│
+└─ [PLUS/PREMIUM]
+↓
+¿consultas_mes < 20? (IF)
+├─ NO → Enviar Límite PLUS → FIN
+└─ SÍ → AI Agent → Incrementar → Send → FIN
 \`\`\`
 
 ---
@@ -244,14 +250,14 @@ Plan Switch
 
 \`\`\`sql
 CREATE TABLE users (
-  id UUID PRIMARY KEY,
-  phone VARCHAR UNIQUE,
-  name VARCHAR,
-  plan VARCHAR DEFAULT 'free',
-  email VARCHAR,
-  consultas_mes INTEGER DEFAULT 0,        -- 🆕 NUEVO
-  mes_periodo VARCHAR(7) DEFAULT '2025-10', -- 🆕 NUEVO
-  created_at TIMESTAMP DEFAULT NOW()
+id UUID PRIMARY KEY,
+phone VARCHAR UNIQUE,
+name VARCHAR,
+plan VARCHAR DEFAULT 'free',
+email VARCHAR,
+consultas_mes INTEGER DEFAULT 0, -- 🆕 NUEVO
+mes_periodo VARCHAR(7) DEFAULT '2025-10', -- 🆕 NUEVO
+created_at TIMESTAMP DEFAULT NOW()
 );
 \`\`\`
 
@@ -263,7 +269,7 @@ CREATE TABLE users (
 
 1. **Simula** en Supabase:
    \`\`\`sql
-   UPDATE users 
+   UPDATE users
    SET consultas_mes = 2, mes_periodo = '2025-10'
    WHERE phone = '+5491134070204';
    \`\`\`
@@ -278,7 +284,7 @@ CREATE TABLE users (
 
 1. **Simula**:
    \`\`\`sql
-   UPDATE users 
+   UPDATE users
    SET consultas_mes = 5
    WHERE phone = '+5491134070204';
    \`\`\`
@@ -293,7 +299,7 @@ CREATE TABLE users (
 
 1. **Simula** mes anterior:
    \`\`\`sql
-   UPDATE users 
+   UPDATE users
    SET consultas_mes = 5, mes_periodo = '2024-09'
    WHERE phone = '+5491134070204';
    \`\`\`
@@ -310,11 +316,11 @@ CREATE TABLE users (
 
 Si quieres cambiar los límites, edita los nodos IF:
 
-| Plan | Límite Actual | Dónde Cambiar |
-|------|---------------|---------------|
-| **FREE** | 5 consultas | Nodo "¿Puede Consultar? (FREE)" → Value 2 |
-| **PLUS** | 20 consultas | Nodo "¿Puede Consultar? (PLUS)" → Value 2 |
-| **PREMIUM** | 20 consultas | Mismo nodo que PLUS (o crear uno separado) |
+| Plan        | Límite Actual | Dónde Cambiar                              |
+| ----------- | ------------- | ------------------------------------------ |
+| **FREE**    | 5 consultas   | Nodo "¿Puede Consultar? (FREE)" → Value 2  |
+| **PLUS**    | 20 consultas  | Nodo "¿Puede Consultar? (PLUS)" → Value 2  |
+| **PREMIUM** | 20 consultas  | Mismo nodo que PLUS (o crear uno separado) |
 
 ---
 
@@ -324,13 +330,13 @@ Para ver el estado de tus usuarios:
 
 \`\`\`sql
 -- Ver contador de todos los usuarios
-SELECT 
-  name,
-  phone,
-  plan,
-  consultas_mes,
-  mes_periodo,
-  created_at
+SELECT
+name,
+phone,
+plan,
+consultas_mes,
+mes_periodo,
+created_at
 FROM users
 ORDER BY consultas_mes DESC;
 
@@ -343,7 +349,7 @@ WHERE phone = '+5491134070204';
 SELECT name, plan, consultas_mes
 FROM users
 WHERE (plan = 'free' AND consultas_mes >= 5)
-   OR (plan = 'plus' AND consultas_mes >= 20);
+OR (plan = 'plus' AND consultas_mes >= 20);
 \`\`\`
 
 ---
@@ -351,17 +357,21 @@ WHERE (plan = 'free' AND consultas_mes >= 5)
 ## 🚨 Solución de Problemas
 
 ### ❌ Error: "column consultas_mes does not exist"
+
 **Solución**: No aplicaste la migración 005. Ve al Paso 1.
 
 ### ⚠️ El contador no se incrementa
+
 **Causa**: El nodo "Incrementar Consultas" está mal ubicado o no conectado
 **Solución**: Debe estar DESPUÉS del AI Agent/Bot, ANTES del Send final
 
 ### ⚠️ El contador no se resetea cada mes
+
 **Causa**: Estás usando la Opción A (Update simple) en lugar de la Opción B
 **Solución**: Usa la función `incrementar_consultas()` (Opción B)
 
 ### ❌ IF no funciona correctamente
+
 **Causa**: Sintaxis incorrecta en la expresión
 **Solución**: Asegúrate de usar exactamente:
 \`\`\`
@@ -384,13 +394,13 @@ Una vez que valides con usuarios reales:
 
 ## ✅ Resumen de Cambios
 
-| Qué | Dónde | Qué Hace |
-|-----|-------|----------|
-| **Migración SQL** | `005_add_consultas_counter.sql` | Agrega columnas a users |
-| **IF FREE** | Rama free del Plan Switch | Valida límite de 5 |
-| **IF PLUS** | Rama plus del Plan Switch | Valida límite de 20 |
-| **Incrementar** | Después de AI Agent/Bot | +1 al contador |
-| **Mensajes Límite** | Cuando IF = FALSE | Notifica y ofrece upgrade |
+| Qué                 | Dónde                           | Qué Hace                  |
+| ------------------- | ------------------------------- | ------------------------- |
+| **Migración SQL**   | `005_add_consultas_counter.sql` | Agrega columnas a users   |
+| **IF FREE**         | Rama free del Plan Switch       | Valida límite de 5        |
+| **IF PLUS**         | Rama plus del Plan Switch       | Valida límite de 20       |
+| **Incrementar**     | Después de AI Agent/Bot         | +1 al contador            |
+| **Mensajes Límite** | Cuando IF = FALSE               | Notifica y ofrece upgrade |
 
 ---
 

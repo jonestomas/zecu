@@ -3,6 +3,7 @@
 ## 🔒 Características de Seguridad
 
 ### **Ofuscación Automática**
+
 - **Teléfonos**: `+5491134070204` → `+549****0204`
 - **Emails**: `user@example.com` → `[REDACTED]`
 - **Tokens**: `eyJhbGciOiJIUzI1NiIs...` → `[REDACTED]`
@@ -10,22 +11,39 @@
 - **IPs**: `192.168.1.100` → `192.168.1.xxx`
 
 ### **Campos Sensibles Detectados**
+
 ```typescript
 sensitiveFields: [
-  'password', 'token', 'secret', 'key', 'otp', 'code',
-  'phone', 'email', 'credit_card', 'cvv', 'ssn', 'dni',
-  'address', 'ip', 'session', 'cookie', 'authorization'
-]
+  'password',
+  'token',
+  'secret',
+  'key',
+  'otp',
+  'code',
+  'phone',
+  'email',
+  'credit_card',
+  'cvv',
+  'ssn',
+  'dni',
+  'address',
+  'ip',
+  'session',
+  'cookie',
+  'authorization',
+];
 ```
 
 ## 📊 Niveles de Logging
 
 ### **Por Entorno**
+
 - **Development**: DEBUG, INFO, WARN, ERROR, CRITICAL
 - **Production**: INFO, WARN, ERROR, CRITICAL
 - **Test**: ERROR, CRITICAL
 
 ### **Categorías**
+
 - **AUTH**: Autenticación y autorización
 - **PAYMENT**: Procesos de pago
 - **API**: Requests y responses de APIs
@@ -37,6 +55,7 @@ sensitiveFields: [
 ## 🛠️ Uso del Logger
 
 ### **Logger Básico**
+
 ```typescript
 import { createLogger } from '@/lib/secure-logging';
 
@@ -48,6 +67,7 @@ logger.warn('SECURITY', 'Suspicious activity detected');
 ```
 
 ### **Logger de Autenticación**
+
 ```typescript
 import { createAuthLogger } from '@/lib/secure-logging';
 
@@ -60,6 +80,7 @@ authLogger.sessionCreated(request, userId);
 ```
 
 ### **Logger de Webhooks**
+
 ```typescript
 import { createWebhookLogger } from '@/lib/secure-logging';
 
@@ -73,6 +94,7 @@ webhookLogger.error(request, error);
 ## 📈 Formato de Logs
 
 ### **Desarrollo (Console)**
+
 ```
 14:30:25 INFO     AUTH     [req_1234567890_abc123] User logged in
   Metadata: {
@@ -82,6 +104,7 @@ webhookLogger.error(request, error);
 ```
 
 ### **Producción (JSON)**
+
 ```json
 {
   "timestamp": "2025-01-28T14:30:25.123Z",
@@ -103,11 +126,13 @@ webhookLogger.error(request, error);
 ## 🔍 APIs de Administración
 
 ### **Estadísticas de Logs**
+
 ```bash
 GET /api/admin/logs?level=INFO&category=AUTH&hours=24
 ```
 
 ### **Configurar Logging**
+
 ```bash
 POST /api/admin/logs
 {
@@ -120,12 +145,14 @@ POST /api/admin/logs
 ## ⚠️ Mejores Prácticas
 
 ### **✅ Hacer**
+
 - Usar categorías apropiadas
 - Incluir contexto relevante
 - Ofuscar datos sensibles automáticamente
 - Usar niveles apropiados
 
 ### **❌ No Hacer**
+
 - Loggear passwords o tokens completos
 - Loggear datos de tarjetas de crédito
 - Usar console.log directamente
@@ -134,6 +161,7 @@ POST /api/admin/logs
 ## 🚀 Integración con Servicios Externos
 
 ### **Configuración Futura**
+
 ```typescript
 // En lib/logging-config.ts
 externalServices: {

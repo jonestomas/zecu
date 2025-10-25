@@ -5,6 +5,7 @@ Esta guía te llevará paso a paso para configurar el envío de códigos OTP por
 ---
 
 ## ⏱️ Tiempo Estimado
+
 **1 hora** (incluye configuración de credenciales y pruebas)
 
 ---
@@ -25,21 +26,24 @@ Antes de comenzar, asegúrate de tener:
 ## 🚀 Paso 1: Configurar Credenciales de Twilio en n8n
 
 ### 1.1 Acceder a n8n
+
 1. Abre tu instancia de n8n (ej: `http://localhost:5678`)
 2. Inicia sesión
 
 ### 1.2 Agregar Credenciales de Twilio
+
 1. En n8n, haz clic en **"Settings"** (⚙️) en la barra lateral izquierda
 2. Selecciona **"Credentials"**
 3. Haz clic en **"+ New Credential"**
 4. Busca y selecciona **"Twilio API"**
 5. Completa los campos:
    - **Credential Name**: `Twilio Zecubot Production`
-   - **Account SID**: `ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx` *(tu Account SID)*
-   - **Auth Token**: `xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx` *(tu Auth Token)*
+   - **Account SID**: `ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx` _(tu Account SID)_
+   - **Auth Token**: `xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx` _(tu Auth Token)_
 6. Haz clic en **"Save"**
 
 ### 1.3 Verificar Credenciales
+
 - Asegúrate de que las credenciales se guardaron correctamente
 - Anota el nombre de las credenciales (lo necesitarás en el siguiente paso)
 
@@ -48,9 +52,11 @@ Antes de comenzar, asegúrate de tener:
 ## 📥 Paso 2: Importar el Workflow de OTP
 
 ### 2.1 Ubicar el Archivo JSON
+
 El workflow está en: `zecu/docs/n8n-workflows/SEND_OTP_WORKFLOW.json`
 
 ### 2.2 Importar a n8n
+
 1. En n8n, haz clic en **"Workflows"** en la barra lateral
 2. Haz clic en **"+ New"** (o **"Import"** si ya tienes otros workflows)
 3. Si creaste un nuevo workflow:
@@ -60,7 +66,9 @@ El workflow está en: `zecu/docs/n8n-workflows/SEND_OTP_WORKFLOW.json`
 5. El workflow se importará automáticamente
 
 ### 2.3 Verificar Nodos
+
 Deberías ver estos nodos:
+
 1. 🔔 **Webhook Recibir OTP** (trigger)
 2. ✅ **Validar Datos**
 3. 📝 **Preparar Mensaje**
@@ -74,33 +82,39 @@ Deberías ver estos nodos:
 ## 🔧 Paso 3: Configurar el Nodo de Twilio
 
 ### 3.1 Abrir el Nodo de Twilio
+
 1. Haz clic en el nodo **"Enviar WhatsApp (Twilio)"**
 2. En el panel derecho, verás la configuración
 
 ### 3.2 Seleccionar Credenciales
+
 1. En **"Credential to connect with"**, haz clic en el dropdown
 2. Selecciona **"Twilio Zecubot Production"** (las credenciales que creaste)
 3. Si no aparecen, haz clic en **"+ Add New"** y configúralas ahora
 
 ### 3.3 Configurar el Número de Origen
+
 1. En **"From"**, selecciona **"Expression"** (icono fx)
-2. Mantén el valor: `whatsapp:+12692562013` *(reemplaza con tu número de Twilio)*
+2. Mantén el valor: `whatsapp:+12692562013` _(reemplaza con tu número de Twilio)_
    - **Importante**: El formato debe ser `whatsapp:+[código_país][número]`
    - Ejemplo: `whatsapp:+14155238886`
 
 ### 3.4 Verificar Configuración
-- **To**: `={{ 'whatsapp:' + $json.phone }}` *(deja como está)*
-- **Message**: `={{ $json.message }}` *(deja como está)*
+
+- **To**: `={{ 'whatsapp:' + $json.phone }}` _(deja como está)_
+- **Message**: `={{ $json.message }}` _(deja como está)_
 
 ---
 
 ## 🔗 Paso 4: Obtener la URL del Webhook
 
 ### 4.1 Activar el Workflow
+
 1. En la esquina superior derecha, cambia el toggle a **"Active"** (ON)
 2. El workflow debe estar activo (verde)
 
 ### 4.2 Copiar URL del Webhook
+
 1. Haz clic en el nodo **"Webhook Recibir OTP"**
 2. En el panel derecho, verás:
    - **Test URL**: `http://localhost:5678/webhook-test/...`
@@ -121,6 +135,7 @@ https://n8n.tudominio.com/webhook/zecubot-send-otp
 ## 🔐 Paso 5: Actualizar Variables de Entorno en Next.js
 
 ### 5.1 Editar `.env.local`
+
 1. Abre el archivo `zecu/.env.local`
 2. Busca la línea:
    \`\`\`
@@ -136,6 +151,7 @@ https://n8n.tudominio.com/webhook/zecubot-send-otp
    \`\`\`
 
 ### 5.2 Reiniciar Next.js
+
 1. En tu terminal, presiona `Ctrl + C` para detener el servidor
 2. Reinicia con:
    \`\`\`bash
@@ -148,10 +164,12 @@ https://n8n.tudominio.com/webhook/zecubot-send-otp
 ## 🧪 Paso 6: Probar el Flujo Completo
 
 ### 6.1 Acceder a la Aplicación
+
 1. Abre tu navegador en: `http://localhost:3000`
 2. Cierra sesión si estás logueado
 
 ### 6.2 Probar OTP por WhatsApp
+
 1. Haz clic en **"Iniciar Sesión"**
 2. Ingresa tu número de teléfono (con código de país):
    - Ejemplo: `+54 11 3407 0204`
@@ -163,12 +181,12 @@ https://n8n.tudominio.com/webhook/zecubot-send-otp
    \`\`\`
 5. **Verifica en tu WhatsApp**:
    - Deberías recibir un mensaje como:
-   \`\`\`
-   Hola Tomas! 👋
+     \`\`\`
+     Hola Tomas! 👋
 
    Tu código de verificación Zecubot es:
 
-   *123456*
+   _123456_
 
    Este código expira en 5 minutos.
 
@@ -176,6 +194,7 @@ https://n8n.tudominio.com/webhook/zecubot-send-otp
    \`\`\`
 
 ### 6.3 Ingresar el Código
+
 1. Ingresa el código que recibiste en WhatsApp
 2. Haz clic en **"Verificar"**
 3. Deberías ser redirigido al dashboard
@@ -187,6 +206,7 @@ https://n8n.tudominio.com/webhook/zecubot-send-otp
 ### ❌ Error: "No se pudo enviar el código OTP"
 
 **Posibles causas:**
+
 1. **N8N_WEBHOOK_SEND_OTP_URL vacía o incorrecta**
    - Verifica el archivo `.env.local`
    - Asegúrate de que la URL sea la "Production URL" (sin `-test`)
@@ -206,6 +226,7 @@ https://n8n.tudominio.com/webhook/zecubot-send-otp
 ### ⚠️ No recibo el mensaje en WhatsApp
 
 **Posibles causas:**
+
 1. **Número no registrado con Twilio**
    - Si usas Twilio Trial, debes agregar tu número en "Verified Caller IDs"
    - Accede a: https://console.twilio.com/us1/develop/phone-numbers/manage/verified
@@ -222,6 +243,7 @@ https://n8n.tudominio.com/webhook/zecubot-send-otp
 ### 🔍 Ver Logs en n8n
 
 Para ver qué está pasando en n8n:
+
 1. Haz clic en **"Executions"** en n8n (barra lateral)
 2. Verás una lista de todas las ejecuciones
 3. Haz clic en una ejecución para ver los detalles
@@ -266,6 +288,7 @@ Cuando estés listo para producción:
 ## 🆘 ¿Necesitas Ayuda?
 
 Si algo no funciona:
+
 1. Revisa los logs de Next.js (terminal donde corre `npm run dev`)
 2. Revisa las ejecuciones en n8n (sección "Executions")
 3. Verifica el formato de tu número de teléfono

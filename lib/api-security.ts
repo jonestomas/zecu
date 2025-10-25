@@ -3,26 +3,29 @@ import { z } from 'zod';
 import rateLimit from 'express-rate-limit';
 
 // Esquemas de validación
-export const createPaymentSchema = z.object({
+export const _createPaymentSchema = z.object({
   planId: z.enum(['plus'], {
-    errorMap: () => ({ message: 'Plan debe ser "plus"' })
+    errorMap: () => ({ message: 'Plan debe ser "plus"' }),
   }),
   userEmail: z.string().email('Email inválido').optional(),
-  captchaToken: z.string().min(1, 'Token captcha requerido').optional()
+  captchaToken: z.string().min(1, 'Token captcha requerido').optional(),
 });
 
 // Rate limiting por IP
-const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
+const _rateLimitStore = new Map<string, { count: number; resetTime: number }>();
 
 export class APISecurityError extends Error {
-  constructor(message: string, public statusCode: number = 400) {
+  constructor(
+    message: string,
+    public statusCode: number = 400
+  ) {
     super(message);
     this.name = 'APISecurityError';
   }
 }
 
 export async function validateAPIRequest(
-  request: NextRequest,
+  _request: NextRequest,
   schema?: z.ZodSchema,
   options: {
     requireCaptcha?: boolean;
@@ -30,15 +33,14 @@ export async function validateAPIRequest(
     rateLimitWindow?: number;
   } = {}
 ): Promise<any> {
-  
   const {
     requireCaptcha = false,
     rateLimitRequests = 10,
-    rateLimitWindow = 60000 // 1 minuto
+    rateLimitWindow = 60000, // 1 minuto
   } = options;
 
   // 1. Validar método HTTP
-  if (request.method !== 'POST') {
+  if (_request.method !== 'POST') {
     throw new APISecurityError('Método no permitido', 405);
   }
 
@@ -49,14 +51,15 @@ export async function validateAPIRequest(
   }
 
   // 3. Rate limiting
-  const clientIP = getClientIP(request);
+  const clientIP = getClientIP(_request);
   if (!checkAPIRateLimit(clientIP, rateLimitRequests, rateLimitWindow)) {
     throw new APISecurityError('Demasiadas solicitudes', 429);
   }
 
   // 4. Validar tamaño del payload
   const rawBody = await request.text();
-  if (rawBody.length > 10240) { // 10KB máximo
+  if (rawBody.length > 10240) {
+    // 10KB máximo
     throw new APISecurityError('Payload demasiado grande', 413);
   }
 
@@ -92,13 +95,13 @@ export async function validateAPIRequest(
   // 9. Validar origen (CORS básico)
   const origin = request.headers.get('origin');
   const referer = request.headers.get('referer');
-  
+
   if (process.env.NODE_ENV === 'production') {
     const allowedOrigins = [
       'https://zecu.vercel.app',
-      'https://www.zecu.com' // Si tienes dominio propio
+      'https://www.zecu.com', // Si tienes dominio propio
     ];
-    
+
     if (origin && !allowedOrigins.includes(origin)) {
       console.warn('⚠️ Origen sospechoso:', origin);
     }
@@ -117,15 +120,15 @@ export function sanitizeInput(input: any): any {
       .replace(/on\w+\s*=/gi, '')
       .substring(0, 1000); // Limitar longitud
   }
-  
+
   if (Array.isArray(input)) {
     return input.map(sanitizeInput).slice(0, 100); // Limitar arrays
   }
-  
+
   if (input && typeof input === 'object') {
     const sanitized: any = {};
     const allowedKeys = ['planId', 'userEmail', 'captchaToken']; // Whitelist
-    
+
     for (const key of allowedKeys) {
       if (key in input) {
         sanitized[key] = sanitizeInput(input[key]);
@@ -133,39 +136,37 @@ export function sanitizeInput(input: any): any {
     }
     return sanitized;
   }
-  
+
   return input;
 }
 
-function getClientIP(request: NextRequest): string {
-  return request.headers.get('x-forwarded-for')?.split(',')[0] ||
-         request.headers.get('x-real-ip') ||
-         'unknown';
+function getClientIP(_request: NextRequest): string {
+  return (
+    _request.headers.get('x-forwarded-for')?.split(',')[0] ||
+    request.headers.get('x-real-ip') ||
+    'unknown'
+  );
 }
 
-function checkAPIRateLimit(
-  ip: string, 
-  maxRequests: number, 
-  windowMs: number
-): boolean {
+function checkAPIRateLimit(ip: string, maxRequests: number, windowMs: number): boolean {
   const now = Date.now();
   const key = ip;
-  
+
   const current = rateLimitStore.get(key);
-  
+
   if (!current || now > current.resetTime) {
     // Nueva ventana o primera solicitud
     rateLimitStore.set(key, {
       count: 1,
-      resetTime: now + windowMs
+      resetTime: now + windowMs,
     });
     return true;
   }
-  
+
   if (current.count >= maxRequests) {
     return false;
   }
-  
+
   current.count++;
   rateLimitStore.set(key, current);
   return true;
@@ -173,7 +174,7 @@ function checkAPIRateLimit(
 
 // Middleware wrapper para APIs
 export function withAPISecurity(
-  handler: (request: NextRequest, validatedBody: any) => Promise<NextResponse>,
+  handler: (_request: NextRequest, validatedBody: any) => Promise<NextResponse>,
   options: {
     schema?: z.ZodSchema;
     requireCaptcha?: boolean;
@@ -181,33 +182,26 @@ export function withAPISecurity(
     rateLimitWindow?: number;
   } = {}
 ) {
-  return async (request: NextRequest) => {
+  return async (_request: NextRequest) => {
     try {
-      const validatedBody = await validateAPIRequest(request, options.schema, options);
-      
+      const validatedBody = await validateAPIRequest(_request, options.schema, options);
+
       // Log seguro
-      console.log('🔒 API call:', {
-        method: request.method,
-        path: new URL(request.url).pathname,
-        ip: getClientIP(request).replace(/\d+$/, 'xxx'),
-        timestamp: new Date().toISOString()
+      console.warn('🔒 API call:', {
+        method: _request.method,
+        path: new URL(_request.url).pathname,
+        ip: getClientIP(_request).replace(/\d+$/, 'xxx'),
+        timestamp: new Date().toISOString(),
       });
-      
-      return await handler(request, validatedBody);
-      
+
+      return await handler(_request, validatedBody);
     } catch (error) {
       if (error instanceof APISecurityError) {
-        return NextResponse.json(
-          { error: error.message },
-          { status: error.statusCode }
-        );
+        return NextResponse.json({ error: error.message }, { status: error.statusCode });
       }
-      
+
       console.error('❌ API Error:', error);
-      return NextResponse.json(
-        { error: 'Error interno del servidor' },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 });
     }
   };
 }

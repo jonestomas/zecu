@@ -11,11 +11,12 @@ El flujo de compra ahora requiere que el usuario se registre/autentique **ANTES*
 ### ❌ Flujo Anterior (Ya NO se usa)
 
 \`\`\`
-Landing → "Suscribirse Plus" → Mercado Pago → Pago → 
+Landing → "Suscribirse Plus" → Mercado Pago → Pago →
 Webhook crea usuario → Envía OTP → Login → Dashboard
 \`\`\`
 
 **Problemas:**
+
 - Usuarios fantasma si el pago falla
 - No sabemos quién es el usuario hasta después del pago
 - Más complejo de trackear
@@ -24,11 +25,12 @@ Webhook crea usuario → Envía OTP → Login → Dashboard
 
 \`\`\`
 Landing → "Suscribirse Plus" → Verificar Sesión →
-[NO autenticado] → Login/Registro OTP → Checkout → 
+[NO autenticado] → Login/Registro OTP → Checkout →
 Mercado Pago → Pago → Webhook actualiza plan → Dashboard
 \`\`\`
 
 **Ventajas:**
+
 - ✅ Usuario creado antes del pago
 - ✅ No hay usuarios fantasma
 - ✅ Mejor tracking y analytics
@@ -42,6 +44,7 @@ Mercado Pago → Pago → Webhook actualiza plan → Dashboard
 ### Flujo 1: Usuario NUEVO compra Plan Plus
 
 \`\`\`
+
 1. Usuario en landing page
    ↓
 2. Clic en "Suscribirse a Plan Plus" (AR$5.499/mes)
@@ -50,10 +53,10 @@ Mercado Pago → Pago → Webhook actualiza plan → Dashboard
    ↓ (No autenticado)
 4. Guarda intención de compra en sessionStorage:
    {
-     planId: "plus",
-     planName: "Plan Plus",
-     price: "AR$5.499",
-     timestamp: 1696800000000
+   planId: "plus",
+   planName: "Plan Plus",
+   price: "AR$5.499",
+   timestamp: 1696800000000
    }
    ↓
 5. Redirige a /login
@@ -77,7 +80,7 @@ Mercado Pago → Pago → Webhook actualiza plan → Dashboard
     - POST /api/create-payment con planId
     - Limpia sessionStorage
     - Redirige a Mercado Pago
-    ↓
+      ↓
 14. Usuario paga en Mercado Pago
     ↓
 15. Mercado Pago → Webhook POST /api/webhooks/mercadopago
@@ -89,11 +92,12 @@ Mercado Pago → Pago → Webhook actualiza plan → Dashboard
 18. Mercado Pago redirige a /payment/success
     ↓
 19. Usuario va a Dashboard → Ve Plan Plus activo ✅
-\`\`\`
+    \`\`\`
 
 ### Flujo 2: Usuario EXISTENTE compra Plan Plus
 
 \`\`\`
+
 1. Usuario en landing page (ya autenticado)
    ↓
 2. Clic en "Suscribirse a Plan Plus"
@@ -111,11 +115,12 @@ Mercado Pago → Pago → Webhook actualiza plan → Dashboard
 8. Redirige a /payment/success
    ↓
 9. Dashboard → Plan Plus activo ✅
-\`\`\`
+   \`\`\`
 
 ### Flujo 3: Usuario se registra sin comprar (Plan Free)
 
 \`\`\`
+
 1. Usuario → /login o /register
    ↓
 2. Ingresa teléfono → POST /api/auth/send-otp
@@ -131,7 +136,7 @@ Mercado Pago → Pago → Webhook actualiza plan → Dashboard
 7. NO hay pendingPurchase → Redirige a Dashboard
    ↓
 8. Dashboard → Plan Free activo (gratis) ✅
-\`\`\`
+   \`\`\`
 
 ---
 
@@ -151,12 +156,12 @@ await fetch("/api/create-payment", { ... })
 const sessionCheck = await fetch("/api/auth/check-session")
 
 if (!authenticated) {
-  // Guarda intención y redirige a login
-  sessionStorage.setItem("pendingPurchase", JSON.stringify({ planId, ... }))
-  window.location.href = "/login"
+// Guarda intención y redirige a login
+sessionStorage.setItem("pendingPurchase", JSON.stringify({ planId, ... }))
+window.location.href = "/login"
 } else {
-  // Procede al pago
-  await fetch("/api/create-payment", { ... })
+// Procede al pago
+await fetch("/api/create-payment", { ... })
 }
 \`\`\`
 
@@ -166,14 +171,14 @@ if (!authenticated) {
 
 \`\`\`typescript
 export async function GET(request: NextRequest) {
-  const sessionToken = request.cookies.get('session_token')?.value
-  const session = await verifySessionToken(sessionToken)
-  
-  return NextResponse.json({
-    authenticated: !!session,
-    userId: session?.userId,
-    phone: session?.phone
-  })
+const sessionToken = request.cookies.get('session_token')?.value
+const session = await verifySessionToken(sessionToken)
+
+return NextResponse.json({
+authenticated: !!session,
+userId: session?.userId,
+phone: session?.phone
+})
 }
 \`\`\`
 
@@ -183,23 +188,24 @@ export async function GET(request: NextRequest) {
 
 \`\`\`typescript
 useEffect(() => {
-  const pendingPurchase = sessionStorage.getItem('pendingPurchase')
-  
-  if (pendingPurchase) {
-    const { planId } = JSON.parse(pendingPurchase)
-    
+const pendingPurchase = sessionStorage.getItem('pendingPurchase')
+
+if (pendingPurchase) {
+const { planId } = JSON.parse(pendingPurchase)
+
     // Crear preferencia de pago
     const response = await fetch('/api/create-payment', {
       method: 'POST',
       body: JSON.stringify({ planId })
     })
-    
+
     // Limpiar sessionStorage
     sessionStorage.removeItem('pendingPurchase')
-    
+
     // Redirigir a Mercado Pago
     window.location.href = initPoint
-  }
+
+}
 }, [])
 \`\`\`
 
@@ -212,9 +218,9 @@ useEffect(() => {
 const pendingPurchase = sessionStorage.getItem('pendingPurchase')
 
 if (pendingPurchase) {
-  router.push('/checkout')  // Ir a procesar compra
+router.push('/checkout') // Ir a procesar compra
 } else {
-  router.push('/dashboard')  // Ir al dashboard normal
+router.push('/dashboard') // Ir al dashboard normal
 }
 \`\`\`
 
@@ -224,16 +230,16 @@ if (pendingPurchase) {
 
 \`\`\`typescript
 if (planId === 'plus') {
-  const existingUser = await getUserByPhone(fullPhone)
-  
-  if (existingUser) {
-    // Usuario existe - actualizar plan (caso normal)
-    await updateUserPlan(fullPhone, 'plus')
-  } else {
-    // Usuario no existe - crear con Plus (fallback legacy)
-    await createUser({ phone, email, plan: 'plus' })
-    await sendOTPViaWhatsApp(fullPhone, otpCode)
-  }
+const existingUser = await getUserByPhone(fullPhone)
+
+if (existingUser) {
+// Usuario existe - actualizar plan (caso normal)
+await updateUserPlan(fullPhone, 'plus')
+} else {
+// Usuario no existe - crear con Plus (fallback legacy)
+await createUser({ phone, email, plan: 'plus' })
+await sendOTPViaWhatsApp(fullPhone, otpCode)
+}
 }
 \`\`\`
 
@@ -246,21 +252,24 @@ if (planId === 'plus') {
 **Estructura:**
 \`\`\`json
 {
-  "planId": "plus",
-  "planName": "Plan Plus",
-  "price": "AR$5.499",
-  "timestamp": 1696800000000
+"planId": "plus",
+"planName": "Plan Plus",
+"price": "AR$5.499",
+"timestamp": 1696800000000
 }
 \`\`\`
 
 **Cuándo se crea:**
+
 - Al hacer clic en botón de pago sin estar autenticado
 
 **Cuándo se limpia:**
+
 - Al procesar la compra en `/checkout`
 - Cuando el usuario cancela explícitamente
 
 **Dónde se usa:**
+
 - `components/payment-button.tsx` (escritura)
 - `app/login/page.tsx` (lectura)
 - `app/verify/page.tsx` (lectura)
@@ -273,10 +282,13 @@ if (planId === 'plus') {
 ### Test del Flujo Completo
 
 \`\`\`bash
+
 # 1. Iniciar servidor
+
 npm run dev
 
 # 2. Limpiar sessionStorage en DevTools
+
 sessionStorage.clear()
 
 # 3. Ir a http://localhost:3000
@@ -284,7 +296,8 @@ sessionStorage.clear()
 # 4. Scroll a "Suscripción" → Clic "Suscribirse a Plus"
 
 # 5. Verificar redirección a /login
-#    y que sessionStorage tiene "pendingPurchase"
+
+# y que sessionStorage tiene "pendingPurchase"
 
 # 6. Ingresar teléfono +5491112345678
 
@@ -303,7 +316,8 @@ sessionStorage.clear()
 # 13. Verificar webhook en logs del servidor
 
 # 14. Verificar plan actualizado en Supabase:
-SELECT * FROM users WHERE phone = '+5491112345678';
+
+SELECT \* FROM users WHERE phone = '+5491112345678';
 \`\`\`
 
 ### Verificar sessionStorage
@@ -344,11 +358,11 @@ En lugar de `sessionStorage`, guardar en tabla `pending_purchases`:
 
 \`\`\`sql
 CREATE TABLE pending_purchases (
-  id UUID PRIMARY KEY,
-  user_id UUID REFERENCES users(id),
-  plan_id VARCHAR(20),
-  created_at TIMESTAMP,
-  expires_at TIMESTAMP
+id UUID PRIMARY KEY,
+user_id UUID REFERENCES users(id),
+plan_id VARCHAR(20),
+created_at TIMESTAMP,
+expires_at TIMESTAMP
 );
 \`\`\`
 
@@ -364,6 +378,7 @@ https://zecubot.com/checkout?token=abc123
 ### Opción 3: Analytics de abandono
 
 Trackear cuántos usuarios abandonan en cada paso:
+
 - Login iniciado
 - OTP enviado
 - OTP verificado

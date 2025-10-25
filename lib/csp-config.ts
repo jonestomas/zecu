@@ -1,5 +1,5 @@
 // Content Security Policy configurations
-export const CSP_POLICIES = {
+export const _CSP_POLICIES = {
   // CSP para páginas públicas
   public: [
     "default-src 'self'",
@@ -15,7 +15,7 @@ export const CSP_POLICIES = {
     "media-src 'self'",
     "worker-src 'self' blob:",
     "child-src 'self' blob:",
-    "manifest-src 'self'"
+    "manifest-src 'self'",
   ].join('; '),
 
   // CSP más estricto para APIs
@@ -33,7 +33,7 @@ export const CSP_POLICIES = {
     "media-src 'none'",
     "worker-src 'none'",
     "child-src 'none'",
-    "manifest-src 'none'"
+    "manifest-src 'none'",
   ].join('; '),
 
   // CSP para páginas de autenticación (más estricto)
@@ -51,12 +51,12 @@ export const CSP_POLICIES = {
     "media-src 'none'",
     "worker-src 'none'",
     "child-src 'none'",
-    "manifest-src 'none'"
-  ].join('; ')
+    "manifest-src 'none'",
+  ].join('; '),
 };
 
 // Headers de seguridad por tipo de página
-export const SECURITY_HEADERS_BY_TYPE = {
+export const _SECURITY_HEADERS_BY_TYPE = {
   public: {
     'Content-Security-Policy': CSP_POLICIES.public,
     'X-Content-Type-Options': 'nosniff',
@@ -65,9 +65,9 @@ export const SECURITY_HEADERS_BY_TYPE = {
     'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
     'Referrer-Policy': 'strict-origin-when-cross-origin',
     'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), interest-cohort=()',
-    'X-Powered-By': 'Next.js'
+    'X-Powered-By': 'Next.js',
   },
-  
+
   api: {
     'Content-Security-Policy': CSP_POLICIES.api,
     'X-Content-Type-Options': 'nosniff',
@@ -77,11 +77,11 @@ export const SECURITY_HEADERS_BY_TYPE = {
     'Referrer-Policy': 'no-referrer',
     'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), interest-cohort=()',
     'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
-    'Pragma': 'no-cache',
-    'Expires': '0',
-    'X-Powered-By': 'Next.js'
+    Pragma: 'no-cache',
+    Expires: '0',
+    'X-Powered-By': 'Next.js',
   },
-  
+
   auth: {
     'Content-Security-Policy': CSP_POLICIES.auth,
     'X-Content-Type-Options': 'nosniff',
@@ -91,8 +91,8 @@ export const SECURITY_HEADERS_BY_TYPE = {
     'Referrer-Policy': 'no-referrer',
     'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), interest-cohort=()',
     'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
-    'Pragma': 'no-cache',
-    'Expires': '0',
-    'X-Powered-By': 'Next.js'
-  }
+    Pragma: 'no-cache',
+    Expires: '0',
+    'X-Powered-By': 'Next.js',
+  },
 };

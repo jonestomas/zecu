@@ -4,35 +4,37 @@ import { z } from 'zod';
 import { jwtVerify } from 'jose';
 
 // Schema de validación
-const updateProfileSchema = z.object({
+const _updateProfileSchema = z.object({
   name: z.string().min(1, 'El nombre es requerido').max(255),
   country: z.string().optional(),
-  city: z.string().optional()
+  city: z.string().optional(),
 });
 
 // Verificar token de sesión
-async function verifySessionToken(token: string): Promise<{ userId: string; phone: string } | null> {
+async function verifySessionToken(
+  token: string
+): Promise<{ userId: string; phone: string } | null> {
   try {
     const jwtSecret = process.env.JWT_SECRET;
-    
+
     if (!jwtSecret) {
       console.error('JWT_SECRET no está configurado en las variables de entorno');
       return null;
     }
 
-    const secret = new TextEncoder().encode(jwtSecret);
+    const secret = new global.TextEncoder().encode(jwtSecret);
 
     const { payload } = await jwtVerify(token, secret);
     return {
       userId: payload.userId as string,
-      phone: payload.phone as string
+      phone: payload.phone as string,
     };
   } catch (error) {
     return null;
   }
 }
 
-export async function POST(request: NextRequest) {
+export async function POST(_request: NextRequest) {
   try {
     // Verificar sesión
     const sessionToken = request.cookies.get('session_token')?.value;
@@ -41,7 +43,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error: 'No autenticado'
+          error: 'No autenticado',
         },
         { status: 401 }
       );
@@ -53,7 +55,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error: 'Sesión inválida'
+          error: 'Sesión inválida',
         },
         { status: 401 }
       );
@@ -81,7 +83,7 @@ export async function POST(request: NextRequest) {
       throw error;
     }
 
-    console.log(`✅ Perfil actualizado para usuario: ${session.phone}`, updateData);
+    console.warn(`✅ Perfil actualizado para usuario: ${session.phone}`, updateData);
 
     return NextResponse.json({
       success: true,
@@ -93,10 +95,9 @@ export async function POST(request: NextRequest) {
         country: user.country,
         city: user.city,
         plan: user.plan,
-        plan_expires_at: user.plan_expires_at
-      }
+        plan_expires_at: user.plan_expires_at,
+      },
     });
-
   } catch (error) {
     console.error('Error en update-profile:', error);
 
@@ -105,7 +106,7 @@ export async function POST(request: NextRequest) {
         {
           success: false,
           error: 'Datos inválidos',
-          details: error.errors
+          details: error.errors,
         },
         { status: 400 }
       );
@@ -115,7 +116,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error: error.message
+          error: error.message,
         },
         { status: 500 }
       );
@@ -124,7 +125,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         success: false,
-        error: 'Error interno del servidor'
+        error: 'Error interno del servidor',
       },
       { status: 500 }
     );

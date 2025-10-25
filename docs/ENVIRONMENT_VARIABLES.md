@@ -5,51 +5,85 @@
 Copia este contenido en tu archivo `.env.local`:
 
 \`\`\`bash
+
 # ===========================================
+
 # Supabase Configuration
+
 # ===========================================
+
 # URL de tu proyecto en Supabase
+
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 
 # Service Role Key (con privilegios administrativos)
+
 # NO expongas esta clave en el frontend
+
 # Encuéntrala en: Settings → API → service_role (secret)
+
 SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.your-key-here
 
 # ===========================================
+
 # JWT Secret for Session Tokens
+
 # ===========================================
+
 # Genera un secreto aleatorio con:
+
 # node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+
 JWT_SECRET=tu-secreto-super-seguro-cambiar-en-produccion
 
 # ===========================================
+
 # n8n Webhook for OTP Sending
+
 # ===========================================
+
 # URL del webhook de n8n que envía WhatsApp
+
 # Formato: https://your-n8n-instance.com/webhook/send-otp
+
 # Déjalo vacío en desarrollo para ver códigos en consola
+
 N8N_WEBHOOK_SEND_OTP_URL=
 
 # ===========================================
+
 # Mercado Pago
+
 # ===========================================
+
 # Access Token de Mercado Pago
+
 # Test: TEST-xxx (sandbox)
+
 # Production: APP_USR-xxx (producción)
+
 MERCADOPAGO_ACCESS_TOKEN=TEST-your-access-token-here
 
 # URL base de tu aplicación (para webhooks y redirects)
+
 NEXT_PUBLIC_BASE_URL=http://localhost:3000
 
 # ===========================================
+
 # Twilio (para n8n workflow)
+
 # ===========================================
+
 # Estas credenciales NO se usan directamente en Next.js
+
 # Se configuran en tu workflow de n8n
+
 # TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
 # TWILIO_AUTH_TOKEN=your-auth-token
+
 # TWILIO_WHATSAPP_FROM=whatsapp:+14155238886
+
 \`\`\`
 
 ---
@@ -74,6 +108,7 @@ https://abcdefghijklmnop.supabase.co
 **Dónde obtenerla:** Supabase Dashboard → Settings → API → service_role (secret)
 
 **⚠️ Importante:**
+
 - Esta clave tiene acceso completo a tu base de datos
 - Solo úsala en el servidor (API Routes)
 - Ignora Row Level Security (RLS)
@@ -113,10 +148,12 @@ https://tu-n8n-instance.com/webhook/send-otp
 \`\`\`
 
 **Desarrollo sin n8n:**
+
 - Déjalo vacío o comenta la línea
 - Los códigos OTP se imprimirán en la consola del servidor
 
 **Producción:**
+
 - Configura tu instancia de n8n
 - Crea el webhook (ver `docs/N8N_WORKFLOW.md`)
 - Pega la URL aquí
@@ -126,15 +163,18 @@ https://tu-n8n-instance.com/webhook/send-otp
 ### MERCADOPAGO_ACCESS_TOKEN
 
 **Tipo:** SECRETO  
-**Dónde obtenerla:** 
+**Dónde obtenerla:**
+
 - Sandbox: [Mercado Pago Developers - Test Credentials](https://www.mercadopago.com.ar/developers/panel/credentials)
 - Producción: [Mercado Pago Developers - Production Credentials](https://www.mercadopago.com.ar/developers/panel/credentials)
 
 **Formatos:**
+
 - **Test (Sandbox):** `TEST-1234567890123456-100000-abcdef123456789`
 - **Producción:** `APP_USR-1234567890123456-100000-abcdef123456789`
 
 **⚠️ Importante:**
+
 - Usa TEST en desarrollo
 - Cambia a APP_USR en producción
 - NUNCA expongas estas credenciales en el código
@@ -148,13 +188,17 @@ https://tu-n8n-instance.com/webhook/send-otp
 
 **Ejemplos:**
 \`\`\`bash
+
 # Desarrollo local
+
 NEXT_PUBLIC_BASE_URL=http://localhost:3000
 
 # Producción en Vercel
+
 NEXT_PUBLIC_BASE_URL=https://zecubot.vercel.app
 
 # Dominio custom
+
 NEXT_PUBLIC_BASE_URL=https://www.zecubot.com
 \`\`\`
 
@@ -166,7 +210,9 @@ NEXT_PUBLIC_BASE_URL=https://www.zecubot.com
 
 \`\`\`bash
 cp docs/ENVIRONMENT_VARIABLES.md .env.local
+
 # Edita .env.local con tus valores reales
+
 \`\`\`
 
 ### 2. Configurar Supabase
@@ -180,7 +226,9 @@ cp docs/ENVIRONMENT_VARIABLES.md .env.local
 
 \`\`\`bash
 node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+
 # Copia el output → JWT_SECRET
+
 \`\`\`
 
 ### 4. Configurar Mercado Pago
@@ -232,6 +280,7 @@ Environment: Production, Preview, Development
 \`\`\`
 
 Repite para:
+
 - `SUPABASE_SERVICE_ROLE_KEY` (solo Production y Preview)
 - `JWT_SECRET` (genera uno nuevo para producción)
 - `N8N_WEBHOOK_SEND_OTP_URL`
@@ -241,17 +290,21 @@ Repite para:
 ### Verificar Deploy
 
 \`\`\`bash
+
 # 1. Trigger redeploy
+
 git push origin main
 
 # 2. Verificar logs en Vercel
+
 # Busca errores relacionados con variables faltantes
 
 # 3. Test en producción
+
 curl https://tu-app.vercel.app/api/auth/send-otp \
-  -X POST \
-  -H "Content-Type: application/json" \
-  -d '{"phone": "+5491112345678"}'
+ -X POST \
+ -H "Content-Type: application/json" \
+ -d '{"phone": "+5491112345678"}'
 \`\`\`
 
 ---
@@ -261,19 +314,21 @@ curl https://tu-app.vercel.app/api/auth/send-otp \
 ### Verificar Variables Localmente
 
 \`\`\`bash
+
 # Verificar que todas las variables están cargadas
+
 node -e "
 require('dotenv').config({ path: '.env.local' });
 const vars = [
-  'NEXT_PUBLIC_SUPABASE_URL',
-  'SUPABASE_SERVICE_ROLE_KEY',
-  'JWT_SECRET',
-  'MERCADOPAGO_ACCESS_TOKEN',
-  'NEXT_PUBLIC_BASE_URL'
+'NEXT_PUBLIC_SUPABASE_URL',
+'SUPABASE_SERVICE_ROLE_KEY',
+'JWT_SECRET',
+'MERCADOPAGO_ACCESS_TOKEN',
+'NEXT_PUBLIC_BASE_URL'
 ];
 vars.forEach(v => {
-  const val = process.env[v];
-  console.log(\`\${v}: \${val ? '✅ Set' : '❌ Missing'}\`);
+const val = process.env[v];
+console.log(\`\${v}: \${val ? '✅ Set' : '❌ Missing'}\`);
 });
 "
 \`\`\`

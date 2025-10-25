@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { 
-  getUserByPhone, 
-  createUser, 
+import {
+  getUserByPhone,
+  createUser,
   verifyOTPCode,
-  invalidateAllOTPCodes
+  invalidateAllOTPCodes,
 } from '@/lib/supabase-client';
 import { normalizePhoneNumber } from '@/lib/phone-utils';
 import { z } from 'zod';
@@ -11,29 +11,30 @@ import { SignJWT } from 'jose';
 import { validateOrigin, logSecurityEvent } from '@/lib/security-headers';
 import { withAuthRateLimit } from '@/lib/rate-limit-middleware';
 import { createLogger, createAuthLogger } from '@/lib/secure-logging';
-import { handleError, handleAuthError, createSecureErrorResponse } from '@/lib/secure-error-handling';
 
 // Schema de validación
-const verifyOTPSchema = z.object({
-  phone: z.string()
+const _verifyOTPSchema = z.object({
+  phone: z
+    .string()
     .min(10, 'Número de teléfono inválido')
     .max(20, 'Número de teléfono inválido')
     .regex(/^\+?[1-9]\d{1,14}$/, 'Formato de teléfono inválido'),
-  code: z.string()
+  code: z
+    .string()
     .length(6, 'El código debe tener 6 dígitos')
     .regex(/^\d{6}$/, 'El código debe contener solo números'),
-  name: z.string().optional()
+  name: z.string().optional(),
 });
 
 // Crear JWT token para sesión
 async function createSessionToken(userId: string, phone: string): Promise<string> {
   const jwtSecret = process.env.JWT_SECRET;
-  
+
   if (!jwtSecret) {
     throw new Error('JWT_SECRET no está configurado en las variables de entorno');
   }
 
-  const secret = new TextEncoder().encode(jwtSecret);
+  const secret = new global.TextEncoder().encode(jwtSecret);
 
   const token = await new SignJWT({ userId, phone })
     .setProtectedHeader({ alg: 'HS256' })
@@ -45,20 +46,17 @@ async function createSessionToken(userId: string, phone: string): Promise<string
 }
 
 // Handler original sin rate limiting
-async function verifyOTPHandler(request: NextRequest) {
-  const logger = createLogger(request);
-  const authLogger = createAuthLogger();
-  
+async function verifyOTPHandler(_request: NextRequest) {
+  const logger = createLogger(_request);
+  const _authLogger = createAuthLogger();
+
   try {
-    logger.info('AUTH', 'OTP verification request initiated');
-    
+    logger.info('AUTH', 'OTP verification _request initiated');
+
     // Validar origen de la solicitud
-    if (!validateOrigin(request)) {
-      logSecurityEvent('INVALID_ORIGIN_VERIFY_OTP', request);
-      return NextResponse.json(
-        { success: false, error: 'Origen no autorizado' },
-        { status: 403 }
-      );
+    if (!validateOrigin(_request)) {
+      logSecurityEvent('INVALID_ORIGIN_VERIFY_OTP', _request);
+      return NextResponse.json({ success: false, error: 'Origen no autorizado' }, { status: 403 });
     }
 
     // Parsear y validar el body
@@ -77,7 +75,7 @@ async function verifyOTPHandler(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error: 'Código inválido o expirado'
+          error: 'Código inválido o expirado',
         },
         { status: 400 }
       );
@@ -95,21 +93,21 @@ async function verifyOTPHandler(request: NextRequest) {
       user = await createUser({
         phone: normalizedPhone,
         name: name || undefined,
-        plan: 'free'
+        plan: 'free',
       });
       isNewUser = true;
       hasSubscription = false; // Usuario nuevo no tiene plan activado aún
 
-      console.log(`✅ Nuevo usuario creado: ${normalizedPhone} - Sin plan activado`);
+      console.warn(`✅ Nuevo usuario creado: ${normalizedPhone} - Sin plan activado`);
     } else {
-      console.log(`✅ Usuario existente verificado: ${normalizedPhone}`);
-      
+      console.warn(`✅ Usuario existente verificado: ${normalizedPhone}`);
+
       // Verificar si ya tiene un plan activo
       // Consideramos que tiene suscripción si ya pasó por el flujo de selección
       // Para simplificar: si tiene nombre guardado, ya completó el onboarding
       hasSubscription = Boolean(user.name);
-      
-      console.log(`📊 hasSubscription: ${hasSubscription} (nombre: ${user.name})`);
+
+      console.warn(`📊 hasSubscription: ${hasSubscription} (nombre: ${user.name})`);
     }
 
     // Invalidar todos los códigos OTP anteriores de este teléfono
@@ -131,8 +129,8 @@ async function verifyOTPHandler(request: NextRequest) {
         country: user.country,
         city: user.city,
         plan: user.plan,
-        plan_expires_at: user.plan_expires_at
-      }
+        plan_expires_at: user.plan_expires_at,
+      },
     });
 
     // Establecer cookie de sesión
@@ -141,16 +139,15 @@ async function verifyOTPHandler(request: NextRequest) {
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       maxAge: 30 * 24 * 60 * 60, // 30 días
-      path: '/'
+      path: '/',
     });
 
     return response;
-
   } catch (error) {
     // Usar el sistema de manejo de errores seguro
-    return handleError(error, request);
+    return handleError(error, _request);
   }
 }
 
 // Exportar función POST con rate limiting aplicado
-export const POST = withAuthRateLimit(verifyOTPHandler);
+export const _POST = withAuthRateLimit(verifyOTPHandler);

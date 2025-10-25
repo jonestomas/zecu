@@ -3,28 +3,30 @@ import { supabaseAdmin } from '@/lib/supabase-client';
 import { jwtVerify } from 'jose';
 
 // Verificar token de sesión
-async function verifySessionToken(token: string): Promise<{ userId: string; phone: string } | null> {
+async function verifySessionToken(
+  token: string
+): Promise<{ userId: string; phone: string } | null> {
   try {
     const jwtSecret = process.env.JWT_SECRET;
-    
+
     if (!jwtSecret) {
       console.error('JWT_SECRET no está configurado en las variables de entorno');
       return null;
     }
 
-    const secret = new TextEncoder().encode(jwtSecret);
+    const secret = new global.TextEncoder().encode(jwtSecret);
 
     const { payload } = await jwtVerify(token, secret);
     return {
       userId: payload.userId as string,
-      phone: payload.phone as string
+      phone: payload.phone as string,
     };
   } catch (error) {
     return null;
   }
 }
 
-export async function POST(request: NextRequest) {
+export async function POST(_request: NextRequest) {
   try {
     // Verificar sesión
     const sessionToken = request.cookies.get('session_token')?.value;
@@ -33,7 +35,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error: 'No autenticado'
+          error: 'No autenticado',
         },
         { status: 401 }
       );
@@ -45,7 +47,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error: 'Sesión inválida'
+          error: 'Sesión inválida',
         },
         { status: 401 }
       );
@@ -69,7 +71,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json(
           {
             success: false,
-            error: 'Ya tienes un plan Plus activo. No puedes activar el plan Free.'
+            error: 'Ya tienes un plan Plus activo. No puedes activar el plan Free.',
           },
           { status: 400 }
         );
@@ -79,9 +81,9 @@ export async function POST(request: NextRequest) {
     // Activar plan Free
     const { data: user, error } = await supabaseAdmin
       .from('users')
-      .update({ 
+      .update({
         plan: 'free',
-        plan_expires_at: null // El plan free no expira
+        plan_expires_at: null, // El plan free no expira
       })
       .eq('id', session.userId)
       .select()
@@ -91,7 +93,7 @@ export async function POST(request: NextRequest) {
       throw error;
     }
 
-    console.log(`✅ Plan Free activado para usuario: ${session.phone} (${session.userId})`);
+    console.warn(`✅ Plan Free activado para usuario: ${session.phone} (${session.userId})`);
 
     return NextResponse.json({
       success: true,
@@ -103,10 +105,9 @@ export async function POST(request: NextRequest) {
         country: user.country,
         city: user.city,
         plan: user.plan,
-        plan_expires_at: user.plan_expires_at
-      }
+        plan_expires_at: user.plan_expires_at,
+      },
     });
-
   } catch (error) {
     console.error('Error en activate-free-plan:', error);
 
@@ -114,7 +115,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error: error.message
+          error: error.message,
         },
         { status: 500 }
       );
@@ -123,7 +124,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         success: false,
-        error: 'Error interno del servidor'
+        error: 'Error interno del servidor',
       },
       { status: 500 }
     );

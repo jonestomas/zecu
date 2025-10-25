@@ -4,45 +4,53 @@ import { supabaseAdmin } from '@/lib/supabase-client';
 import { polar } from '@/lib/polar-config';
 
 // Verificar token de sesión
-async function verifySessionToken(token: string): Promise<{ userId: string; phone: string } | null> {
+async function verifySessionToken(
+  token: string
+): Promise<{ userId: string; phone: string } | null> {
   try {
     const jwtSecret = process.env.JWT_SECRET;
-    
+
     if (!jwtSecret) {
       console.error('JWT_SECRET no está configurado en las variables de entorno');
       return null;
     }
 
-    const secret = new TextEncoder().encode(jwtSecret);
+    const secret = new global.TextEncoder().encode(jwtSecret);
 
     const { payload } = await jwtVerify(token, secret);
     return {
       userId: payload.userId as string,
-      phone: payload.phone as string
+      phone: payload.phone as string,
     };
   } catch (error) {
     return null;
   }
 }
 
-export async function POST(request: NextRequest) {
+export async function POST(_request: NextRequest) {
   try {
     const sessionToken = request.cookies.get('session_token')?.value;
 
     if (!sessionToken) {
-      return NextResponse.json({
-        success: false,
-        error: 'No autenticado'
-      }, { status: 401 });
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'No autenticado',
+        },
+        { status: 401 }
+      );
     }
 
     const session = await verifySessionToken(sessionToken);
 
     if (!session) {
-      return NextResponse.json({
-        success: false,
-        error: 'Sesión inválida'
-      }, { status: 401 });
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Sesión inválida',
+        },
+        { status: 401 }
+      );
     }
 
     // Obtener información del usuario para encontrar la suscripción de Polar
@@ -54,22 +62,25 @@ export async function POST(request: NextRequest) {
 
     if (userError) {
       console.error('Error obteniendo usuario:', userError);
-      return NextResponse.json({
-        success: false,
-        error: 'Error al obtener información del usuario'
-      }, { status: 500 });
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Error al obtener información del usuario',
+        },
+        { status: 500 }
+      );
     }
 
     // Cancelar suscripción en Polar.sh si existe
     if (user.polar_subscription_id) {
       try {
-        console.log(`🔄 Cancelando suscripción en Polar.sh: ${user.polar_subscription_id}`);
-        
+        console.warn(`🔄 Cancelando suscripción en Polar.sh: ${user.polar_subscription_id}`);
+
         await polar.subscriptions.cancel({
-          id: user.polar_subscription_id
+          id: user.polar_subscription_id,
         });
-        
-        console.log(`✅ Suscripción cancelada en Polar.sh: ${user.polar_subscription_id}`);
+
+        console.warn(`✅ Suscripción cancelada en Polar.sh: ${user.polar_subscription_id}`);
       } catch (polarError) {
         console.error('Error cancelando en Polar.sh:', polarError);
         // Continuamos con la cancelación local aunque falle Polar.sh
@@ -92,25 +103,30 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       console.error('Error cancelando suscripción:', error);
-      return NextResponse.json({
-        success: false,
-        error: 'Error al cancelar la suscripción'
-      }, { status: 500 });
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Error al cancelar la suscripción',
+        },
+        { status: 500 }
+      );
     }
 
-    console.log(`✅ Suscripción cancelada completamente para usuario ${session.userId}`);
+    console.warn(`✅ Suscripción cancelada completamente para usuario ${session.userId}`);
 
     return NextResponse.json({
       success: true,
       message: 'Suscripción cancelada exitosamente',
-      newPlan: 'free'
+      newPlan: 'free',
     });
-
   } catch (error) {
     console.error('Error en cancel-subscription:', error);
-    return NextResponse.json({
-      success: false,
-      error: 'Error interno del servidor'
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        success: false,
+        error: 'Error interno del servidor',
+      },
+      { status: 500 }
+    );
   }
 }

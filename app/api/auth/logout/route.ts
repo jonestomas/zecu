@@ -1,29 +1,29 @@
-import { NextResponse } from "next/server"
+import { NextResponse } from 'next/server';
 
 export async function POST() {
   try {
     const response = NextResponse.json({
       success: true,
-      message: "Sesión cerrada exitosamente",
-    })
+      message: 'Sesión cerrada exitosamente',
+    });
 
-    response.cookies.set("session_token", "", {
+    response.cookies.set('session_token', '', {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
       maxAge: 0, // Expire immediately
-      path: "/",
-    })
+      path: '/',
+    });
 
-    return response
+    return response;
   } catch (error) {
-    console.error("Error en logout:", error)
+    console.error('Error en logout:', error);
     return NextResponse.json(
       {
         success: false,
-        error: "Error al cerrar sesión",
+        error: 'Error al cerrar sesión',
       },
-      { status: 500 },
-    )
+      { status: 500 }
+    );
   }
 }

@@ -1,40 +1,40 @@
-"use client"
+'use client';
 
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import Link from "next/link"
-import Image from "next/image"
-import { ArrowLeft, LogOut, TrendingUp, Shield, AlertTriangle, Loader2 } from "lucide-react"
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import Image from 'next/image';
+import { ArrowLeft, LogOut, TrendingUp, Shield, AlertTriangle, Loader2 } from 'lucide-react';
 
 interface UserData {
-  name?: string
-  plan: "free" | "plus" | "premium"
-  plan_expires_at?: string
-  consultas_mes: number
-  consultas_limite: number
-  consultas_restantes: number
-  mes_periodo: string
+  name?: string;
+  plan: 'free' | 'plus' | 'premium';
+  plan_expires_at?: string;
+  consultas_mes: number;
+  consultas_limite: number;
+  consultas_restantes: number;
+  mes_periodo: string;
 }
 
 export default function DashboardPage() {
-  const router = useRouter()
-  const [language, setLanguage] = useState<"es" | "en">("en")
-  const [showUnsubscribeModal, setShowUnsubscribeModal] = useState(false)
-  const [userData, setUserData] = useState<UserData | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [isCancelling, setIsCancelling] = useState(false)
+  const router = useRouter();
+  const [language, setLanguage] = useState<'es' | 'en'>('en');
+  const [showUnsubscribeModal, setShowUnsubscribeModal] = useState(false);
+  const [userData, setUserData] = useState<UserData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isCancelling, setIsCancelling] = useState(false);
 
   useEffect(() => {
     // Obtener datos del usuario desde la sesión
     const fetchUserData = async () => {
       try {
-        const response = await fetch("/api/auth/check-session")
-        const data = await response.json()
+        const response = await fetch('/api/auth/check-session');
+        const data = await response.json();
 
         if (!data.authenticated) {
           // Si no está autenticado, redirigir a login
-          router.push("/login")
-          return
+          router.push('/login');
+          return;
         }
 
         setUserData({
@@ -45,199 +45,204 @@ export default function DashboardPage() {
           consultas_limite: data.consultas_limite,
           consultas_restantes: data.consultas_restantes,
           mes_periodo: data.mes_periodo,
-        })
+        });
       } catch (error) {
-        console.error("Error obteniendo datos del usuario:", error)
-        router.push("/login")
+        console.error('Error obteniendo datos del usuario:', error);
+        router.push('/login');
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
 
-    fetchUserData()
-  }, [router])
+    fetchUserData();
+  }, [router]);
 
-  const handleLogout = () => {
+  const _handleLogout = () => {
     // Eliminar cookie de sesión
-    document.cookie = "session_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"
-    router.push("/")
-  }
+    document.cookie = 'session_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    router.push('/');
+  };
 
-  const handleCancelSubscription = async () => {
-    setIsCancelling(true)
+  const _handleCancelSubscription = async () => {
+    setIsCancelling(true);
 
     try {
-      const response = await fetch("/api/auth/cancel-subscription", {
-        method: "POST",
+      const response = await fetch('/api/auth/cancel-subscription', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
-      })
+      });
 
-      const data = await response.json()
+      const data = await response.json();
 
       if (data.success) {
         // Actualizar estado local
         if (userData) {
           setUserData({
             ...userData,
-            plan: "free",
+            plan: 'free',
             plan_expires_at: undefined,
             consultas_limite: 5,
             consultas_restantes: Math.max(0, 5 - userData.consultas_mes),
-          })
+          });
         }
 
-        setShowUnsubscribeModal(false)
+        setShowUnsubscribeModal(false);
 
         // Mostrar mensaje de éxito (opcional: puedes agregar un toast/notification)
-        alert(
-          language === "es"
-            ? "Tu suscripción ha sido cancelada. Ahora tienes el plan Free."
-            : "Your subscription has been cancelled. You now have the Free plan.",
-        )
+        console.warn(
+          language === 'es'
+            ? 'Tu suscripción ha sido cancelada. Ahora tienes el plan Free.'
+            : 'Your subscription has been cancelled. You now have the Free plan.'
+        );
       } else {
-        alert(
-          language === "es"
-            ? "Error al cancelar la suscripción. Por favor intenta de nuevo."
-            : "Error cancelling subscription. Please try again.",
-        )
+        console.warn(
+          language === 'es'
+            ? 'Error al cancelar la suscripción. Por favor intenta de nuevo.'
+            : 'Error cancelling subscription. Please try again.'
+        );
       }
     } catch (error) {
-      console.error("Error cancelando suscripción:", error)
-      alert(
-        language === "es"
-          ? "Error al cancelar la suscripción. Por favor intenta de nuevo."
-          : "Error cancelling subscription. Please try again.",
-      )
+      console.error('Error cancelando suscripción:', error);
+      console.warn(
+        language === 'es'
+          ? 'Error al cancelar la suscripción. Por favor intenta de nuevo.'
+          : 'Error cancelling subscription. Please try again.'
+      );
     } finally {
-      setIsCancelling(false)
+      setIsCancelling(false);
     }
-  }
+  };
 
   if (isLoading || !userData) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      <div className='min-h-screen bg-background flex items-center justify-center'>
+        <Loader2 className='w-8 h-8 animate-spin text-primary' />
       </div>
-    )
+    );
   }
 
-  const planName = userData.plan === "plus" ? "Plus" : userData.plan === "premium" ? "Premium" : "Free"
+  const _planName =
+    userData.plan === 'plus' ? 'Plus' : userData.plan === 'premium' ? 'Premium' : 'Free';
   const nextRenewal = userData.plan_expires_at
-    ? new Date(userData.plan_expires_at).toLocaleDateString("es-AR", {
-        day: "numeric",
-        month: "long",
-        year: "numeric",
+    ? new Date(userData.plan_expires_at).toLocaleDateString('es-AR', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
       })
-    : "Plan Free (sin vencimiento)"
+    : 'Plan Free (sin vencimiento)';
 
   // Calcular porcentaje de consultas usadas
   const porcentajeUsado =
-    userData.consultas_limite > 0 ? Math.round((userData.consultas_mes / userData.consultas_limite) * 100) : 0
+    userData.consultas_limite > 0
+      ? Math.round((userData.consultas_mes / userData.consultas_limite) * 100)
+      : 0;
 
   // Calcular porcentaje restante
-  const porcentajeRestante = 100 - porcentajeUsado
+  const _porcentajeRestante = 100 - porcentajeUsado;
 
-  const translations = {
+  const _translations = {
     en: {
-      title: "My Dashboard",
-      currentPlan: "Current Plan",
-      analysesRemaining: "Queries Remaining",
-      analysesUsed: "Queries Used",
-      of: "of",
-      thisMonth: "this month",
-      nextRenewal: "Next renewal",
-      unsubscribe: "I want to unsubscribe",
-      upgradePlan: "Upgrade plan",
-      logout: "Log out",
-      backToHome: "Back to home",
-      unsubscribeTitle: "Are you sure?",
-      unsubscribeMessage: "We're sorry to see you go. Are you sure you want to cancel your subscription?",
-      cancel: "Cancel",
-      confirmUnsubscribe: "Yes, unsubscribe",
-      planBenefits: "Your plan benefits",
-      benefit1: "Scam detection",
-      benefit2: "Real-time analysis",
-      benefit3: "Priority support",
-      benefit4: "Automatic updates",
-      freePlanNoExpiry: "Free Plan (no expiration)",
-      available: "available",
-      upgradeMessage: "Upgrade to Plus for more queries! (50 per month)",
-      plusMessage: "You have {limit} queries per month with your Plus plan!",
-      premiumMessage: "You have {limit} queries per month with your Premium plan!",
-      accessMoreFeatures: "Access more features and analyses",
-      cancelSubscription: "Cancel your current subscription",
+      title: 'My Dashboard',
+      currentPlan: 'Current Plan',
+      analysesRemaining: 'Queries Remaining',
+      analysesUsed: 'Queries Used',
+      of: 'of',
+      thisMonth: 'this month',
+      nextRenewal: 'Next renewal',
+      unsubscribe: 'I want to unsubscribe',
+      upgradePlan: 'Upgrade plan',
+      logout: 'Log out',
+      backToHome: 'Back to home',
+      unsubscribeTitle: 'Are you sure?',
+      unsubscribeMessage:
+        "We're sorry to see you go. Are you sure you want to cancel your subscription?",
+      cancel: 'Cancel',
+      confirmUnsubscribe: 'Yes, unsubscribe',
+      planBenefits: 'Your plan benefits',
+      benefit1: 'Scam detection',
+      benefit2: 'Real-time analysis',
+      benefit3: 'Priority support',
+      benefit4: 'Automatic updates',
+      freePlanNoExpiry: 'Free Plan (no expiration)',
+      available: 'available',
+      upgradeMessage: 'Upgrade to Plus for more queries! (50 per month)',
+      plusMessage: 'You have {limit} queries per month with your Plus plan!',
+      premiumMessage: 'You have {limit} queries per month with your Premium plan!',
+      accessMoreFeatures: 'Access more features and analyses',
+      cancelSubscription: 'Cancel your current subscription',
     },
     es: {
-      title: "Mi Dashboard",
-      currentPlan: "Plan Actual",
-      analysesRemaining: "Consultas Restantes",
-      analysesUsed: "Consultas Usadas",
-      of: "de",
-      thisMonth: "este mes",
-      nextRenewal: "Próxima renovación",
-      unsubscribe: "Quiero darme de baja",
-      upgradePlan: "Mejorar plan",
-      logout: "Cerrar sesión",
-      backToHome: "Volver al inicio",
-      unsubscribeTitle: "¿Estás seguro?",
-      unsubscribeMessage: "Lamentamos que quieras irte. ¿Estás seguro de que deseas cancelar tu suscripción?",
-      cancel: "Cancelar",
-      confirmUnsubscribe: "Sí, darme de baja",
-      planBenefits: "Beneficios de tu plan",
-      benefit1: "Detección de estafas",
-      benefit2: "Análisis en tiempo real",
-      benefit3: "Soporte prioritario",
-      benefit4: "Actualizaciones automáticas",
-      freePlanNoExpiry: "Plan Free (sin vencimiento)",
-      available: "disponible",
-      upgradeMessage: "¡Actualiza a Plus para más consultas! (50 al mes)",
-      plusMessage: "¡Tienes {limit} consultas al mes con tu plan Plus!",
-      premiumMessage: "¡Tienes {limit} consultas al mes con tu plan Premium!",
-      accessMoreFeatures: "Accede a más funciones y análisis",
-      cancelSubscription: "Cancelar tu suscripción actual",
+      title: 'Mi Dashboard',
+      currentPlan: 'Plan Actual',
+      analysesRemaining: 'Consultas Restantes',
+      analysesUsed: 'Consultas Usadas',
+      of: 'de',
+      thisMonth: 'este mes',
+      nextRenewal: 'Próxima renovación',
+      unsubscribe: 'Quiero darme de baja',
+      upgradePlan: 'Mejorar plan',
+      logout: 'Cerrar sesión',
+      backToHome: 'Volver al inicio',
+      unsubscribeTitle: '¿Estás seguro?',
+      unsubscribeMessage:
+        'Lamentamos que quieras irte. ¿Estás seguro de que deseas cancelar tu suscripción?',
+      cancel: 'Cancelar',
+      confirmUnsubscribe: 'Sí, darme de baja',
+      planBenefits: 'Beneficios de tu plan',
+      benefit1: 'Detección de estafas',
+      benefit2: 'Análisis en tiempo real',
+      benefit3: 'Soporte prioritario',
+      benefit4: 'Actualizaciones automáticas',
+      freePlanNoExpiry: 'Plan Free (sin vencimiento)',
+      available: 'disponible',
+      upgradeMessage: '¡Actualiza a Plus para más consultas! (50 al mes)',
+      plusMessage: '¡Tienes {limit} consultas al mes con tu plan Plus!',
+      premiumMessage: '¡Tienes {limit} consultas al mes con tu plan Premium!',
+      accessMoreFeatures: 'Accede a más funciones y análisis',
+      cancelSubscription: 'Cancelar tu suscripción actual',
     },
-  }
+  };
 
-  const t = translations[language]
+  const t = translations[language];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className='min-h-screen bg-background'>
       {/* Navbar */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b-2 border-border">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
+      <nav className='fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b-2 border-border'>
+        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
+          <div className='flex items-center justify-between h-20'>
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-              <div className="w-12 h-12 rounded-full overflow-hidden flex items-center justify-center">
+            <Link href='/' className='flex items-center gap-3 hover:opacity-80 transition-opacity'>
+              <div className='w-12 h-12 rounded-full overflow-hidden flex items-center justify-center'>
                 <Image
-                  src="/zecu-logo.png"
-                  alt="Zecubot Logo"
+                  src='/zecu-logo.png'
+                  alt='Zecubot Logo'
                   width={48}
                   height={48}
-                  className="w-full h-full object-contain rounded-full"
+                  className='w-full h-full object-contain rounded-full'
                 />
               </div>
-              <span className="text-2xl font-bold text-foreground">Zecu</span>
+              <span className='text-2xl font-bold text-foreground'>Zecu</span>
             </Link>
 
             {/* Right side */}
-            <div className="flex items-center gap-4">
+            <div className='flex items-center gap-4'>
               {/* Language Toggle */}
               <button
-                onClick={() => setLanguage(language === "es" ? "en" : "es")}
-                className="px-4 py-2 rounded-lg border-2 border-border hover:border-primary transition-colors text-sm font-medium"
+                onClick={() => setLanguage(language === 'es' ? 'en' : 'es')}
+                className='px-4 py-2 rounded-lg border-2 border-border hover:border-primary transition-colors text-sm font-medium'
               >
-                {language === "es" ? "EN" : "ES"}
+                {language === 'es' ? 'EN' : 'ES'}
               </button>
 
               {/* Logout Button */}
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg border-2 border-border hover:border-destructive hover:text-destructive transition-colors text-sm font-medium"
+                className='flex items-center gap-2 px-4 py-2 rounded-lg border-2 border-border hover:border-destructive hover:text-destructive transition-colors text-sm font-medium'
               >
-                <LogOut className="w-4 h-4" />
+                <LogOut className='w-4 h-4' />
                 {t.logout}
               </button>
             </div>
@@ -246,56 +251,57 @@ export default function DashboardPage() {
       </nav>
 
       {/* Main Content */}
-      <main className="pt-28 pb-16 px-4">
-        <div className="max-w-6xl mx-auto">
+      <main className='pt-28 pb-16 px-4'>
+        <div className='max-w-6xl mx-auto'>
           {/* Back to Home Link */}
           <Link
-            href="/"
-            className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-8"
+            href='/'
+            className='inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-8'
           >
-            <ArrowLeft className="w-4 h-4" />
+            <ArrowLeft className='w-4 h-4' />
             {t.backToHome}
           </Link>
 
           {/* Page Title */}
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-12">{t.title}</h1>
+          <h1 className='text-4xl md:text-5xl font-bold text-foreground mb-12'>{t.title}</h1>
 
           {/* Dashboard Grid */}
-          <div className="grid md:grid-cols-2 gap-6 mb-8">
+          <div className='grid md:grid-cols-2 gap-6 mb-8'>
             {/* Current Plan Card */}
-            <div className="glass-card p-8 rounded-2xl">
-              <div className="flex items-start justify-between mb-6">
+            <div className='glass-card p-8 rounded-2xl'>
+              <div className='flex items-start justify-between mb-6'>
                 <div>
-                  <p className="text-muted-foreground text-sm mb-2">{t.currentPlan}</p>
-                  <h2 className="text-4xl font-bold text-foreground">{planName}</h2>
+                  <p className='text-muted-foreground text-sm mb-2'>{t.currentPlan}</p>
+                  <h2 className='text-4xl font-bold text-foreground'>{planName}</h2>
                 </div>
-                <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
-                  <Shield className="w-6 h-6 text-primary" />
+                <div className='w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center'>
+                  <Shield className='w-6 h-6 text-primary' />
                 </div>
               </div>
-              <div className="space-y-2 mb-6">
-                <p className="text-sm text-muted-foreground">
-                  {t.nextRenewal}: <span className="text-foreground font-medium">{nextRenewal}</span>
+              <div className='space-y-2 mb-6'>
+                <p className='text-sm text-muted-foreground'>
+                  {t.nextRenewal}:{' '}
+                  <span className='text-foreground font-medium'>{nextRenewal}</span>
                 </p>
               </div>
               {/* Plan Benefits */}
-              <div className="border-t-2 border-border pt-6">
-                <p className="text-sm font-semibold text-foreground mb-3">{t.planBenefits}</p>
-                <ul className="space-y-2">
-                  <li className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <div className="w-1.5 h-1.5 rounded-full bg-primary"></div>
+              <div className='border-t-2 border-border pt-6'>
+                <p className='text-sm font-semibold text-foreground mb-3'>{t.planBenefits}</p>
+                <ul className='space-y-2'>
+                  <li className='flex items-center gap-2 text-sm text-muted-foreground'>
+                    <div className='w-1.5 h-1.5 rounded-full bg-primary'></div>
                     {t.benefit1}
                   </li>
-                  <li className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <div className="w-1.5 h-1.5 rounded-full bg-primary"></div>
+                  <li className='flex items-center gap-2 text-sm text-muted-foreground'>
+                    <div className='w-1.5 h-1.5 rounded-full bg-primary'></div>
                     {t.benefit2}
                   </li>
-                  <li className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <div className="w-1.5 h-1.5 rounded-full bg-primary"></div>
+                  <li className='flex items-center gap-2 text-sm text-muted-foreground'>
+                    <div className='w-1.5 h-1.5 rounded-full bg-primary'></div>
                     {t.benefit3}
                   </li>
-                  <li className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <div className="w-1.5 h-1.5 rounded-full bg-primary"></div>
+                  <li className='flex items-center gap-2 text-sm text-muted-foreground'>
+                    <div className='w-1.5 h-1.5 rounded-full bg-primary'></div>
                     {t.benefit4}
                   </li>
                 </ul>
@@ -303,48 +309,48 @@ export default function DashboardPage() {
             </div>
 
             {/* Queries Remaining Card */}
-            <div className="glass-card p-8 rounded-2xl">
-              <div className="flex items-start justify-between mb-6">
+            <div className='glass-card p-8 rounded-2xl'>
+              <div className='flex items-start justify-between mb-6'>
                 <div>
-                  <p className="text-muted-foreground text-sm mb-2">{t.analysesRemaining}</p>
-                  <h2 className="text-4xl font-bold text-foreground">
+                  <p className='text-muted-foreground text-sm mb-2'>{t.analysesRemaining}</p>
+                  <h2 className='text-4xl font-bold text-foreground'>
                     {userData.consultas_restantes}
-                    <span className="text-2xl text-muted-foreground ml-2">
+                    <span className='text-2xl text-muted-foreground ml-2'>
                       {t.of} {userData.consultas_limite}
                     </span>
                   </h2>
                 </div>
-                <div className="w-12 h-12 rounded-full bg-chart-2/20 flex items-center justify-center">
-                  <TrendingUp className="w-6 h-6 text-chart-2" />
+                <div className='w-12 h-12 rounded-full bg-chart-2/20 flex items-center justify-center'>
+                  <TrendingUp className='w-6 h-6 text-chart-2' />
                 </div>
               </div>
 
               {/* Consultas Usadas */}
-              <div className="mb-4">
-                <p className="text-sm text-muted-foreground mb-2">
-                  {t.analysesUsed}:{" "}
-                  <span className="text-foreground font-semibold">
+              <div className='mb-4'>
+                <p className='text-sm text-muted-foreground mb-2'>
+                  {t.analysesUsed}:{' '}
+                  <span className='text-foreground font-semibold'>
                     {userData.consultas_mes} {t.of} {userData.consultas_limite}
-                  </span>{" "}
+                  </span>{' '}
                   {t.thisMonth}
                 </p>
               </div>
 
               {/* Progress Bar */}
-              <div className="mb-6">
-                <div className="w-full h-3 bg-muted rounded-full overflow-hidden">
+              <div className='mb-6'>
+                <div className='w-full h-3 bg-muted rounded-full overflow-hidden'>
                   <div
                     className={`h-full transition-all duration-500 ${
                       porcentajeRestante > 50
-                        ? "bg-gradient-to-r from-green-500 to-green-400"
+                        ? 'bg-gradient-to-r from-green-500 to-green-400'
                         : porcentajeRestante > 20
-                          ? "bg-gradient-to-r from-yellow-500 to-yellow-400"
-                          : "bg-gradient-to-r from-red-500 to-red-400"
+                          ? 'bg-gradient-to-r from-yellow-500 to-yellow-400'
+                          : 'bg-gradient-to-r from-red-500 to-red-400'
                     }`}
                     style={{ width: `${porcentajeRestante}%` }}
                   ></div>
                 </div>
-                <p className="text-xs text-muted-foreground mt-2">
+                <p className='text-xs text-muted-foreground mt-2'>
                   {porcentajeRestante}% {t.available}
                 </p>
               </div>
@@ -353,68 +359,70 @@ export default function DashboardPage() {
               <div
                 className={`border-2 rounded-xl p-4 ${
                   porcentajeRestante > 20
-                    ? "bg-primary/10 border-primary/30"
-                    : "bg-destructive/10 border-destructive/30"
+                    ? 'bg-primary/10 border-primary/30'
+                    : 'bg-destructive/10 border-destructive/30'
                 }`}
               >
-                <p className="text-sm text-foreground">
-                  {userData.plan === "free"
+                <p className='text-sm text-foreground'>
+                  {userData.plan === 'free'
                     ? t.upgradeMessage
-                    : userData.plan === "plus"
-                      ? t.plusMessage.replace("{limit}", userData.consultas_limite.toString())
-                      : t.premiumMessage.replace("{limit}", userData.consultas_limite.toString())}
+                    : userData.plan === 'plus'
+                      ? t.plusMessage.replace('{limit}', userData.consultas_limite.toString())
+                      : t.premiumMessage.replace('{limit}', userData.consultas_limite.toString())}
                 </p>
               </div>
             </div>
           </div>
 
           {/* Action Buttons */}
-          <div className={`grid gap-6 ${userData.plan !== "free" ? "md:grid-cols-2" : "md:grid-cols-1"}`}>
+          <div
+            className={`grid gap-6 ${userData.plan !== 'free' ? 'md:grid-cols-2' : 'md:grid-cols-1'}`}
+          >
             {/* Upgrade Plan Button - Solo mostrar si es FREE */}
-            {userData.plan === "free" && (
+            {userData.plan === 'free' && (
               <button
                 onClick={() => {
                   // Guardar intención de compra
                   sessionStorage.setItem(
-                    "pendingPurchase",
+                    'pendingPurchase',
                     JSON.stringify({
-                      planId: "plus",
-                      planName: "Plus",
-                      price: "$10 USD",
+                      planId: 'plus',
+                      planName: 'Plus',
+                      price: '$10 USD',
                       timestamp: Date.now(),
-                    }),
-                  )
+                    })
+                  );
                   // Redirigir a checkout
-                  router.push("/checkout")
+                  router.push('/checkout');
                 }}
-                className="glass-card p-6 rounded-2xl hover:border-primary transition-all group cursor-pointer text-left w-full"
+                className='glass-card p-6 rounded-2xl hover:border-primary transition-all group cursor-pointer text-left w-full'
               >
-                <div className="flex items-center justify-between">
+                <div className='flex items-center justify-between'>
                   <div>
-                    <h3 className="text-xl font-bold text-foreground mb-2 group-hover:text-primary transition-colors">
+                    <h3 className='text-xl font-bold text-foreground mb-2 group-hover:text-primary transition-colors'>
                       {t.upgradePlan}
                     </h3>
-                    <p className="text-sm text-muted-foreground">{t.accessMoreFeatures}</p>
+                    <p className='text-sm text-muted-foreground'>{t.accessMoreFeatures}</p>
                   </div>
-                  <TrendingUp className="w-8 h-8 text-primary" />
+                  <TrendingUp className='w-8 h-8 text-primary' />
                 </div>
               </button>
             )}
 
             {/* Unsubscribe Button - Solo mostrar si es PLUS o PREMIUM */}
-            {userData.plan !== "free" && (
+            {userData.plan !== 'free' && (
               <button
                 onClick={() => setShowUnsubscribeModal(true)}
-                className="glass-card p-6 rounded-2xl hover:border-destructive transition-all group cursor-pointer text-left"
+                className='glass-card p-6 rounded-2xl hover:border-destructive transition-all group cursor-pointer text-left'
               >
-                <div className="flex items-center justify-between">
+                <div className='flex items-center justify-between'>
                   <div>
-                    <h3 className="text-xl font-bold text-foreground mb-2 group-hover:text-destructive transition-colors">
+                    <h3 className='text-xl font-bold text-foreground mb-2 group-hover:text-destructive transition-colors'>
                       {t.unsubscribe}
                     </h3>
-                    <p className="text-sm text-muted-foreground">{t.cancelSubscription}</p>
+                    <p className='text-sm text-muted-foreground'>{t.cancelSubscription}</p>
                   </div>
-                  <AlertTriangle className="w-8 h-8 text-destructive" />
+                  <AlertTriangle className='w-8 h-8 text-destructive' />
                 </div>
               </button>
             )}
@@ -424,28 +432,28 @@ export default function DashboardPage() {
 
       {/* Unsubscribe Modal */}
       {showUnsubscribeModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-secondary/80 backdrop-blur-sm">
-          <div className="glass-card max-w-md w-full p-8 rounded-2xl">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 rounded-full bg-destructive/20 flex items-center justify-center">
-                <AlertTriangle className="w-6 h-6 text-destructive" />
+        <div className='fixed inset-0 z-50 flex items-center justify-center p-4 bg-secondary/80 backdrop-blur-sm'>
+          <div className='glass-card max-w-md w-full p-8 rounded-2xl'>
+            <div className='flex items-center gap-3 mb-4'>
+              <div className='w-12 h-12 rounded-full bg-destructive/20 flex items-center justify-center'>
+                <AlertTriangle className='w-6 h-6 text-destructive' />
               </div>
-              <h2 className="text-2xl font-bold text-foreground">{t.unsubscribeTitle}</h2>
+              <h2 className='text-2xl font-bold text-foreground'>{t.unsubscribeTitle}</h2>
             </div>
-            <p className="text-muted-foreground mb-8">{t.unsubscribeMessage}</p>
-            <div className="flex gap-4">
+            <p className='text-muted-foreground mb-8'>{t.unsubscribeMessage}</p>
+            <div className='flex gap-4'>
               <button
                 onClick={() => setShowUnsubscribeModal(false)}
-                className="flex-1 px-6 py-3 rounded-xl border-2 border-border hover:border-foreground transition-colors font-semibold"
+                className='flex-1 px-6 py-3 rounded-xl border-2 border-border hover:border-foreground transition-colors font-semibold'
               >
                 {t.cancel}
               </button>
               <button
                 onClick={handleCancelSubscription}
                 disabled={isCancelling}
-                className="flex-1 px-6 py-3 rounded-xl bg-destructive hover:bg-destructive/90 text-white font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className='flex-1 px-6 py-3 rounded-xl bg-destructive hover:bg-destructive/90 text-white font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2'
               >
-                {isCancelling && <Loader2 className="w-4 h-4 animate-spin" />}
+                {isCancelling && <Loader2 className='w-4 h-4 animate-spin' />}
                 {t.confirmUnsubscribe}
               </button>
             </div>
@@ -453,5 +461,5 @@ export default function DashboardPage() {
         </div>
       )}
     </div>
-  )
+  );
 }

@@ -22,22 +22,22 @@ class WebhookLogger {
       type: webhookData.type || 'unknown',
       action: webhookData.action || 'unknown',
       paymentId: webhookData.data?.id || 'unknown',
-      raw: webhookData
+      raw: webhookData,
     };
 
     this.logs.unshift(log); // Agregar al inicio
-    
+
     // Mantener solo los últimos 100 logs
     if (this.logs.length > this.maxLogs) {
       this.logs = this.logs.slice(0, this.maxLogs);
     }
 
     // Log en consola para debugging
-    console.log('🔔 Webhook recibido:', {
+    console.warn('🔔 Webhook recibido:', {
       timestamp: log.timestamp,
       type: log.type,
       action: log.action,
-      paymentId: log.paymentId
+      paymentId: log.paymentId,
     });
 
     return log;
@@ -50,7 +50,7 @@ class WebhookLogger {
         ...this.logs[logIndex],
         status: paymentInfo.status,
         amount: paymentInfo.transaction_amount,
-        email: paymentInfo.payer?.email
+        email: paymentInfo.payer?.email,
       };
     }
   }
@@ -68,4 +68,4 @@ class WebhookLogger {
   }
 }
 
-export const webhookLogger = new WebhookLogger();
+export const _webhookLogger = new WebhookLogger();

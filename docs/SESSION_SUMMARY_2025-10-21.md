@@ -3,30 +3,36 @@
 ## ✅ **Lo que logramos hoy:**
 
 ### 1. **Configuración de Supabase MCP** ✅
+
 - Verificada conexión con servidor MCP de Supabase
 - Base de datos operativa con todas las tablas
 
 ### 2. **Corrección de Base de Datos** ✅
+
 - Campo `email` cambiado a nullable
 - Usuarios ahora se pueden crear sin email (solo con teléfono)
 
 ### 3. **Normalización de Números Argentinos** ✅
+
 - Creado `lib/phone-utils.ts`
 - Solución para problema de Twilio que agrega "9" a números argentinos
 - Números ahora se guardan como: `+5491134070204`
 - Sistema encuentra correctamente a usuarios cuando Twilio envía mensajes
 
 ### 4. **Actualización de Número de WhatsApp** ✅
+
 - Número del bot actualizado a: `+1 269 256 2013`
 - Variable de entorno: `NEXT_PUBLIC_WHATSAPP_BOT_NUMBER`
 
 ### 5. **Prueba Completa del Flujo** ✅
+
 - Registro exitoso con OTP
 - Perfil completado (nombre, país, ciudad)
 - Plan Plus activado manualmente
 - Dashboard funcionando correctamente
 
 ### 6. **Cambios en Git** ✅
+
 - Commit: "feat: normalización de números argentinos y actualización de WhatsApp"
 - Push a GitHub: jonestomas/zecu
 - 16 archivos modificados/creados
@@ -36,9 +42,11 @@
 ## 🔧 **Archivos Clave Modificados:**
 
 ### **Nuevos:**
+
 - `lib/phone-utils.ts` - Utilidades de normalización de teléfonos
 
 ### **Actualizados:**
+
 - `app/api/auth/send-otp/route.ts` - Normaliza teléfonos al enviar OTP
 - `app/api/auth/verify-otp/route.ts` - Normaliza teléfonos al verificar OTP
 - `app/welcome/page.tsx` - Nuevo número de WhatsApp
@@ -62,11 +70,13 @@
 ## ⚠️ **Problemas Encontrados:**
 
 ### **Mercado Pago Sandbox:**
+
 - ❌ Botón de pago se queda deshabilitado
 - ❌ Usuarios de prueba no siempre funcionan correctamente
 - ✅ **Solución:** Esto es normal en sandbox, funcionará en producción
 
 ### **Credenciales de Prueba:**
+
 - Confusion entre credenciales TEST y APP_USR
 - ✅ **Aprendido:** Usuarios vendedor de prueba usan credenciales APP_USR (pero siguen siendo de prueba)
 
@@ -117,6 +127,7 @@
 ## 🎯 **Próximos Pasos Inmediatos:**
 
 ### **Para Sesión 1 (OTP en Producción):**
+
 1. Configurar instancia de n8n (cloud o self-hosted)
 2. Crear workflow de envío de WhatsApp con Twilio
 3. Obtener credenciales de Twilio
@@ -125,6 +136,7 @@
 6. Probar envío real de OTP por WhatsApp
 
 ### **Para Sesión 2 (Contabilización):**
+
 1. Crear tabla `user_queries` en Supabase
 2. Implementar lógica de conteo en n8n
 3. API endpoint para verificar límite de consultas
@@ -152,17 +164,19 @@
 ## 💡 **Notas Técnicas:**
 
 ### **Normalización de Teléfonos:**
+
 \`\`\`typescript
 // Argentina: +54 11 3407 0204 → +54 9 11 3407 0204
 normalizePhoneNumber('+541134070204') // '+5491134070204'
 \`\`\`
 
 ### **Variables de Entorno Clave:**
+
 \`\`\`bash
 NEXT_PUBLIC_SUPABASE_URL=https://pguikxzntrotsrqrzwuh.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=[configurado]
 JWT_SECRET=[configurado]
-MERCADOPAGO_ACCESS_TOKEN=TEST-*** (sandbox) o APP_USR-*** (producción)
+MERCADOPAGO_ACCESS_TOKEN=TEST-**_ (sandbox) o APP_USR-_** (producción)
 NEXT_PUBLIC_WHATSAPP_BOT_NUMBER=12692562013
 N8N_WEBHOOK_SEND_OTP_URL= (vacío = modo desarrollo)
 \`\`\`

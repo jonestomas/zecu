@@ -9,7 +9,7 @@ const readline = require('readline');
 
 const rl = readline.createInterface({
   input: process.stdin,
-  output: process.stdout
+  output: process.stdout,
 });
 
 const COLORS = {
@@ -19,17 +19,17 @@ const COLORS = {
   yellow: '\x1b[33m',
   blue: '\x1b[34m',
   cyan: '\x1b[36m',
-  red: '\x1b[31m'
+  red: '\x1b[31m',
 };
 
 function log(message, color = COLORS.reset) {
-  console.log(`${color}${message}${COLORS.reset}`);
+  console.warn(`${color}${message}${COLORS.reset}`);
 }
 
 function header(text) {
-  log('\n' + '='.repeat(70), COLORS.cyan);
+  log(`\n${'='.repeat(70)}`, COLORS.cyan);
   log(`  ${text}`, COLORS.bright + COLORS.cyan);
-  log('='.repeat(70) + '\n', COLORS.cyan);
+  log(`${'='.repeat(70)}\n`, COLORS.cyan);
 }
 
 function section(text) {
@@ -54,7 +54,7 @@ function error(text) {
 }
 
 function question(query) {
-  return new Promise((resolve) => rl.question(query, resolve));
+  return new Promise(resolve => rl.question(query, resolve));
 }
 
 async function showMenu() {
@@ -123,11 +123,11 @@ async function testCase1() {
 
   section('Paso 7: Verificar redirect a /welcome');
   const url = await question('¿Cuál es la URL actual? ');
-  
+
   if (url.includes('/welcome')) {
     success('✓ URL correcta: /welcome');
   } else {
-    error('✗ URL incorrecta. Esperada: /welcome, Actual: ' + url);
+    error(`✗ URL incorrecta. Esperada: /welcome, Actual: ${url}`);
   }
 
   const showsName = await question('¿Muestra "¡Bienvenido, Test User!"? (s/n): ');
@@ -188,10 +188,13 @@ async function testCase2() {
   const paymentId = await question('Ingresa el PAYMENT_ID: ');
 
   log('\nEjecuta este comando en otra terminal:\n', COLORS.cyan);
-  log(`curl http://localhost:3000/api/webhooks/mercadopago \\
+  log(
+    `curl http://localhost:3000/api/webhooks/mercadopago \\
   -X POST \\
   -H "Content-Type: application/json" \\
-  -d '{"type":"payment","data":{"id":${paymentId}}}'`, COLORS.cyan);
+  -d '{"type":"payment","data":{"id":${paymentId}}}'`,
+    COLORS.cyan
+  );
 
   await question('\nPresiona ENTER después de ejecutar el webhook...');
 
@@ -202,17 +205,21 @@ function showSQLQueries() {
   header('📊 Queries SQL Útiles');
 
   section('Ver todos los usuarios');
-  log(`SELECT 
+  log(
+    `SELECT 
   phone, 
   name, 
   plan, 
   plan_expires_at, 
   created_at 
 FROM users 
-ORDER BY created_at DESC;`, COLORS.cyan);
+ORDER BY created_at DESC;`,
+    COLORS.cyan
+  );
 
   section('Ver códigos OTP recientes');
-  log(`SELECT 
+  log(
+    `SELECT 
   phone, 
   code, 
   expires_at, 
@@ -220,44 +227,61 @@ ORDER BY created_at DESC;`, COLORS.cyan);
   created_at 
 FROM otp_codes 
 WHERE created_at > NOW() - INTERVAL '1 hour'
-ORDER BY created_at DESC;`, COLORS.cyan);
+ORDER BY created_at DESC;`,
+    COLORS.cyan
+  );
 
   section('Limpiar usuario de prueba');
-  log(`DELETE FROM users WHERE phone = '+541112345678';
-DELETE FROM otp_codes WHERE phone = '+541112345678';`, COLORS.cyan);
+  log(
+    `DELETE FROM users WHERE phone = '+541112345678';
+DELETE FROM otp_codes WHERE phone = '+541112345678';`,
+    COLORS.cyan
+  );
 
   section('Expirar plan Plus de un usuario');
-  log(`UPDATE users 
+  log(
+    `UPDATE users 
 SET plan_expires_at = NOW() - INTERVAL '1 day'
-WHERE phone = '+541112345678';`, COLORS.cyan);
+WHERE phone = '+541112345678';`,
+    COLORS.cyan
+  );
 }
 
 function showDebuggingCommands() {
   header('🔧 Comandos de Debugging');
 
   section('Verificar sesión (en consola del navegador)');
-  log(`fetch('/api/auth/check-session')
+  log(
+    `fetch('/api/auth/check-session')
   .then(r => r.json())
-  .then(console.log)`, COLORS.cyan);
+  .then(console.log)`,
+    COLORS.cyan
+  );
 
   section('Ver pendingPurchase');
-  log(`console.log(JSON.parse(sessionStorage.getItem('pendingPurchase')))`, COLORS.cyan);
+  log(`console.warn(JSON.parse(sessionStorage.getItem('pendingPurchase')))`, COLORS.cyan);
 
   section('Limpiar sesión');
-  log(`// Limpiar sessionStorage
+  log(
+    `// Limpiar sessionStorage
 sessionStorage.clear()
 
 // Limpiar cookies
 document.cookie = "session_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/"
 
 // Recargar
-location.reload()`, COLORS.cyan);
+location.reload()`,
+    COLORS.cyan
+  );
 
   section('Simular webhook de Mercado Pago');
-  log(`curl http://localhost:3000/api/webhooks/mercadopago \\
+  log(
+    `curl http://localhost:3000/api/webhooks/mercadopago \\
   -X POST \\
   -H "Content-Type: application/json" \\
-  -d '{"type":"payment","data":{"id":PAYMENT_ID}}'`, COLORS.cyan);
+  -d '{"type":"payment","data":{"id":PAYMENT_ID}}'`,
+    COLORS.cyan
+  );
 }
 
 function generateTestPhone() {
@@ -271,7 +295,7 @@ async function main() {
     while (true) {
       const choice = await showMenu();
 
-      switch(choice) {
+      switch (choice) {
         case '1':
           await testCase1();
           break;
@@ -309,7 +333,7 @@ async function main() {
       }
     }
   } catch (err) {
-    error('Error: ' + err.message);
+    error(`Error: ${err.message}`);
     rl.close();
     process.exit(1);
   }

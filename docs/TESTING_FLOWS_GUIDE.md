@@ -16,10 +16,13 @@
 ### 1. Verificar que todo esté configurado
 
 \`\`\`bash
+
 # Verificar variables de entorno
+
 npm run check-env
 
 # Si falta algo, configurarlo en .env.local
+
 \`\`\`
 
 ### 2. Levantar el servidor
@@ -31,13 +34,15 @@ npm run dev
 Deberías ver:
 \`\`\`
 ▲ Next.js 15.2.4
-- Local:        http://localhost:3000
+
+- Local: http://localhost:3000
 - Ready in 2.5s
-\`\`\`
+  \`\`\`
 
 ### 3. Preparar herramientas de testing
 
 **Abrir 3 ventanas:**
+
 1. **Navegador**: http://localhost:3000
 2. **DevTools del navegador**: F12 (para ver console y cookies)
 3. **Terminal del servidor**: Para ver logs del backend
@@ -51,7 +56,7 @@ sessionStorage.clear()
 
 // Limpiar cookies
 document.cookie.split(";").forEach(c => {
-  document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+document.cookie = c.replace(/^ +/, "").replace(/=.\*/, "=;expires=" + new Date().toUTCString() + ";path=/");
 });
 
 // Recargar página
@@ -104,10 +109,11 @@ location.reload()
 
 **Verificación en Supabase:**
 \`\`\`sql
-SELECT * FROM users WHERE phone = '+541112345678';
+SELECT \* FROM users WHERE phone = '+541112345678';
 \`\`\`
 
 Debería mostrar:
+
 - `name`: Test User
 - `country`: Argentina
 - `city`: Buenos Aires
@@ -156,17 +162,18 @@ Debería mostrar:
     # En otra terminal
     # Reemplaza PAYMENT_ID con el ID real del pago (lo ves en la URL de success)
     curl http://localhost:3000/api/webhooks/mercadopago \
-      -X POST \
-      -H "Content-Type: application/json" \
-      -d "{\"type\":\"payment\",\"data\":{\"id\":PAYMENT_ID}}"
+     -X POST \
+     -H "Content-Type: application/json" \
+     -d "{\"type\":\"payment\",\"data\":{\"id\":PAYMENT_ID}}"
     \`\`\`
 
 **Verificación en Supabase:**
 \`\`\`sql
-SELECT * FROM users WHERE phone = '+541112345678';
+SELECT \* FROM users WHERE phone = '+541112345678';
 \`\`\`
 
 Debería mostrar:
+
 - `plan`: plus
 - `plan_expires_at`: fecha 30 días adelante
 
@@ -268,14 +275,14 @@ Debería mostrar:
    // En consola del navegador
    JSON.parse(sessionStorage.getItem('pendingPurchase'))
    \`\`\`
-   
+
    Debería mostrar:
    \`\`\`json
    {
-     "planId": "free",
-     "planName": "Free",
-     "price": "AR$0",
-     "timestamp": 1234567890123
+   "planId": "free",
+   "planName": "Free",
+   "price": "AR$0",
+   "timestamp": 1234567890123
    }
    \`\`\`
 
@@ -310,14 +317,14 @@ Debería mostrar:
    \`\`\`javascript
    JSON.parse(sessionStorage.getItem('pendingPurchase'))
    \`\`\`
-   
+
    Debería mostrar:
    \`\`\`json
    {
-     "planId": "plus",
-     "planName": "Plus",
-     "price": "AR$5.499",
-     "timestamp": 1234567890123
+   "planId": "plus",
+   "planName": "Plus",
+   "price": "AR$5.499",
+   "timestamp": 1234567890123
    }
    \`\`\`
 
@@ -402,17 +409,17 @@ Debería mostrar:
 
 ### Matriz de testing
 
-| Caso | Usuario | Acción | Tiene sesión? | Plan actual | Resultado esperado |
-|------|---------|--------|---------------|-------------|-------------------|
-| 1.1 | Nuevo | Login → Free | No | - | Registro → Perfil → Free → /welcome |
-| 1.2 | Nuevo | Login → Plus | No | - | Registro → Perfil → Pago → /welcome |
-| 1.3 | Existente | Login | No | Sin plan | OTP → Seleccionar plan |
-| 1.4 | Existente | Login | No | Free/Plus | OTP → /dashboard |
-| 2.1 | No auth | Landing Free | No | - | Confirm → Login → Free → /welcome |
-| 2.2 | No auth | Landing Plus | No | - | Confirm → Login → Pago → /welcome |
-| 2.3 | Auth | Landing Free | Sí | Free/Plus | Activar Free → /welcome |
-| 2.4 | Auth | Landing Plus | Sí | Free | Pago → /welcome |
-| 2.5 | Auth | Landing Plus | Sí | Plus activo | Error: "Ya tienes plan Plus" |
+| Caso | Usuario   | Acción       | Tiene sesión? | Plan actual | Resultado esperado                  |
+| ---- | --------- | ------------ | ------------- | ----------- | ----------------------------------- |
+| 1.1  | Nuevo     | Login → Free | No            | -           | Registro → Perfil → Free → /welcome |
+| 1.2  | Nuevo     | Login → Plus | No            | -           | Registro → Perfil → Pago → /welcome |
+| 1.3  | Existente | Login        | No            | Sin plan    | OTP → Seleccionar plan              |
+| 1.4  | Existente | Login        | No            | Free/Plus   | OTP → /dashboard                    |
+| 2.1  | No auth   | Landing Free | No            | -           | Confirm → Login → Free → /welcome   |
+| 2.2  | No auth   | Landing Plus | No            | -           | Confirm → Login → Pago → /welcome   |
+| 2.3  | Auth      | Landing Free | Sí            | Free/Plus   | Activar Free → /welcome             |
+| 2.4  | Auth      | Landing Plus | Sí            | Free        | Pago → /welcome                     |
+| 2.5  | Auth      | Landing Plus | Sí            | Plus activo | Error: "Ya tienes plan Plus"        |
 
 ---
 
@@ -423,19 +430,19 @@ Debería mostrar:
 \`\`\`javascript
 // En consola del navegador
 fetch('/api/auth/check-session')
-  .then(r => r.json())
-  .then(console.log)
+.then(r => r.json())
+.then(console.log)
 \`\`\`
 
 Respuesta:
 \`\`\`json
 {
-  "authenticated": true,
-  "userId": "uuid-...",
-  "phone": "+541112345678",
-  "name": "Test User",
-  "plan": "free",
-  "plan_expires_at": null
+"authenticated": true,
+"userId": "uuid-...",
+"phone": "+541112345678",
+"name": "Test User",
+"plan": "free",
+"plan_expires_at": null
 }
 \`\`\`
 
@@ -449,20 +456,26 @@ console.log(JSON.parse(sessionStorage.getItem('pendingPurchase')))
 ### 3. Ver logs del servidor en tiempo real
 
 \`\`\`bash
+
 # Terminal donde corre npm run dev
+
 # Busca estos logs:
 
 # OTP generado
+
 📱 [DESARROLLO] Código OTP para +5491112345678: 123456
 
 # Usuario verificado
+
 ✅ Usuario existente verificado: +5491112345678
 📊 hasSubscription: true (nombre: Test User)
 
 # Plan activado
+
 ✅ Plan Free activado para usuario: +5491112345678 (uuid-...)
 
 # Pago procesado
+
 ✅ Pago aprobado: 123456789
 ✅ Plan Plus activado para usuario uuid (+5491112345678)
 \`\`\`
@@ -471,23 +484,23 @@ console.log(JSON.parse(sessionStorage.getItem('pendingPurchase')))
 
 \`\`\`sql
 -- Ver todos los usuarios
-SELECT 
-  phone, 
-  name, 
-  plan, 
-  plan_expires_at, 
-  created_at 
-FROM users 
+SELECT
+phone,
+name,
+plan,
+plan_expires_at,
+created_at
+FROM users
 ORDER BY created_at DESC;
 
 -- Ver códigos OTP recientes
-SELECT 
-  phone, 
-  code, 
-  expires_at, 
-  verified,
-  created_at 
-FROM otp_codes 
+SELECT
+phone,
+code,
+expires_at,
+verified,
+created_at
+FROM otp_codes
 WHERE created_at > NOW() - INTERVAL '1 hour'
 ORDER BY created_at DESC;
 
@@ -503,9 +516,11 @@ DELETE FROM otp_codes WHERE phone = '+541112345678';
 ### Problema 1: No aparece el código OTP en la consola
 
 **Síntomas:**
+
 - No ves `📱 [DESARROLLO]` en la terminal
 
 **Soluciones:**
+
 1. Verifica que `N8N_WEBHOOK_SEND_OTP_URL` esté vacío en `.env.local`
 2. Scroll hacia arriba en la terminal
 3. Reinicia el servidor: `Ctrl+C` → `npm run dev`
@@ -515,9 +530,11 @@ DELETE FROM otp_codes WHERE phone = '+541112345678';
 ### Problema 2: "No estás autenticado" al hacer clic en plan
 
 **Síntomas:**
+
 - Error al intentar activar plan o crear pago
 
 **Soluciones:**
+
 1. Verifica que la cookie `session_token` exista:
    \`\`\`javascript
    document.cookie
@@ -533,21 +550,26 @@ DELETE FROM otp_codes WHERE phone = '+541112345678';
 ### Problema 3: Webhook no se ejecuta después del pago
 
 **Síntomas:**
+
 - Pago completa pero el plan no se activa
 
 **Causa:**
+
 - Mercado Pago NO puede enviar webhooks a `localhost`
 
 **Solución:**
 \`\`\`bash
+
 # Simular webhook manualmente
+
 curl http://localhost:3000/api/webhooks/mercadopago \
-  -X POST \
-  -H "Content-Type: application/json" \
-  -d '{"type":"payment","data":{"id":PAYMENT_ID}}'
+ -X POST \
+ -H "Content-Type: application/json" \
+ -d '{"type":"payment","data":{"id":PAYMENT_ID}}'
 \`\`\`
 
 Obtén el `PAYMENT_ID` de:
+
 - URL de success: `/payment/success?payment_id=123456789`
 - Logs del servidor
 - Dashboard de Mercado Pago
@@ -557,9 +579,11 @@ Obtén el `PAYMENT_ID` de:
 ### Problema 4: Usuario se queda en "Seleccionar plan" después de login
 
 **Síntomas:**
+
 - Completó OTP y perfil pero no detecta `pendingPurchase`
 
 **Soluciones:**
+
 1. Verifica que `pendingPurchase` esté en sessionStorage:
    \`\`\`javascript
    sessionStorage.getItem('pendingPurchase')
@@ -572,14 +596,16 @@ Obtén el `PAYMENT_ID` de:
 ### Problema 5: Error "Ya tienes un plan Plus activo"
 
 **Síntomas:**
+
 - Usuario con plan Plus intenta comprar de nuevo
 
 **Solución:**
+
 - Esto es correcto, es una validación
 - Si quieres testear de nuevo:
   \`\`\`sql
   -- Expirar el plan manualmente
-  UPDATE users 
+  UPDATE users
   SET plan_expires_at = NOW() - INTERVAL '1 day'
   WHERE phone = '+541112345678';
   \`\`\`
@@ -610,11 +636,13 @@ Obtén el `PAYMENT_ID` de:
 Si encuentras un bug, repórtalo con este formato:
 
 \`\`\`markdown
+
 ### Bug: [Título descriptivo]
 
 **Caso de prueba:** Caso X.X
 
 **Pasos para reproducir:**
+
 1. ...
 2. ...
 3. ...

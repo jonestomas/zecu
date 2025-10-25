@@ -26,25 +26,25 @@ const nextConfig = {
             key: 'X-XSS-Protection',
             value: '1; mode=block',
           },
-          
+
           // HTTPS enforcement
           {
             key: 'Strict-Transport-Security',
             value: 'max-age=31536000; includeSubDomains; preload',
           },
-          
+
           // Referrer Policy
           {
             key: 'Referrer-Policy',
             value: 'strict-origin-when-cross-origin',
           },
-          
+
           // Permissions Policy
           {
             key: 'Permissions-Policy',
             value: 'camera=(), microphone=(), geolocation=(), interest-cohort=()',
           },
-          
+
           // Ocultar tecnología
           {
             key: 'X-Powered-By',
@@ -70,7 +70,7 @@ const nextConfig = {
           },
         ],
       },
-    ]
+    ];
   },
   eslint: {
     ignoreDuringBuilds: true,
@@ -78,6 +78,6 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-}
+};
 
-export default nextConfig
+export default nextConfig;

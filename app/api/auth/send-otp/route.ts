@@ -4,15 +4,16 @@ import { normalizePhoneNumber } from '@/lib/phone-utils';
 import { z } from 'zod';
 import { withAuthRateLimit } from '@/lib/rate-limit-middleware';
 import { createLogger, createAuthLogger } from '@/lib/secure-logging';
-import { handleError, handleZodError, createSecureErrorResponse } from '@/lib/secure-error-handling';
+import { handleError } from '@/lib/secure-error-handling';
 
 // Schema de validación
-const sendOTPSchema = z.object({
-  phone: z.string()
+const _sendOTPSchema = z.object({
+  phone: z
+    .string()
     .min(10, 'Número de teléfono inválido')
     .max(20, 'Número de teléfono inválido')
     .regex(/^\+?[1-9]\d{1,14}$/, 'Formato de teléfono inválido (debe incluir código de país)'),
-  name: z.string().optional()
+  name: z.string().optional(),
 });
 
 // Generar código OTP de 6 dígitos
@@ -26,7 +27,7 @@ async function sendOTPViaWhatsApp(phone: string, code: string, name?: string) {
 
   if (!n8nWebhookUrl) {
     console.warn('⚠️ N8N_WEBHOOK_SEND_OTP_URL no configurada, saltando envío de WhatsApp');
-    console.log(`📱 [DESARROLLO] Código OTP para ${phone}: ${code}`);
+    console.warn(`📱 [DESARROLLO] Código OTP para ${phone}: ${code}`);
     return;
   }
 
@@ -40,15 +41,15 @@ async function sendOTPViaWhatsApp(phone: string, code: string, name?: string) {
         phone,
         code,
         name: name || 'Usuario',
-        timestamp: new Date().toISOString()
-      })
+        timestamp: new Date().toISOString(),
+      }),
     });
 
     if (!response.ok) {
       throw new Error(`n8n webhook falló: ${response.status}`);
     }
 
-    console.log(`✅ OTP enviado exitosamente a ${phone}`);
+    console.warn(`✅ OTP enviado exitosamente a ${phone}`);
   } catch (error) {
     console.error('❌ Error enviando OTP vía n8n:', error);
     throw new Error('Error al enviar código de verificación');
@@ -56,13 +57,13 @@ async function sendOTPViaWhatsApp(phone: string, code: string, name?: string) {
 }
 
 // Handler original sin rate limiting
-async function sendOTPHandler(request: NextRequest) {
-  const logger = createLogger(request);
+async function sendOTPHandler(_request: NextRequest) {
+  const logger = createLogger(_request);
   const authLogger = createAuthLogger();
-  
+
   try {
-    logger.info('AUTH', 'OTP send request initiated');
-    
+    logger.info('AUTH', 'OTP send _request initiated');
+
     // Parsear y validar el body
     const body = await request.json();
     const validatedData = sendOTPSchema.parse(body);
@@ -71,10 +72,10 @@ async function sendOTPHandler(request: NextRequest) {
 
     // Normalizar el número de teléfono
     const normalizedPhone = normalizePhoneNumber(phone);
-    
-    logger.info('AUTH', 'Phone number normalized', { 
+
+    logger.info('AUTH', 'Phone number normalized', {
       originalPhone: phone.replace(/\d(?=\d{4})/g, '*'),
-      normalizedPhone: normalizedPhone.replace(/\d(?=\d{4})/g, '*')
+      normalizedPhone: normalizedPhone.replace(/\d(?=\d{4})/g, '*'),
     });
 
     // Verificar si el usuario ya existe
@@ -85,19 +86,19 @@ async function sendOTPHandler(request: NextRequest) {
     const otpCode = generateOTPCode();
 
     // Guardar OTP en base de datos
-    await createOTPCode(normalizedPhone, otpCode, 5); // Expira en 5 minutos
+    const otpRecord = await createOTPCode(normalizedPhone, otpCode, 5); // Expira en 5 minutos
 
     // Enviar OTP por WhatsApp
     await sendOTPViaWhatsApp(normalizedPhone, otpCode, name);
-    
-    authLogger.otpSent(request, normalizedPhone, { 
+
+    authLogger.otpSent(_request, normalizedPhone, {
       isNewUser,
-      userId: existingUser?.id ? existingUser.id.substring(0, 8) + '...' : undefined
+      userId: existingUser?.id ? `${existingUser.id.substring(0, 8)}...` : undefined,
     });
 
-    logger.info('AUTH', 'OTP sent successfully', { 
+    logger.info('AUTH', 'OTP sent successfully', {
       isNewUser,
-      otpId: otpRecord.id.substring(0, 8) + '...'
+      otpId: `${otpRecord.id.substring(0, 8)}...`,
     });
 
     // Responder al frontend
@@ -105,14 +106,13 @@ async function sendOTPHandler(request: NextRequest) {
       success: true,
       message: 'Código enviado exitosamente',
       isNewUser,
-      expiresIn: 300 // segundos (5 minutos)
+      expiresIn: 300, // segundos (5 minutos)
     });
-
   } catch (error) {
     // Usar el sistema de manejo de errores seguro
-    return handleError(error, request);
+    return handleError(error, _request);
   }
 }
 
 // Exportar función POST con rate limiting aplicado
-export const POST = withAuthRateLimit(sendOTPHandler);
+export const _POST = withAuthRateLimit(sendOTPHandler);

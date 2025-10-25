@@ -9,6 +9,7 @@
 **Dependencias:** n8n, Twilio
 
 **Pasos:**
+
 - [ ] Configurar cuenta Twilio (o servicio alternativo)
 - [ ] Crear workflow en n8n para envío de WhatsApp
 - [ ] Configurar webhook endpoint en n8n
@@ -17,10 +18,12 @@
 - [ ] Documentar flujo completo
 
 **Archivos a modificar:**
+
 - `.env.local` - Agregar URL de webhook n8n
 - Ningún archivo de código (ya está implementado)
 
 **Recursos:**
+
 - [Twilio WhatsApp Sandbox](https://www.twilio.com/docs/whatsapp/sandbox)
 - [n8n Twilio Node](https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.twilio/)
 
@@ -33,34 +36,38 @@
 **Dependencias:** Supabase, n8n
 
 **Pasos:**
+
 - [ ] Crear tabla `user_queries` en Supabase
-  \`\`\`sql
-  CREATE TABLE user_queries (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_phone VARCHAR(20) NOT NULL,
-    query_type VARCHAR(50), -- 'message_analysis', 'image_analysis', etc
-    timestamp TIMESTAMP DEFAULT NOW(),
-    month_year VARCHAR(7), -- 'YYYY-MM' para agrupar
-    FOREIGN KEY (user_phone) REFERENCES users(phone)
-  );
-  
+      \`\`\`sql
+      CREATE TABLE user_queries (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      user_phone VARCHAR(20) NOT NULL,
+      query_type VARCHAR(50), -- 'message_analysis', 'image_analysis', etc
+      timestamp TIMESTAMP DEFAULT NOW(),
+      month_year VARCHAR(7), -- 'YYYY-MM' para agrupar
+      FOREIGN KEY (user_phone) REFERENCES users(phone)
+      );
+
   CREATE INDEX idx_user_queries_phone_month ON user_queries(user_phone, month_year);
   \`\`\`
 
 - [ ] Crear función para contar consultas del mes
-  \`\`\`sql
-  CREATE OR REPLACE FUNCTION get_monthly_query_count(p_phone VARCHAR)
-  RETURNS INT AS $$
-  BEGIN
-    RETURN (
-      SELECT COUNT(*)
+      \`\`\`sql
+      CREATE OR REPLACE FUNCTION get_monthly_query_count(p_phone VARCHAR)
+      RETURNS INT AS $$
+      BEGIN
+      RETURN (
+      SELECT COUNT(\*)
       FROM user_queries
       WHERE user_phone = p_phone
       AND month_year = TO_CHAR(NOW(), 'YYYY-MM')
-    );
-  END;
-  $$ LANGUAGE plpgsql;
+      );
+      END;
+
+  $$
+  LANGUAGE plpgsql;
   \`\`\`
+  $$
 
 - [ ] API endpoint `/api/queries/check-limit`
 - [ ] Implementar lógica en n8n para:
@@ -74,10 +81,12 @@
   - Fecha de reset (próximo mes)
 
 **Límites por Plan:**
+
 - **Free:** 5 consultas/mes
 - **Plus:** 50 consultas/mes
 
 **Archivos a crear/modificar:**
+
 - `supabase/migrations/004_create_user_queries_table.sql`
 - `app/api/queries/check-limit/route.ts`
 - `app/api/queries/increment/route.ts`
@@ -93,6 +102,7 @@
 **Dependencias:** Mercado Pago API
 
 **Pasos:**
+
 - [ ] Investigar API de Mercado Pago para cancelar suscripciones
 - [ ] API endpoint `/api/subscription/cancel`
 - [ ] UI en dashboard con botón "Cancelar suscripción"
@@ -104,6 +114,7 @@
   - Enviar email de confirmación (opcional)
 
 **Flujo:**
+
 1. Usuario hace clic en "Cancelar suscripción"
 2. Modal: "¿Estás seguro? Mantendrás acceso hasta [fecha]"
 3. Confirma → Cancela en MP → Actualiza DB
@@ -111,12 +122,14 @@
 5. Al expirar → Downgrade a Free
 
 **Archivos a crear/modificar:**
+
 - `app/api/subscription/cancel/route.ts`
 - `app/dashboard/page.tsx` - Agregar botón/modal
 - `components/cancel-subscription-modal.tsx`
 - `lib/mercadopago.ts` - Función para cancelar
 
 **Documentación:**
+
 - [Mercado Pago - Cancelar suscripción](https://www.mercadopago.com.ar/developers/es/reference/subscriptions/_preapproval_id/put)
 
 ---
@@ -130,12 +143,14 @@
 **Dependencias:** Ninguna
 
 **Objetivos:**
+
 - [ ] Mejorar detección de patrones de estafa argentinos
 - [ ] Agregar ejemplos de mensajes legítimos vs estafas
 - [ ] Respuestas más claras y accionables
 - [ ] Tono amigable pero serio
 
 **Casos de Uso Específicos:**
+
 - Phishing de bancos argentinos (Galicia, Santander, BBVA, etc.)
 - Estafas de ANSES/AFIP
 - Delivery falso (Rappi, PedidosYa)
@@ -143,6 +158,7 @@
 - Ofertas de trabajo fraudulentas
 
 **Estructura del Prompt:**
+
 1. **Contexto:** Eres experto en ciberseguridad argentino
 2. **Tarea:** Analizar mensaje y determinar nivel de riesgo
 3. **Criterios:** Patrones comunes de estafas
@@ -153,6 +169,7 @@
    - Qué hacer si ya compartiste datos
 
 **Archivo:**
+
 - Workflow n8n - Nodo de prompt AI
 
 ---
@@ -164,6 +181,7 @@
 **Dependencias:** n8n
 
 **Mejoras:**
+
 - [ ] Menú principal con opciones
 - [ ] Manejo de contexto/historial
 - [ ] Respuestas rápidas (quick replies)
@@ -185,6 +203,7 @@ Responde con el número o envía directamente el mensaje.
 \`\`\`
 
 **Archivo:**
+
 - Workflow n8n - Reestructurar flujo
 
 ---
@@ -198,6 +217,7 @@ Responde con el número o envía directamente el mensaje.
 **Dependencias:** Dominio/Vercel
 
 **Opciones:**
+
 1. **Vercel (Recomendado):**
    - Deploy automático desde GitHub
    - URL: `https://zecu.vercel.app/api/webhooks/mercadopago`
@@ -209,6 +229,7 @@ Responde con el número o envía directamente el mensaje.
    - Solo para pruebas locales
 
 **Pasos:**
+
 - [ ] Deploy a Vercel
 - [ ] Configurar variables de entorno en Vercel
 - [ ] Configurar webhook en Mercado Pago con URL pública
@@ -223,6 +244,7 @@ Responde con el número o envía directamente el mensaje.
 **Dependencias:** Cuenta Mercado Pago verificada
 
 **Pasos:**
+
 - [ ] Verificar cuenta de Mercado Pago (datos fiscales)
 - [ ] Obtener credenciales de producción (`APP_USR-xxx`)
 - [ ] Actualizar `.env.local` o variables de Vercel
@@ -230,6 +252,7 @@ Responde con el número o envía directamente el mensaje.
 - [ ] Verificar que no haya credenciales TEST en producción
 
 **Archivo:**
+
 - `.env.local` → Vercel Environment Variables
 
 ---
@@ -241,6 +264,7 @@ Responde con el número o envía directamente el mensaje.
 **Dependencias:** Todo lo anterior
 
 **Checklist:**
+
 - [ ] Pago real con tarjeta propia ($1 o monto mínimo)
 - [ ] Verificar que webhook se recibe
 - [ ] Plan se actualiza correctamente
@@ -255,13 +279,13 @@ Responde con el número o envía directamente el mensaje.
 
 ## 📊 **Progreso General**
 
-| Categoría | Completado | Pendiente | Total |
-|-----------|------------|-----------|-------|
-| 🔐 Autenticación | 90% | 10% | 100% |
-| 💳 Pagos | 70% | 30% | 100% |
-| 🤖 Bot WhatsApp | 30% | 70% | 100% |
-| 📊 Dashboard | 80% | 20% | 100% |
-| 🚀 Producción | 0% | 100% | 100% |
+| Categoría        | Completado | Pendiente | Total |
+| ---------------- | ---------- | --------- | ----- |
+| 🔐 Autenticación | 90%        | 10%       | 100%  |
+| 💳 Pagos         | 70%        | 30%       | 100%  |
+| 🤖 Bot WhatsApp  | 30%        | 70%       | 100%  |
+| 📊 Dashboard     | 80%        | 20%       | 100%  |
+| 🚀 Producción    | 0%         | 100%      | 100%  |
 
 **Total General:** ~54% completado
 

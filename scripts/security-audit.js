@@ -14,7 +14,7 @@ const CONFIG = {
   outputDir: './security-reports',
   reportFile: 'dependency-audit.json',
   criticalThreshold: 'high',
-  moderateThreshold: 'moderate'
+  moderateThreshold: 'moderate',
 };
 
 // Colores para consola
@@ -24,11 +24,11 @@ const colors = {
   green: '\x1b[32m',
   blue: '\x1b[34m',
   reset: '\x1b[0m',
-  bold: '\x1b[1m'
+  bold: '\x1b[1m',
 };
 
 function log(message, color = 'reset') {
-  console.log(`${colors[color]}${message}${colors.reset}`);
+  console.warn(`${colors[color]}${message}${colors.reset}`);
 }
 
 function createOutputDir() {
@@ -40,13 +40,13 @@ function createOutputDir() {
 
 function runAudit() {
   log('🔍 Ejecutando auditoría de dependencias...', 'blue');
-  
+
   try {
-    const auditOutput = execSync('pnpm audit --json', { 
+    const auditOutput = execSync('pnpm audit --json', {
       encoding: 'utf8',
-      cwd: process.cwd()
+      cwd: process.cwd(),
     });
-    
+
     const auditData = JSON.parse(auditOutput);
     return auditData;
   } catch (error) {
@@ -74,7 +74,7 @@ function analyzeVulnerabilities(auditData) {
       high: 0,
       moderate: 0,
       low: 0,
-      vulnerabilities: []
+      vulnerabilities: [],
     };
   }
 
@@ -85,12 +85,12 @@ function analyzeVulnerabilities(auditData) {
     high: 0,
     moderate: 0,
     low: 0,
-    vulnerabilities: []
+    vulnerabilities: [],
   };
 
   vulnerabilities.forEach(vuln => {
     const severity = vuln.severity?.toLowerCase() || 'unknown';
-    
+
     switch (severity) {
       case 'critical':
         analysis.critical++;
@@ -114,7 +114,7 @@ function analyzeVulnerabilities(auditData) {
       recommendation: vuln.recommendation,
       paths: vuln.paths,
       cwe: vuln.cwe,
-      cvss: vuln.cvss
+      cvss: vuln.cvss,
     });
   });
 
@@ -129,15 +129,15 @@ function generateReport(analysis) {
       critical: analysis.critical,
       high: analysis.high,
       moderate: analysis.moderate,
-      low: analysis.low
+      low: analysis.low,
     },
     vulnerabilities: analysis.vulnerabilities,
-    recommendations: generateRecommendations(analysis)
+    recommendations: generateRecommendations(analysis),
   };
 
   const reportPath = path.join(CONFIG.outputDir, CONFIG.reportFile);
   fs.writeFileSync(reportPath, JSON.stringify(report, null, 2));
-  
+
   log(`📊 Reporte generado: ${reportPath}`, 'green');
   return report;
 }
@@ -151,7 +151,7 @@ function generateRecommendations(analysis) {
       action: 'Actualizar inmediatamente las dependencias críticas',
       packages: analysis.vulnerabilities
         .filter(v => v.severity?.toLowerCase() === 'critical')
-        .map(v => v.package)
+        .map(v => v.package),
     });
   }
 
@@ -161,7 +161,7 @@ function generateRecommendations(analysis) {
       action: 'Actualizar dependencias de alta prioridad en las próximas 24 horas',
       packages: analysis.vulnerabilities
         .filter(v => v.severity?.toLowerCase() === 'high')
-        .map(v => v.package)
+        .map(v => v.package),
     });
   }
 
@@ -171,7 +171,7 @@ function generateRecommendations(analysis) {
       action: 'Planificar actualización de dependencias moderadas',
       packages: analysis.vulnerabilities
         .filter(v => v.severity?.toLowerCase() === 'moderate')
-        .map(v => v.package)
+        .map(v => v.package),
     });
   }
 
@@ -179,7 +179,7 @@ function generateRecommendations(analysis) {
     recommendations.push({
       priority: 'INFO',
       action: 'Mantener auditorías regulares',
-      packages: []
+      packages: [],
     });
   }
 
@@ -189,11 +189,13 @@ function generateRecommendations(analysis) {
 function printSummary(report) {
   log('\n📋 RESUMEN DE AUDITORÍA', 'bold');
   log('═'.repeat(50), 'blue');
-  
+
   log(`📅 Fecha: ${new Date(report.timestamp).toLocaleString()}`, 'blue');
-  log(`📦 Total de vulnerabilidades: ${report.summary.total}`, 
-      report.summary.total > 0 ? 'red' : 'green');
-  
+  log(
+    `📦 Total de vulnerabilidades: ${report.summary.total}`,
+    report.summary.total > 0 ? 'red' : 'green'
+  );
+
   if (report.summary.total > 0) {
     log(`🔴 Críticas: ${report.summary.critical}`, 'red');
     log(`🟠 Altas: ${report.summary.high}`, 'yellow');
@@ -203,15 +205,14 @@ function printSummary(report) {
 
   log('\n🎯 RECOMENDACIONES:', 'bold');
   report.recommendations.forEach(rec => {
-    const color = rec.priority === 'CRITICAL' ? 'red' : 
-                  rec.priority === 'HIGH' ? 'yellow' : 'blue';
+    const color = rec.priority === 'CRITICAL' ? 'red' : rec.priority === 'HIGH' ? 'yellow' : 'blue';
     log(`• ${rec.priority}: ${rec.action}`, color);
     if (rec.packages.length > 0) {
       log(`  Paquetes: ${rec.packages.join(', ')}`, 'blue');
     }
   });
 
-  log('\n' + '═'.repeat(50), 'blue');
+  log(`\n${'═'.repeat(50)}`, 'blue');
 }
 
 function main() {
@@ -219,11 +220,11 @@ function main() {
   log('═'.repeat(50), 'blue');
 
   createOutputDir();
-  
+
   const auditData = runAudit();
   const analysis = analyzeVulnerabilities(auditData);
   const report = generateReport(analysis);
-  
+
   printSummary(report);
 
   // Código de salida basado en severidad

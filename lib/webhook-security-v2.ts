@@ -2,7 +2,7 @@ import crypto from 'crypto';
 import { NextRequest } from 'next/server';
 
 // Configuración de seguridad
-const WEBHOOK_CONFIG = {
+const _WEBHOOK_CONFIG = {
   MAX_PAYLOAD_SIZE: 1024 * 1024, // 1MB máximo
   RATE_LIMIT_WINDOW: 60 * 1000, // 1 minuto
   MAX_REQUESTS_PER_WINDOW: 100,
@@ -16,20 +16,23 @@ const WEBHOOK_CONFIG = {
     '200.115.53.198',
     '200.115.53.199',
     // Agregar más IPs según la documentación oficial
-  ]
+  ],
 };
 
 // Rate limiting simple en memoria (en producción usar Redis)
-const requestCounts = new Map<string, { count: number; window: number }>();
+const _requestCounts = new Map<string, { count: number; window: number }>();
 
 export class WebhookSecurityError extends Error {
-  constructor(message: string, public code: string) {
+  constructor(
+    message: string,
+    public code: string
+  ) {
     super(message);
     this.name = 'WebhookSecurityError';
   }
 }
 
-export async function validateWebhookSecurity(request: NextRequest): Promise<boolean> {
+export async function validateWebhookSecurity(_request: NextRequest): Promise<boolean> {
   // 1. Validar Content-Type
   const contentType = request.headers.get('content-type');
   if (!contentType?.includes('application/json')) {
@@ -43,7 +46,7 @@ export async function validateWebhookSecurity(request: NextRequest): Promise<boo
   }
 
   // 3. Rate limiting por IP
-  const clientIP = getClientIP(request);
+  const clientIP = getClientIP(_request);
   if (!checkRateLimit(clientIP)) {
     throw new WebhookSecurityError('Rate limit excedido', 'RATE_LIMIT_EXCEEDED');
   }
@@ -65,10 +68,7 @@ export function validateWebhookSignature(
 ): boolean {
   try {
     // Mercado Pago usa HMAC-SHA256
-    const expectedSignature = crypto
-      .createHmac('sha256', secret)
-      .update(payload)
-      .digest('hex');
+    const expectedSignature = crypto.createHmac('sha256', secret).update(payload).digest('hex');
 
     // Comparación segura para evitar timing attacks
     return crypto.timingSafeEqual(
@@ -84,16 +84,16 @@ export function validateWebhookSignature(
 export function sanitizeWebhookData(data: any): any {
   // Remover campos potencialmente peligrosos
   const sanitized = { ...data };
-  
+
   // Lista de campos a remover por seguridad
   const sensitiveFields = ['__proto__', 'constructor', 'prototype'];
-  
+
   function cleanObject(obj: any): any {
     if (obj && typeof obj === 'object') {
       for (const field of sensitiveFields) {
         delete obj[field];
       }
-      
+
       // Recursivamente limpiar objetos anidados
       for (const key in obj) {
         if (obj.hasOwnProperty(key)) {
@@ -103,16 +103,16 @@ export function sanitizeWebhookData(data: any): any {
     }
     return obj;
   }
-  
+
   return cleanObject(sanitized);
 }
 
-function getClientIP(request: NextRequest): string {
+function getClientIP(_request: NextRequest): string {
   // Intentar obtener IP real (considerando proxies)
   const forwarded = request.headers.get('x-forwarded-for');
   const realIP = request.headers.get('x-real-ip');
   const cloudflareIP = request.headers.get('cf-connecting-ip');
-  
+
   // Usar la IP más confiable disponible
   return cloudflareIP || realIP || forwarded?.split(',')[0] || 'unknown';
 }
@@ -120,10 +120,10 @@ function getClientIP(request: NextRequest): string {
 function checkRateLimit(ip: string): boolean {
   const now = Date.now();
   const windowStart = Math.floor(now / WEBHOOK_CONFIG.RATE_LIMIT_WINDOW);
-  
+
   const key = `${ip}-${windowStart}`;
   const current = requestCounts.get(key) || { count: 0, window: windowStart };
-  
+
   if (current.window < windowStart) {
     // Nueva ventana de tiempo
     current.count = 1;
@@ -131,18 +131,18 @@ function checkRateLimit(ip: string): boolean {
   } else {
     current.count++;
   }
-  
+
   requestCounts.set(key, current);
-  
+
   // Limpiar entradas antiguas
-  setTimeout(() => {
-    for (const [k, v] of requestCounts.entries()) {
+  window.setTimeout(() => {
+    for (const [k, v] of _requestCounts.entries()) {
       if (v.window < windowStart - 1) {
         requestCounts.delete(k);
       }
     }
   }, 1000);
-  
+
   return current.count <= WEBHOOK_CONFIG.MAX_REQUESTS_PER_WINDOW;
 }
 
@@ -153,7 +153,7 @@ function isAllowedIP(ip: string): boolean {
       return true;
     }
   }
-  
+
   return WEBHOOK_CONFIG.ALLOWED_IPs.includes(ip);
 }
 
@@ -165,8 +165,8 @@ export function logWebhookSecurely(data: any, ip: string) {
     action: data.action,
     paymentId: data.data?.id ? `***${data.data.id.slice(-4)}` : 'unknown',
     ip: ip.replace(/\d+$/, 'xxx'), // Ofuscar último octeto de IP
-    userAgent: 'MercadoPago-Webhook'
+    userAgent: 'MercadoPago-Webhook',
   };
-  
-  console.log('🔔 Webhook seguro recibido:', safeLog);
+
+  console.warn('🔔 Webhook seguro recibido:', safeLog);
 }

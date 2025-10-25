@@ -7,7 +7,7 @@ Sistema implementado donde el usuario **DEBE** registrarse o autenticarse **ANTE
 ✅ Todos los pagos estén asociados a un usuario existente  
 ✅ No haya usuarios "fantasma" creados después del pago  
 ✅ El tracking sea más preciso  
-✅ La experiencia del usuario sea más clara  
+✅ La experiencia del usuario sea más clara
 
 ---
 
@@ -19,10 +19,10 @@ El usuario navega por el landing y ve el plan Plus (AR$5.499/mes).
 
 \`\`\`
 ┌─────────────────────────────────┐
-│   Landing Page (app/page.tsx)   │
-│                                  │
-│   Plan Plus: AR$5.499/mes       │
-│   [Suscribirse a Plus]          │
+│ Landing Page (app/page.tsx) │
+│ │
+│ Plan Plus: AR$5.499/mes │
+│ [Suscribirse a Plus] │
 └─────────────────────────────────┘
 \`\`\`
 
@@ -34,26 +34,27 @@ El botón `PlusPlanPaymentButton` verifica si el usuario está autenticado.
 
 \`\`\`typescript
 const handlePayment = async () => {
-  // 1. Verificar sesión
-  const sessionCheck = await fetch("/api/auth/check-session")
-  const { authenticated } = await sessionCheck.json()
+// 1. Verificar sesión
+const sessionCheck = await fetch("/api/auth/check-session")
+const { authenticated } = await sessionCheck.json()
 
-  if (!authenticated) {
-    // Guardar intención de compra
-    sessionStorage.setItem("pendingPurchase", JSON.stringify({
-      planId: "plus",
-      planName: "Plus",
-      price: "AR$5.499",
-      timestamp: Date.now()
-    }))
-    
+if (!authenticated) {
+// Guardar intención de compra
+sessionStorage.setItem("pendingPurchase", JSON.stringify({
+planId: "plus",
+planName: "Plus",
+price: "AR$5.499",
+timestamp: Date.now()
+}))
+
     // Redirigir a login
     window.location.href = "/login"
     return
-  }
 
-  // Usuario autenticado → Continuar al pago
-  // ...
+}
+
+// Usuario autenticado → Continuar al pago
+// ...
 }
 \`\`\`
 
@@ -64,13 +65,14 @@ Si el usuario no está autenticado, se le redirige a `/login`.
 **Flujo de autenticación OTP:**
 
 \`\`\`
+
 1. Usuario ingresa teléfono (+54911...)
    ↓
 2. POST /api/auth/send-otp
    - Genera código de 6 dígitos
    - Guarda en tabla `otp_codes`
    - Envía por WhatsApp (vía n8n → Twilio)
-   ↓
+     ↓
 3. Usuario recibe WhatsApp:
    "Hola! Tu código Zecubot es: 123456"
    ↓
@@ -82,9 +84,9 @@ Si el usuario no está autenticado, se le redirige a `/login`.
    - Si es usuario existente: valida
    - Crea JWT session token
    - Establece cookie `session_token`
-   ↓
+     ↓
 6. Usuario autenticado ✅
-\`\`\`
+   \`\`\`
 
 ### 4️⃣ Checkout Automático
 
@@ -94,27 +96,28 @@ Después del login exitoso, el frontend detecta la `pendingPurchase` en `session
 
 \`\`\`typescript
 useEffect(() => {
-  const processPendingPurchase = async () => {
-    // 1. Verificar autenticación
-    const { authenticated } = await fetch("/api/auth/check-session").then(r => r.json())
-    
+const processPendingPurchase = async () => {
+// 1. Verificar autenticación
+const { authenticated } = await fetch("/api/auth/check-session").then(r => r.json())
+
     // 2. Obtener compra pendiente
     const purchase = JSON.parse(sessionStorage.getItem("pendingPurchase"))
-    
+
     // 3. Crear preferencia de pago
     const { initPoint } = await fetch("/api/create-payment", {
       method: "POST",
       body: JSON.stringify({ planId: purchase.planId })
     }).then(r => r.json())
-    
+
     // 4. Limpiar pendingPurchase
     sessionStorage.removeItem("pendingPurchase")
-    
+
     // 5. Redirigir a Mercado Pago
     window.location.href = initPoint
-  }
-  
-  processPendingPurchase()
+
+}
+
+processPendingPurchase()
 }, [])
 \`\`\`
 
@@ -124,33 +127,33 @@ useEffect(() => {
 
 \`\`\`typescript
 export async function POST(request: NextRequest) {
-  // 1. Verificar JWT token en cookie
-  const sessionToken = request.cookies.get('session_token')?.value
-  if (!sessionToken) {
-    return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
-  }
+// 1. Verificar JWT token en cookie
+const sessionToken = request.cookies.get('session_token')?.value
+if (!sessionToken) {
+return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
+}
 
-  const session = await verifySessionToken(sessionToken)
-  
-  // 2. Obtener usuario de la base de datos
-  const user = await getUserByPhone(session.phone)
-  
-  // 3. Validar que no tenga plan Plus activo
-  if (user.plan === 'plus' && user.plan_expires_at > new Date()) {
-    return NextResponse.json({ error: 'Ya tienes plan Plus' }, { status: 400 })
-  }
-  
-  // 4. Crear preferencia con metadata del usuario
-  const preference = await createPaymentPreference(planId, user.email, {
-    userId: user.id,
-    phone: user.phone,
-    name: user.name
-  })
-  
-  return NextResponse.json({
-    initPoint: preference.init_point,
-    sandboxInitPoint: preference.sandbox_init_point
-  })
+const session = await verifySessionToken(sessionToken)
+
+// 2. Obtener usuario de la base de datos
+const user = await getUserByPhone(session.phone)
+
+// 3. Validar que no tenga plan Plus activo
+if (user.plan === 'plus' && user.plan_expires_at > new Date()) {
+return NextResponse.json({ error: 'Ya tienes plan Plus' }, { status: 400 })
+}
+
+// 4. Crear preferencia con metadata del usuario
+const preference = await createPaymentPreference(planId, user.email, {
+userId: user.id,
+phone: user.phone,
+name: user.name
+})
+
+return NextResponse.json({
+initPoint: preference.init_point,
+sandboxInitPoint: preference.sandbox_init_point
+})
 }
 \`\`\`
 
@@ -158,12 +161,12 @@ export async function POST(request: NextRequest) {
 
 \`\`\`json
 {
-  "metadata": {
-    "user_id": "uuid-del-usuario",
-    "user_phone": "+5491112345678",
-    "plan_id": "plus"
-  },
-  "external_reference": "zecu-plus-uuid-del-usuario-1696800000"
+"metadata": {
+"user_id": "uuid-del-usuario",
+"user_phone": "+5491112345678",
+"plan_id": "plus"
+},
+"external_reference": "zecu-plus-uuid-del-usuario-1696800000"
 }
 \`\`\`
 
@@ -173,12 +176,12 @@ El usuario completa el pago en el checkout de Mercado Pago.
 
 \`\`\`
 ┌─────────────────────────────────┐
-│   Mercado Pago Checkout         │
-│                                  │
-│   Plan Plus - Zecu              │
-│   AR$ 5.499                     │
-│                                  │
-│   [Pagar con tarjeta]           │
+│ Mercado Pago Checkout │
+│ │
+│ Plan Plus - Zecu │
+│ AR$ 5.499 │
+│ │
+│ [Pagar con tarjeta] │
 └─────────────────────────────────┘
 \`\`\`
 
@@ -190,21 +193,21 @@ Cuando el pago es aprobado, Mercado Pago envía un webhook.
 
 \`\`\`typescript
 async function handleApprovedPayment(paymentInfo: any) {
-  // 1. Extraer metadata
-  const metadata = paymentInfo.metadata
-  const userId = metadata.user_id
-  const userPhone = metadata.user_phone
-  const planId = metadata.plan_id
-  
-  // 2. Buscar usuario en base de datos
-  const user = await getUserByPhone(userPhone)
-  
-  // 3. Verificar que el userId coincida (seguridad)
-  if (user.id === userId) {
-    // 4. Activar plan Plus
-    await updateUserPlan(userPhone, 'plus')
-    // plan_expires_at = now + 30 días
-    
+// 1. Extraer metadata
+const metadata = paymentInfo.metadata
+const userId = metadata.user_id
+const userPhone = metadata.user_phone
+const planId = metadata.plan_id
+
+// 2. Buscar usuario en base de datos
+const user = await getUserByPhone(userPhone)
+
+// 3. Verificar que el userId coincida (seguridad)
+if (user.id === userId) {
+// 4. Activar plan Plus
+await updateUserPlan(userPhone, 'plus')
+// plan_expires_at = now + 30 días
+
     // 5. Guardar registro de compra
     await savePurchaseToDatabase({
       userId: user.id,
@@ -212,9 +215,10 @@ async function handleApprovedPayment(paymentInfo: any) {
       amount: paymentInfo.transaction_amount,
       paymentId: paymentInfo.id
     })
-    
+
     console.log(`✅ Plan Plus activado para ${userPhone}`)
-  }
+
+}
 }
 \`\`\`
 
@@ -224,12 +228,12 @@ El usuario es redirigido a `/payment/success`.
 
 \`\`\`
 ┌─────────────────────────────────┐
-│   ✅ Pago Exitoso               │
-│                                  │
-│   ¡Bienvenido al Plan Plus!     │
-│   Tu plan está activo.          │
-│                                  │
-│   [Ir al Dashboard]             │
+│ ✅ Pago Exitoso │
+│ │
+│ ¡Bienvenido al Plan Plus! │
+│ Tu plan está activo. │
+│ │
+│ [Ir al Dashboard] │
 └─────────────────────────────────┘
 \`\`\`
 
@@ -279,7 +283,7 @@ El usuario es redirigido a `/payment/success`.
 ✅ **Verificación de Usuario**: El `user_id` en metadata debe coincidir con el de la DB  
 ✅ **Plan Activo**: No permite comprar si ya tiene plan Plus activo  
 ✅ **Expiración de Compra**: `pendingPurchase` expira en 30 minutos  
-✅ **Webhook Seguro**: Verifica que los datos del pago coincidan con el usuario  
+✅ **Webhook Seguro**: Verifica que los datos del pago coincidan con el usuario
 
 ### Flujo Legacy (Fallback)
 
@@ -298,54 +302,54 @@ Si por alguna razón no llega la metadata (ej: pago directo desde MP), el webhoo
 ┌──────────────┐
 │ Landing Page │
 └──────┬───────┘
-       │ Click "Suscribirse a Plus"
-       ↓
+│ Click "Suscribirse a Plus"
+↓
 ┌──────────────────────┐
-│ PaymentButton        │
-│ Verifica sesión      │
+│ PaymentButton │
+│ Verifica sesión │
 └──────┬───────────────┘
-       │
-       ├─→ NO autenticado
-       │   ├─→ Guarda pendingPurchase
-       │   └─→ Redirige a /login
-       │       ↓
-       │   ┌───────────────┐
-       │   │ Login + OTP   │
-       │   └───────┬───────┘
-       │           │ Sesión creada
-       │           ↓
-       │   ┌───────────────────┐
-       │   │ /checkout         │
-       │   │ Procesa compra    │
-       │   └───────┬───────────┘
-       │           │
-       └─→ SÍ autenticado
-               │
-               ↓
-       ┌──────────────────────┐
-       │ POST /create-payment │
-       │ + JWT validation     │
-       │ + User data          │
-       └──────┬───────────────┘
-              │ Preferencia con metadata
-              ↓
-       ┌──────────────────────┐
-       │ Mercado Pago         │
-       │ Checkout             │
-       └──────┬───────────────┘
-              │ Usuario paga
-              ↓
-       ┌──────────────────────┐
-       │ Webhook MP           │
-       │ Lee metadata         │
-       │ Activa plan Plus     │
-       └──────┬───────────────┘
-              │
-              ↓
-       ┌──────────────────────┐
-       │ /payment/success     │
-       │ Plan activado ✅     │
-       └──────────────────────┘
+│
+├─→ NO autenticado
+│ ├─→ Guarda pendingPurchase
+│ └─→ Redirige a /login
+│ ↓
+│ ┌───────────────┐
+│ │ Login + OTP │
+│ └───────┬───────┘
+│ │ Sesión creada
+│ ↓
+│ ┌───────────────────┐
+│ │ /checkout │
+│ │ Procesa compra │
+│ └───────┬───────────┘
+│ │
+└─→ SÍ autenticado
+│
+↓
+┌──────────────────────┐
+│ POST /create-payment │
+│ + JWT validation │
+│ + User data │
+└──────┬───────────────┘
+│ Preferencia con metadata
+↓
+┌──────────────────────┐
+│ Mercado Pago │
+│ Checkout │
+└──────┬───────────────┘
+│ Usuario paga
+↓
+┌──────────────────────┐
+│ Webhook MP │
+│ Lee metadata │
+│ Activa plan Plus │
+└──────┬───────────────┘
+│
+↓
+┌──────────────────────┐
+│ /payment/success │
+│ Plan activado ✅ │
+└──────────────────────┘
 \`\`\`
 
 ---
@@ -366,7 +370,7 @@ Si por alguna razón no llega la metadata (ej: pago directo desde MP), el webhoo
    8. Debería auto-redirigir a Mercado Pago
    9. Completar pago
    10. Webhook activa plan Plus
-   \`\`\`
+       \`\`\`
 
 2. **Usuario existente compra Plus:**
    \`\`\`
@@ -376,7 +380,7 @@ Si por alguna razón no llega la metadata (ej: pago directo desde MP), el webhoo
    4. Checkout automático
    5. Pago en MP
    6. Plan actualizado de free → plus
-   \`\`\`
+      \`\`\`
 
 3. **Usuario con plan Plus intenta comprar:**
    \`\`\`
@@ -384,17 +388,20 @@ Si por alguna razón no llega la metadata (ej: pago directo desde MP), el webhoo
    2. Click "Suscribirse a Plus"
    3. POST /create-payment → Error 400
    4. Mensaje: "Ya tienes un plan Plus activo"
-   \`\`\`
+      \`\`\`
 
 ### Logs a Monitorear
 
 \`\`\`bash
+
 # Frontend (Browser Console)
+
 📱 Sesión no encontrada, redirigiendo a login
 💾 Compra guardada en sessionStorage
 ✅ Sesión validada, procesando pago
 
 # Backend (Server Console)
+
 ✅ Preferencia de pago creada para usuario +54911... (uuid)
 💳 Preferencia creada: pref_id para usuario uuid
 📦 Metadata recibida: { user_id, user_phone, plan_id }
@@ -405,32 +412,37 @@ Si por alguna razón no llega la metadata (ej: pago directo desde MP), el webhoo
 
 ## 🎯 Ventajas vs Flujo Legacy
 
-| Aspecto | Flujo Nuevo | Flujo Legacy |
-|---------|-------------|--------------|
-| **Registro** | Antes del pago | Después del pago |
-| **Usuarios fantasma** | ❌ No ocurre | ✅ Puede ocurrir |
-| **Tracking** | ✅ Preciso desde el inicio | ⚠️ Tracking parcial |
-| **Experiencia UX** | ✅ Clara y ordenada | ⚠️ Confusa |
-| **Seguridad** | ✅ Validación de usuario | ⚠️ Menos validaciones |
-| **Debugging** | ✅ Logs completos | ⚠️ Logs parciales |
+| Aspecto               | Flujo Nuevo                | Flujo Legacy          |
+| --------------------- | -------------------------- | --------------------- |
+| **Registro**          | Antes del pago             | Después del pago      |
+| **Usuarios fantasma** | ❌ No ocurre               | ✅ Puede ocurrir      |
+| **Tracking**          | ✅ Preciso desde el inicio | ⚠️ Tracking parcial   |
+| **Experiencia UX**    | ✅ Clara y ordenada        | ⚠️ Confusa            |
+| **Seguridad**         | ✅ Validación de usuario   | ⚠️ Menos validaciones |
+| **Debugging**         | ✅ Logs completos          | ⚠️ Logs parciales     |
 
 ---
 
 ## 📝 Variables de Entorno Necesarias
 
 \`\`\`bash
+
 # JWT
+
 JWT_SECRET=tu-secreto-super-seguro
 
 # Supabase
+
 NEXT_PUBLIC_SUPABASE_URL=https://xxx.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1...
 
 # Mercado Pago
+
 MERCADOPAGO_ACCESS_TOKEN=APP_USR-xxx
 NEXT_PUBLIC_BASE_URL=https://tu-dominio.com
 
 # n8n (para OTP)
+
 N8N_WEBHOOK_SEND_OTP_URL=https://n8n.com/webhook/send-otp
 \`\`\`
 

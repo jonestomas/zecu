@@ -11,14 +11,18 @@ Se ha integrado exitosamente Mercado Pago como método de pago para el plan **Pl
 Crea un archivo `.env.local` en la raíz del proyecto con las siguientes variables:
 
 \`\`\`env
+
 # Mercado Pago Configuration
+
 MERCADOPAGO_ACCESS_TOKEN=your_mercadopago_access_token_here
 MERCADOPAGO_PUBLIC_KEY=your_mercadopago_public_key_here
 
 # Base URL for callbacks
+
 NEXT_PUBLIC_BASE_URL=http://localhost:3000
 
 # Environment
+
 NODE_ENV=development
 \`\`\`
 
@@ -126,10 +130,10 @@ NODE_ENV=production
 
 ## 📊 Planes Configurados
 
-| Plan | Precio | ID | Características |
-|------|--------|----|----|
-| **Básico** | AR$1.999/mes | `basic` | 50 análisis, detección avanzada, soporte 24/7 |
-| **Premium** | AR$5.999/mes | `premium` | Análisis ilimitados, IA avanzada, 5 números |
+| Plan        | Precio       | ID        | Características                               |
+| ----------- | ------------ | --------- | --------------------------------------------- |
+| **Básico**  | AR$1.999/mes | `basic`   | 50 análisis, detección avanzada, soporte 24/7 |
+| **Premium** | AR$5.999/mes | `premium` | Análisis ilimitados, IA avanzada, 5 números   |
 
 ## 🔐 Seguridad
 
@@ -141,6 +145,7 @@ NODE_ENV=production
 ## 📞 Soporte
 
 Para dudas sobre la integración:
+
 - Email: soporte@zecu.com
 - Documentación: [Mercado Pago Developers](https://developers.mercadopago.com)
 

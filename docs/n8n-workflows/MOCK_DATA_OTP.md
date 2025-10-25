@@ -29,9 +29,9 @@ Esta guía te proporciona datos de prueba (mock) para cada nodo del workflow de 
 
 \`\`\`json
 {
-  "phone": "+5491134070204",
-  "code": "123456",
-  "name": "Tomás Jones"
+"phone": "+5491134070204",
+"code": "123456",
+"name": "Tomás Jones"
 }
 \`\`\`
 
@@ -40,53 +40,54 @@ Esta guía te proporciona datos de prueba (mock) para cada nodo del workflow de 
 **Usuario sin nombre:**
 \`\`\`json
 {
-  "phone": "+5491134070204",
-  "code": "999999"
+"phone": "+5491134070204",
+"code": "999999"
 }
 \`\`\`
 
 **Número USA:**
 \`\`\`json
 {
-  "phone": "+12692562013",
-  "code": "555555",
-  "name": "John Doe"
+"phone": "+12692562013",
+"code": "555555",
+"name": "John Doe"
 }
 \`\`\`
 
 **Datos inválidos (para probar validación):**
 \`\`\`json
 {
-  "phone": "",
-  "code": ""
+"phone": "",
+"code": ""
 }
 \`\`\`
 
 ### 📡 Cómo Probar con curl
 
 \`\`\`bash
+
 # Reemplaza la URL con tu webhook de n8n
+
 curl -X POST http://localhost:5678/webhook/zecubot-send-otp \
-  -H "Content-Type: application/json" \
-  -d '{
-    "phone": "+5491134070204",
-    "code": "123456",
-    "name": "Tomás Jones"
-  }'
+ -H "Content-Type: application/json" \
+ -d '{
+"phone": "+5491134070204",
+"code": "123456",
+"name": "Tomás Jones"
+}'
 \`\`\`
 
 ### 📡 Cómo Probar con PowerShell (Windows)
 
 \`\`\`powershell
 $body = @{
-    phone = "+5491134070204"
-    code = "123456"
-    name = "Tomás Jones"
+phone = "+5491134070204"
+code = "123456"
+name = "Tomás Jones"
 } | ConvertTo-Json
 
-Invoke-RestMethod -Uri "http://localhost:5678/webhook/zecubot-send-otp" `
-  -Method Post `
-  -ContentType "application/json" `
+Invoke-RestMethod -Uri "http://localhost:5678/webhook/zecubot-send-otp" `  -Method Post`
+-ContentType "application/json" `
   -Body $body
 \`\`\`
 
@@ -98,14 +99,14 @@ Invoke-RestMethod -Uri "http://localhost:5678/webhook/zecubot-send-otp" `
 
 \`\`\`json
 {
-  "headers": {
-    "content-type": "application/json"
-  },
-  "body": {
-    "phone": "+5491134070204",
-    "code": "123456",
-    "name": "Tomás Jones"
-  }
+"headers": {
+"content-type": "application/json"
+},
+"body": {
+"phone": "+5491134070204",
+"code": "123456",
+"name": "Tomás Jones"
+}
 }
 \`\`\`
 
@@ -123,13 +124,13 @@ Invoke-RestMethod -Uri "http://localhost:5678/webhook/zecubot-send-otp" `
 
 \`\`\`json
 {
-  "headers": {
-    "content-type": "application/json"
-  },
-  "body": {
-    "phone": "",
-    "code": ""
-  }
+"headers": {
+"content-type": "application/json"
+},
+"body": {
+"phone": "",
+"code": ""
+}
 }
 \`\`\`
 
@@ -141,11 +142,11 @@ Invoke-RestMethod -Uri "http://localhost:5678/webhook/zecubot-send-otp" `
 
 \`\`\`json
 {
-  "body": {
-    "phone": "+5491134070204",
-    "code": "123456",
-    "name": "Tomás Jones"
-  }
+"body": {
+"phone": "+5491134070204",
+"code": "123456",
+"name": "Tomás Jones"
+}
 }
 \`\`\`
 
@@ -153,10 +154,10 @@ Invoke-RestMethod -Uri "http://localhost:5678/webhook/zecubot-send-otp" `
 
 \`\`\`json
 {
-  "phone": "+5491134070204",
-  "code": "123456",
-  "name": "Tomás Jones",
-  "message": "Hola Tomás Jones! 👋\n\nTu código de verificación Zecubot es:\n\n*123456*\n\nEste código expira en 5 minutos.\n\n🔒 Nunca compartas este código con nadie."
+"phone": "+5491134070204",
+"code": "123456",
+"name": "Tomás Jones",
+"message": "Hola Tomás Jones! 👋\n\nTu código de verificación Zecubot es:\n\n*123456*\n\nEste código expira en 5 minutos.\n\n🔒 Nunca compartas este código con nadie."
 }
 \`\`\`
 
@@ -165,20 +166,20 @@ Invoke-RestMethod -Uri "http://localhost:5678/webhook/zecubot-send-otp" `
 **Entrada:**
 \`\`\`json
 {
-  "body": {
-    "phone": "+5491134070204",
-    "code": "999999"
-  }
+"body": {
+"phone": "+5491134070204",
+"code": "999999"
+}
 }
 \`\`\`
 
 **Salida Esperada:**
 \`\`\`json
 {
-  "phone": "+5491134070204",
-  "code": "999999",
-  "name": "Usuario",
-  "message": "Hola Usuario! 👋\n\nTu código de verificación Zecubot es:\n\n*999999*\n\nEste código expira en 5 minutos.\n\n🔒 Nunca compartas este código con nadie."
+"phone": "+5491134070204",
+"code": "999999",
+"name": "Usuario",
+"message": "Hola Usuario! 👋\n\nTu código de verificación Zecubot es:\n\n*999999*\n\nEste código expira en 5 minutos.\n\n🔒 Nunca compartas este código con nadie."
 }
 \`\`\`
 
@@ -191,6 +192,7 @@ Invoke-RestMethod -Uri "http://localhost:5678/webhook/zecubot-send-otp" `
 **NO ejecutes este nodo manualmente con mock data** porque enviará un WhatsApp real.
 
 En su lugar, usa el **"Execute Node"** pero:
+
 1. Haz clic derecho en el nodo → **Disable**
 2. Prueba los otros nodos
 3. Cuando todo funcione, reactiva este nodo
@@ -199,10 +201,10 @@ En su lugar, usa el **"Execute Node"** pero:
 
 \`\`\`json
 {
-  "phone": "+5491134070204",
-  "code": "123456",
-  "name": "Tomás Jones",
-  "message": "Hola Tomás Jones! 👋\n\nTu código de verificación Zecubot es:\n\n*123456*\n\nEste código expira en 5 minutos.\n\n🔒 Nunca compartas este código con nadie."
+"phone": "+5491134070204",
+"code": "123456",
+"name": "Tomás Jones",
+"message": "Hola Tomás Jones! 👋\n\nTu código de verificación Zecubot es:\n\n*123456*\n\nEste código expira en 5 minutos.\n\n🔒 Nunca compartas este código con nadie."
 }
 \`\`\`
 
@@ -216,14 +218,14 @@ En su lugar, usa el **"Execute Node"** pero:
 
 \`\`\`json
 {
-  "sid": "SMxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-  "status": "queued",
-  "to": "whatsapp:+5491134070204",
-  "from": "whatsapp:+12692562013",
-  "body": "Hola Tomás Jones! 👋\n\nTu código de verificación Zecubot es:\n\n*123456*\n\nEste código expira en 5 minutos.\n\n🔒 Nunca compartas este código con nadie.",
-  "num_segments": "1",
-  "price": null,
-  "price_unit": "USD"
+"sid": "SMxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+"status": "queued",
+"to": "whatsapp:+5491134070204",
+"from": "whatsapp:+12692562013",
+"body": "Hola Tomás Jones! 👋\n\nTu código de verificación Zecubot es:\n\n*123456*\n\nEste código expira en 5 minutos.\n\n🔒 Nunca compartas este código con nadie.",
+"num_segments": "1",
+"price": null,
+"price_unit": "USD"
 }
 \`\`\`
 
@@ -235,11 +237,11 @@ En su lugar, usa el **"Execute Node"** pero:
 
 \`\`\`json
 {
-  "sid": "SMxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-  "status": "queued",
-  "to": "whatsapp:+5491134070204",
-  "from": "whatsapp:+12692562013",
-  "phone": "+5491134070204"
+"sid": "SMxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+"status": "queued",
+"to": "whatsapp:+5491134070204",
+"from": "whatsapp:+12692562013",
+"phone": "+5491134070204"
 }
 \`\`\`
 
@@ -247,9 +249,9 @@ En su lugar, usa el **"Execute Node"** pero:
 
 \`\`\`json
 {
-  "success": true,
-  "message": "OTP enviado correctamente a +5491134070204",
-  "timestamp": "2024-10-21T15:30:00.000Z"
+"success": true,
+"message": "OTP enviado correctamente a +5491134070204",
+"timestamp": "2024-10-21T15:30:00.000Z"
 }
 \`\`\`
 
@@ -265,10 +267,10 @@ Cuando el webhook recibe datos incompletos (sin `phone` o sin `code`)
 
 \`\`\`json
 {
-  "body": {
-    "phone": "",
-    "code": ""
-  }
+"body": {
+"phone": "",
+"code": ""
+}
 }
 \`\`\`
 
@@ -276,9 +278,9 @@ Cuando el webhook recibe datos incompletos (sin `phone` o sin `code`)
 
 \`\`\`json
 {
-  "success": false,
-  "error": "Datos incompletos. Se requiere phone y code",
-  "timestamp": "2024-10-21T15:30:00.000Z"
+"success": false,
+"error": "Datos incompletos. Se requiere phone y code",
+"timestamp": "2024-10-21T15:30:00.000Z"
 }
 \`\`\`
 
@@ -298,8 +300,8 @@ Cuando Twilio falla (credenciales incorrectas, número inválido, sin saldo, etc
 
 \`\`\`json
 {
-  "error": "Unable to create record: The 'To' number +5491134070204 is not a valid WhatsApp-enabled phone number.",
-  "code": 21606
+"error": "Unable to create record: The 'To' number +5491134070204 is not a valid WhatsApp-enabled phone number.",
+"code": 21606
 }
 \`\`\`
 
@@ -307,9 +309,9 @@ Cuando Twilio falla (credenciales incorrectas, número inválido, sin saldo, etc
 
 \`\`\`json
 {
-  "success": false,
-  "error": "Error al enviar WhatsApp: Unable to create record: The 'To' number +5491134070204 is not a valid WhatsApp-enabled phone number.",
-  "timestamp": "2024-10-21T15:30:00.000Z"
+"success": false,
+"error": "Error al enviar WhatsApp: Unable to create record: The 'To' number +5491134070204 is not a valid WhatsApp-enabled phone number.",
+"timestamp": "2024-10-21T15:30:00.000Z"
 }
 \`\`\`
 
@@ -326,20 +328,20 @@ Cuando Twilio falla (credenciales incorrectas, número inválido, sin saldo, etc
 **Request:**
 \`\`\`bash
 curl -X POST http://localhost:5678/webhook/zecubot-send-otp \
-  -H "Content-Type: application/json" \
-  -d '{
-    "phone": "+5491134070204",
-    "code": "123456",
-    "name": "Tomás Jones"
-  }'
+ -H "Content-Type: application/json" \
+ -d '{
+"phone": "+5491134070204",
+"code": "123456",
+"name": "Tomás Jones"
+}'
 \`\`\`
 
 **Response Esperada:**
 \`\`\`json
 {
-  "success": true,
-  "message": "OTP enviado correctamente a +5491134070204",
-  "timestamp": "2024-10-21T15:30:00.000Z"
+"success": true,
+"message": "OTP enviado correctamente a +5491134070204",
+"timestamp": "2024-10-21T15:30:00.000Z"
 }
 \`\`\`
 
@@ -352,19 +354,19 @@ curl -X POST http://localhost:5678/webhook/zecubot-send-otp \
 **Request:**
 \`\`\`bash
 curl -X POST http://localhost:5678/webhook/zecubot-send-otp \
-  -H "Content-Type: application/json" \
-  -d '{
-    "phone": "",
-    "code": ""
-  }'
+ -H "Content-Type: application/json" \
+ -d '{
+"phone": "",
+"code": ""
+}'
 \`\`\`
 
 **Response Esperada:**
 \`\`\`json
 {
-  "success": false,
-  "error": "Datos incompletos. Se requiere phone y code",
-  "timestamp": "2024-10-21T15:30:00.000Z"
+"success": false,
+"error": "Datos incompletos. Se requiere phone y code",
+"timestamp": "2024-10-21T15:30:00.000Z"
 }
 \`\`\`
 
@@ -377,20 +379,20 @@ curl -X POST http://localhost:5678/webhook/zecubot-send-otp \
 **Request:**
 \`\`\`bash
 curl -X POST http://localhost:5678/webhook/zecubot-send-otp \
-  -H "Content-Type: application/json" \
-  -d '{
-    "phone": "+1234567890",
-    "code": "999999",
-    "name": "Test User"
-  }'
+ -H "Content-Type: application/json" \
+ -d '{
+"phone": "+1234567890",
+"code": "999999",
+"name": "Test User"
+}'
 \`\`\`
 
 **Response Esperada:**
 \`\`\`json
 {
-  "success": false,
-  "error": "Error al enviar WhatsApp: The 'To' number +1234567890 is not a valid phone number.",
-  "timestamp": "2024-10-21T15:30:00.000Z"
+"success": false,
+"error": "Error al enviar WhatsApp: The 'To' number +1234567890 is not a valid phone number.",
+"timestamp": "2024-10-21T15:30:00.000Z"
 }
 \`\`\`
 
@@ -425,14 +427,17 @@ Prueba estos escenarios en n8n:
 ### Errores Comunes
 
 **Error:** `Cannot read property 'phone' of undefined`
+
 - **Causa:** El webhook no está recibiendo `body.phone`
 - **Solución:** Verifica que envías el JSON correcto
 
 **Error:** `The 'To' number is not a valid WhatsApp-enabled phone number`
+
 - **Causa:** El número no está habilitado en Twilio (si usas Trial)
 - **Solución:** Agrega el número en Twilio Console → Verified Caller IDs
 
 **Error:** `Authentication failed`
+
 - **Causa:** Credenciales de Twilio incorrectas
 - **Solución:** Verifica Account SID y Auth Token
 
@@ -441,38 +446,42 @@ Prueba estos escenarios en n8n:
 ## 📞 Datos de Ejemplo por País
 
 ### Argentina 🇦🇷
+
 \`\`\`json
 {
-  "phone": "+5491134070204",
-  "code": "123456",
-  "name": "Tomás Jones"
+"phone": "+5491134070204",
+"code": "123456",
+"name": "Tomás Jones"
 }
 \`\`\`
 
 ### USA 🇺🇸
+
 \`\`\`json
 {
-  "phone": "+12692562013",
-  "code": "555555",
-  "name": "John Smith"
+"phone": "+12692562013",
+"code": "555555",
+"name": "John Smith"
 }
 \`\`\`
 
 ### México 🇲🇽
+
 \`\`\`json
 {
-  "phone": "+525512345678",
-  "code": "777777",
-  "name": "Juan Pérez"
+"phone": "+525512345678",
+"code": "777777",
+"name": "Juan Pérez"
 }
 \`\`\`
 
 ### Chile 🇨🇱
+
 \`\`\`json
 {
-  "phone": "+56912345678",
-  "code": "888888",
-  "name": "María González"
+"phone": "+56912345678",
+"code": "888888",
+"name": "María González"
 }
 \`\`\`
 
@@ -484,46 +493,50 @@ Crea un archivo `test-webhook.sh` (Linux/Mac) o `test-webhook.ps1` (Windows):
 
 **PowerShell (Windows):**
 \`\`\`powershell
+
 # test-webhook.ps1
+
 $url = "http://localhost:5678/webhook/zecubot-send-otp"
 
 $tests = @(
-    @{ phone = "+5491134070204"; code = "123456"; name = "Tomás" },
-    @{ phone = "+5491134070204"; code = "999999" },
-    @{ phone = ""; code = "" }
+@{ phone = "+5491134070204"; code = "123456"; name = "Tomás" },
+@{ phone = "+5491134070204"; code = "999999" },
+@{ phone = ""; code = "" }
 )
 
 foreach ($test in $tests) {
     Write-Host "`nProbando: $($test | ConvertTo-Json -Compress)" -ForegroundColor Yellow
-    $body = $test | ConvertTo-Json
+$body = $test | ConvertTo-Json
     try {
         $response = Invoke-RestMethod -Uri $url -Method Post -ContentType "application/json" -Body $body
         Write-Host "✅ Respuesta:" -ForegroundColor Green
         $response | ConvertTo-Json
     } catch {
-        Write-Host "❌ Error: $($_.Exception.Message)" -ForegroundColor Red
-    }
-    Start-Sleep -Seconds 2
+        Write-Host "❌ Error: $($\_.Exception.Message)" -ForegroundColor Red
+}
+Start-Sleep -Seconds 2
 }
 \`\`\`
 
 **Bash (Linux/Mac):**
 \`\`\`bash
 #!/bin/bash
+
 # test-webhook.sh
+
 URL="http://localhost:5678/webhook/zecubot-send-otp"
 
 echo "Test 1: Datos completos"
 curl -X POST $URL -H "Content-Type: application/json" \
-  -d '{"phone":"+5491134070204","code":"123456","name":"Tomás"}'
+ -d '{"phone":"+5491134070204","code":"123456","name":"Tomás"}'
 
 echo -e "\n\nTest 2: Sin nombre"
 curl -X POST $URL -H "Content-Type: application/json" \
-  -d '{"phone":"+5491134070204","code":"999999"}'
+ -d '{"phone":"+5491134070204","code":"999999"}'
 
 echo -e "\n\nTest 3: Datos vacíos (debe fallar)"
 curl -X POST $URL -H "Content-Type: application/json" \
-  -d '{"phone":"","code":""}'
+ -d '{"phone":"","code":""}'
 \`\`\`
 
 ---
