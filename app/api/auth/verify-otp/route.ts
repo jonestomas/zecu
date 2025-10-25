@@ -8,6 +8,7 @@ import {
 import { normalizePhoneNumber } from '@/lib/phone-utils';
 import { z } from 'zod';
 import { SignJWT } from 'jose';
+import { validateOrigin, logSecurityEvent } from '@/lib/security-headers';
 
 // Schema de validación
 const verifyOTPSchema = z.object({
@@ -42,6 +43,15 @@ async function createSessionToken(userId: string, phone: string): Promise<string
 
 export async function POST(request: NextRequest) {
   try {
+    // Validar origen de la solicitud
+    if (!validateOrigin(request)) {
+      logSecurityEvent('INVALID_ORIGIN_VERIFY_OTP', request);
+      return NextResponse.json(
+        { success: false, error: 'Origen no autorizado' },
+        { status: 403 }
+      );
+    }
+
     // Parsear y validar el body
     const body = await request.json();
     const validatedData = verifyOTPSchema.parse(body);
