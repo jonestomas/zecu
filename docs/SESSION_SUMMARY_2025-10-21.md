@@ -172,5 +172,3 @@ N8N_WEBHOOK_SEND_OTP_URL= (vacío = modo desarrollo)
 **Fecha:** 21 Octubre 2025  
 **Duración:** ~4 horas  
 **Estado:** ✅ Sesión exitosa - Sistema base funcional
-
-

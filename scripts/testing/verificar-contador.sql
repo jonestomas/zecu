@@ -14,5 +14,3 @@ SELECT
   END as progreso
 FROM users
 WHERE phone = '+5491134070204';
-
-

@@ -318,5 +318,3 @@ Send WhatsApp
 ---
 
 **¿Listo para implementar? Sigue la guía MVP_SIMPLE_CONTABILIZACION.md** 🚀
-
-
