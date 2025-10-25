@@ -252,3 +252,5 @@ Polar.sh provee un dashboard con:
 ---
 
 **¡Listo para aceptar pagos internacionales!** 🌍🚀
+
+

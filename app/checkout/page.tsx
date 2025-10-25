@@ -19,6 +19,8 @@ export default function CheckoutPage() {
   const [error, setError] = useState<string | null>(null)
   const [pendingPurchase, setPendingPurchase] = useState<PendingPurchase | null>(null)
   const [isProcessing, setIsProcessing] = useState(false)
+  const [email, setEmail] = useState("")
+  const [emailError, setEmailError] = useState<string | null>(null)
 
   const translations = {
     en: {
@@ -42,6 +44,11 @@ export default function CheckoutPage() {
       scamDetection: "Real-time scam detection",
       subscribe: "Subscribe now",
       acceptedCards: "We accept all major credit and debit cards",
+      emailLabel: "Email",
+      emailPlaceholder: "your@email.com",
+      emailRequired: "Email is required",
+      emailInvalid: "Please enter a valid email",
+      emailInfo: "We'll send your payment confirmation to this email",
     },
     es: {
       checkoutError: "Error en el Checkout",
@@ -64,6 +71,11 @@ export default function CheckoutPage() {
       scamDetection: "Detección de estafas en tiempo real",
       subscribe: "Suscribirme ahora",
       acceptedCards: "Aceptamos todas las tarjetas de crédito y débito",
+      emailLabel: "Correo electrónico",
+      emailPlaceholder: "tu@email.com",
+      emailRequired: "El email es requerido",
+      emailInvalid: "Por favor ingresa un email válido",
+      emailInfo: "Te enviaremos la confirmación de pago a este correo",
     },
   }
 
@@ -115,7 +127,24 @@ export default function CheckoutPage() {
     initCheckout()
   }, [router, t])
 
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    return emailRegex.test(email)
+  }
+
   const handleSubscribe = async () => {
+    // Validar email
+    if (!email.trim()) {
+      setEmailError(t.emailRequired)
+      return
+    }
+
+    if (!validateEmail(email)) {
+      setEmailError(t.emailInvalid)
+      return
+    }
+
+    setEmailError(null)
     setIsProcessing(true)
 
     try {
@@ -127,6 +156,7 @@ export default function CheckoutPage() {
         },
         body: JSON.stringify({
           plan: pendingPurchase!.planId,
+          email: email.trim(),
         }),
       })
 
@@ -242,6 +272,28 @@ export default function CheckoutPage() {
             </div>
           </div>
         )}
+
+        {/* Campo de Email */}
+        <div className="mb-6">
+          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+            {t.emailLabel} <span className="text-red-500">*</span>
+          </label>
+          <input
+            id="email"
+            type="email"
+            value={email}
+            onChange={(e) => {
+              setEmail(e.target.value)
+              setEmailError(null)
+            }}
+            placeholder={t.emailPlaceholder}
+            className={`w-full px-4 py-3 rounded-lg border ${
+              emailError ? "border-red-500 focus:ring-red-500" : "border-gray-300 focus:ring-blue-500"
+            } focus:ring-2 focus:border-transparent transition-all`}
+          />
+          {emailError && <p className="text-red-500 text-sm mt-1">{emailError}</p>}
+          <p className="text-gray-500 text-xs mt-1">{t.emailInfo}</p>
+        </div>
 
         {/* Botón de suscripción */}
         <Button

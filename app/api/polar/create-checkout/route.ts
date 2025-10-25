@@ -40,34 +40,51 @@ export async function POST(request: NextRequest) {
       }, { status: 401 });
     }
 
-    // Obtener el plan del body
-    const { plan } = await request.json();
+    // Obtener el plan y email del body
+    const { plan, email } = await request.json();
 
-    if (!plan || !['plus', 'premium'].includes(plan)) {
+    if (!plan || !['plus'].includes(plan)) {
       return NextResponse.json({
         success: false,
-        error: 'Plan inválido'
+        error: 'Plan inválido. Solo está disponible el plan Plus.'
+      }, { status: 400 });
+    }
+
+    if (!email || !email.trim()) {
+      return NextResponse.json({
+        success: false,
+        error: 'Email es requerido'
+      }, { status: 400 });
+    }
+
+    // Validar formato de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return NextResponse.json({
+        success: false,
+        error: 'Email inválido'
       }, { status: 400 });
     }
 
     const selectedPlan = POLAR_PRODUCTS[plan as PolarPlan];
 
-    if (!selectedPlan.priceId) {
+    if (!selectedPlan.productId) {
       return NextResponse.json({
         success: false,
-        error: 'Price ID no configurado para este plan'
+        error: 'Product ID no configurado para este plan'
       }, { status: 500 });
     }
 
     // Crear checkout session en Polar
     const checkout = await polar.checkouts.create({
-      products: [selectedPlan.priceId],
+      products: [selectedPlan.productId], // Array de Product IDs
       successUrl: getSuccessUrl('{CHECKOUT_ID}'),
-      customerEmail: session.phone + '@zecu.app', // Usar phone como identificador único
+      customerEmail: email.trim(), // Email real del usuario
       metadata: {
         userId: session.userId,
         phone: session.phone,
-        plan: plan
+        plan: plan,
+        email: email.trim()
       }
     });
 

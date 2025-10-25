@@ -529,3 +529,5 @@ curl -X POST $URL -H "Content-Type: application/json" \
 ---
 
 **¡Con estos datos mock puedes probar todo el workflow sin enviar WhatsApps reales! 🎉**
+
+

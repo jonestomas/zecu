@@ -8,12 +8,13 @@ if (!process.env.POLAR_ACCESS_TOKEN) {
 // Inicializar el cliente de Polar
 export const polar = new Polar({
   accessToken: process.env.POLAR_ACCESS_TOKEN || '',
-  server: process.env.NODE_ENV === 'production' ? 'production' : 'sandbox'
+  server: 'sandbox' // Usar production siempre (token real)
 });
 
 // Configuración de productos/planes
 export const POLAR_PRODUCTS = {
   plus: {
+    productId: process.env.POLAR_PRODUCT_ID || '6a3b863d-482e-45ba-a563-f7c8398184cb',
     priceId: process.env.POLAR_PRICE_ID_PLUS || '',
     name: 'Zecu Plus',
     price: 10, // USD
@@ -44,7 +45,7 @@ export const POLAR_PRODUCTS = {
 
 // URL de callback exitoso
 export const getSuccessUrl = (checkoutId: string) => {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3001';
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
   return `${baseUrl}/payment/polar/success?checkout_id=${checkoutId}`;
 };
 

@@ -72,3 +72,5 @@ BEGIN
   RAISE NOTICE '✅ Columnas agregadas: consultas_mes, mes_periodo';
   RAISE NOTICE '✅ Función creada: incrementar_consultas(user_id)';
 END $$;
+
+

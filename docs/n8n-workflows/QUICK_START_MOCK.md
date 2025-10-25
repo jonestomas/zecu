@@ -197,3 +197,5 @@ Después de probar, verifica:
 **⏱️ Tiempo total: ~5 minutos**
 
 **🎯 Resultado: Workflow funcionando con datos mock**
+
+

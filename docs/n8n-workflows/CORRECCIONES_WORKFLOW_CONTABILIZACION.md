@@ -274,3 +274,5 @@ Si tienes dudas sobre cómo aplicar algún cambio en n8n:
 4. Guarda el workflow
 
 ¡Cualquier duda me avisas! 🚀
+
+

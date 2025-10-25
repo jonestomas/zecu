@@ -310,3 +310,5 @@ Este diagrama muestra cómo fluyen los datos por cada nodo del workflow.
 ---
 
 **¡Este diagrama es tu mapa para entender y debuggear el workflow! 🗺️**
+
+

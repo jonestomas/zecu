@@ -241,3 +241,5 @@ Después de aplicar TODAS las correcciones:
 5. **Confirma** que se registró en Supabase
 
 ¿Todo listo para aplicar los cambios? 🚀
+
+
