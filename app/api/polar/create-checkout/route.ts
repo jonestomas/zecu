@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { polar, POLAR_PRODUCTS, getSuccessUrl, PolarPlan } from '@/lib/polar-config';
 import { jwtVerify } from 'jose';
+import { withPaymentRateLimit } from '@/lib/rate-limit-middleware';
 
 // Verificar token de sesión
 async function verifySessionToken(token: string): Promise<{ userId: string; phone: string } | null> {
@@ -24,7 +25,8 @@ async function verifySessionToken(token: string): Promise<{ userId: string; phon
   }
 }
 
-export async function POST(request: NextRequest) {
+// Handler original sin rate limiting
+async function createCheckoutHandler(request: NextRequest) {
   try {
     // Verificar autenticación
     const sessionToken = request.cookies.get('session_token')?.value;
@@ -109,3 +111,6 @@ export async function POST(request: NextRequest) {
     }, { status: 500 });
   }
 }
+
+// Exportar función POST con rate limiting aplicado
+export const POST = withPaymentRateLimit(createCheckoutHandler);

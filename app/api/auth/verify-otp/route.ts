@@ -9,6 +9,7 @@ import { normalizePhoneNumber } from '@/lib/phone-utils';
 import { z } from 'zod';
 import { SignJWT } from 'jose';
 import { validateOrigin, logSecurityEvent } from '@/lib/security-headers';
+import { withAuthRateLimit } from '@/lib/rate-limit-middleware';
 
 // Schema de validación
 const verifyOTPSchema = z.object({
@@ -41,7 +42,8 @@ async function createSessionToken(userId: string, phone: string): Promise<string
   return token;
 }
 
-export async function POST(request: NextRequest) {
+// Handler original sin rate limiting
+async function verifyOTPHandler(request: NextRequest) {
   try {
     // Validar origen de la solicitud
     if (!validateOrigin(request)) {
@@ -170,3 +172,6 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
+// Exportar función POST con rate limiting aplicado
+export const POST = withAuthRateLimit(verifyOTPHandler);

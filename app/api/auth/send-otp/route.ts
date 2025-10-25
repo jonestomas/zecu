@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getUserByPhone, createOTPCode } from '@/lib/supabase-client';
 import { normalizePhoneNumber } from '@/lib/phone-utils';
 import { z } from 'zod';
+import { withAuthRateLimit } from '@/lib/rate-limit-middleware';
 
 // Schema de validación
 const sendOTPSchema = z.object({
@@ -52,7 +53,8 @@ async function sendOTPViaWhatsApp(phone: string, code: string, name?: string) {
   }
 }
 
-export async function POST(request: NextRequest) {
+// Handler original sin rate limiting
+async function sendOTPHandler(request: NextRequest) {
   try {
     // Parsear y validar el body
     const body = await request.json();
@@ -117,3 +119,6 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
+// Exportar función POST con rate limiting aplicado
+export const POST = withAuthRateLimit(sendOTPHandler);
