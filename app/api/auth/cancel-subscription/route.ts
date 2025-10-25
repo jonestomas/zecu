@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { jwtVerify } from 'jose';
 import { supabaseAdmin } from '@/lib/supabase-client';
+import { polar } from '@/lib/polar-config';
 
 // Verificar token de sesión
 async function verifySessionToken(token: string): Promise<{ userId: string; phone: string } | null> {
@@ -39,12 +40,44 @@ export async function POST(request: NextRequest) {
       }, { status: 401 });
     }
 
+    // Obtener información del usuario para encontrar la suscripción de Polar
+    const { data: user, error: userError } = await supabaseAdmin
+      .from('users')
+      .select('id, plan, polar_subscription_id')
+      .eq('id', session.userId)
+      .single();
+
+    if (userError) {
+      console.error('Error obteniendo usuario:', userError);
+      return NextResponse.json({
+        success: false,
+        error: 'Error al obtener información del usuario'
+      }, { status: 500 });
+    }
+
+    // Cancelar suscripción en Polar.sh si existe
+    if (user.polar_subscription_id) {
+      try {
+        console.log(`🔄 Cancelando suscripción en Polar.sh: ${user.polar_subscription_id}`);
+        
+        await polar.subscriptions.cancel({
+          id: user.polar_subscription_id
+        });
+        
+        console.log(`✅ Suscripción cancelada en Polar.sh: ${user.polar_subscription_id}`);
+      } catch (polarError) {
+        console.error('Error cancelando en Polar.sh:', polarError);
+        // Continuamos con la cancelación local aunque falle Polar.sh
+      }
+    }
+
     // Actualizar usuario a plan free
     const { data, error } = await supabaseAdmin
       .from('users')
       .update({
         plan: 'free',
         plan_expires_at: null,
+        polar_subscription_id: null, // Limpiar ID de suscripción
         // Mantener el contador de consultas del mes actual
         // Solo cambiamos el plan
       })
@@ -60,7 +93,7 @@ export async function POST(request: NextRequest) {
       }, { status: 500 });
     }
 
-    console.log(`✅ Suscripción cancelada para usuario ${session.userId}`);
+    console.log(`✅ Suscripción cancelada completamente para usuario ${session.userId}`);
 
     return NextResponse.json({
       success: true,

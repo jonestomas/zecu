@@ -66,6 +66,21 @@ export async function POST(request: NextRequest) {
 
       case 'subscription.created':
         console.log(`✅ Suscripción creada: ${event.data.id}`);
+        
+        // Guardar el ID de suscripción en la base de datos
+        const subscriptionMetadata = event.data.metadata as Record<string, any>;
+        const subscriptionUserId = subscriptionMetadata?.userId;
+        
+        if (subscriptionUserId) {
+          await supabaseAdmin
+            .from('users')
+            .update({
+              polar_subscription_id: event.data.id,
+            })
+            .eq('id', subscriptionUserId);
+          
+          console.log(`✅ ID de suscripción ${event.data.id} guardado para usuario ${subscriptionUserId}`);
+        }
         break;
 
       case 'subscription.updated':
@@ -74,7 +89,18 @@ export async function POST(request: NextRequest) {
 
       case 'subscription.canceled':
         console.log(`❌ Suscripción cancelada: ${event.data.id}`);
-        // Aquí podrías manejar la cancelación automática
+        
+        // Actualizar usuario a plan free cuando se cancela la suscripción
+        await supabaseAdmin
+          .from('users')
+          .update({
+            plan: 'free',
+            plan_expires_at: null,
+            polar_subscription_id: null,
+          })
+          .eq('polar_subscription_id', event.data.id);
+        
+        console.log(`✅ Usuario actualizado a plan free por cancelación de suscripción ${event.data.id}`);
         break;
 
       default:
