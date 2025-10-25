@@ -8,7 +8,7 @@ if (!process.env.POLAR_ACCESS_TOKEN) {
 // Inicializar el cliente de Polar
 export const polar = new Polar({
   accessToken: process.env.POLAR_ACCESS_TOKEN || '',
-  server: 'sandbox' // Usar production siempre (token real)
+  server: 'production' // Usar production siempre (token real)
 });
 
 // Configuración de productos/planes
