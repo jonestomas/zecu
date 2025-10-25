@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { validateWebhookPayload } from '@polar-sh/sdk/webhooks';
 import { supabaseAdmin } from '@/lib/supabase-client';
+import { createWebhookLogger } from '@/lib/secure-logging';
 
 export async function POST(request: NextRequest) {
+  const webhookLogger = createWebhookLogger('polar');
+  
   try {
+    webhookLogger.received(request);
+    
     const body = await request.text();
     const webhookSecret = process.env.POLAR_WEBHOOK_SECRET;
 
@@ -107,9 +112,11 @@ export async function POST(request: NextRequest) {
         console.log(`📩 Evento no manejado: ${event.type}`);
     }
 
+    webhookLogger.processed(request, { eventType: event.type });
     return NextResponse.json({ received: true });
 
   } catch (error) {
+    webhookLogger.error(request, error as Error);
     console.error('❌ Error procesando webhook de Polar.sh:', error);
     return NextResponse.json({ error: 'Webhook processing failed' }, { status: 500 });
   }

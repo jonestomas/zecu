@@ -10,6 +10,7 @@ import { z } from 'zod';
 import { SignJWT } from 'jose';
 import { validateOrigin, logSecurityEvent } from '@/lib/security-headers';
 import { withAuthRateLimit } from '@/lib/rate-limit-middleware';
+import { createLogger, createAuthLogger } from '@/lib/secure-logging';
 
 // Schema de validación
 const verifyOTPSchema = z.object({
@@ -44,7 +45,12 @@ async function createSessionToken(userId: string, phone: string): Promise<string
 
 // Handler original sin rate limiting
 async function verifyOTPHandler(request: NextRequest) {
+  const logger = createLogger(request);
+  const authLogger = createAuthLogger();
+  
   try {
+    logger.info('AUTH', 'OTP verification request initiated');
+    
     // Validar origen de la solicitud
     if (!validateOrigin(request)) {
       logSecurityEvent('INVALID_ORIGIN_VERIFY_OTP', request);

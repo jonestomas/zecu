@@ -3,6 +3,7 @@ import { getUserByPhone, createOTPCode } from '@/lib/supabase-client';
 import { normalizePhoneNumber } from '@/lib/phone-utils';
 import { z } from 'zod';
 import { withAuthRateLimit } from '@/lib/rate-limit-middleware';
+import { createLogger, createAuthLogger } from '@/lib/secure-logging';
 
 // Schema de validación
 const sendOTPSchema = z.object({
@@ -55,7 +56,12 @@ async function sendOTPViaWhatsApp(phone: string, code: string, name?: string) {
 
 // Handler original sin rate limiting
 async function sendOTPHandler(request: NextRequest) {
+  const logger = createLogger(request);
+  const authLogger = createAuthLogger();
+  
   try {
+    logger.info('AUTH', 'OTP send request initiated');
+    
     // Parsear y validar el body
     const body = await request.json();
     const validatedData = sendOTPSchema.parse(body);
@@ -64,6 +70,11 @@ async function sendOTPHandler(request: NextRequest) {
 
     // Normalizar el número de teléfono
     const normalizedPhone = normalizePhoneNumber(phone);
+    
+    logger.info('AUTH', 'Phone number normalized', { 
+      originalPhone: phone.replace(/\d(?=\d{4})/g, '*'),
+      normalizedPhone: normalizedPhone.replace(/\d(?=\d{4})/g, '*')
+    });
 
     // Verificar si el usuario ya existe
     const existingUser = await getUserByPhone(normalizedPhone);
@@ -77,6 +88,16 @@ async function sendOTPHandler(request: NextRequest) {
 
     // Enviar OTP por WhatsApp
     await sendOTPViaWhatsApp(normalizedPhone, otpCode, name);
+    
+    authLogger.otpSent(request, normalizedPhone, { 
+      isNewUser,
+      userId: existingUser?.id ? existingUser.id.substring(0, 8) + '...' : undefined
+    });
+
+    logger.info('AUTH', 'OTP sent successfully', { 
+      isNewUser,
+      otpId: otpRecord.id.substring(0, 8) + '...'
+    });
 
     // Responder al frontend
     return NextResponse.json({
@@ -87,9 +108,16 @@ async function sendOTPHandler(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Error en send-otp:', error);
+    logger.error('AUTH', 'OTP send failed', error, {
+      errorType: error instanceof Error ? error.name : 'Unknown',
+      errorMessage: error instanceof Error ? error.message : String(error)
+    });
 
     if (error instanceof z.ZodError) {
+      logger.warn('AUTH', 'Validation error in OTP send', {
+        validationErrors: error.errors
+      });
+      
       return NextResponse.json(
         { 
           success: false,
