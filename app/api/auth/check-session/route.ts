@@ -5,9 +5,14 @@ import { getUserByPhone } from '@/lib/supabase-client';
 // Verificar token de sesión
 async function verifySessionToken(token: string): Promise<{ userId: string; phone: string } | null> {
   try {
-    const secret = new TextEncoder().encode(
-      process.env.JWT_SECRET || 'your-secret-key-change-in-production'
-    );
+    const jwtSecret = process.env.JWT_SECRET;
+    
+    if (!jwtSecret) {
+      console.error('JWT_SECRET no está configurado en las variables de entorno');
+      return null;
+    }
+
+    const secret = new TextEncoder().encode(jwtSecret);
 
     const { payload } = await jwtVerify(token, secret);
     return {

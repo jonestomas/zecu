@@ -23,9 +23,13 @@ const verifyOTPSchema = z.object({
 
 // Crear JWT token para sesión
 async function createSessionToken(userId: string, phone: string): Promise<string> {
-  const secret = new TextEncoder().encode(
-    process.env.JWT_SECRET || 'your-secret-key-change-in-production'
-  );
+  const jwtSecret = process.env.JWT_SECRET;
+  
+  if (!jwtSecret) {
+    throw new Error('JWT_SECRET no está configurado en las variables de entorno');
+  }
+
+  const secret = new TextEncoder().encode(jwtSecret);
 
   const token = await new SignJWT({ userId, phone })
     .setProtectedHeader({ alg: 'HS256' })
